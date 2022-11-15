@@ -12,6 +12,6 @@ jobs:
       - uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url:
-            ssh://git@github.com:EpitechMscProPromo2024/T-DEV-700-NAN_5.git
+            git@github.com:EpitechMscProPromo2024/T-DEV-700-NAN_5.git
           ssh_private_key:
             ${{ secrets.GIT_SSH_KEY }}
