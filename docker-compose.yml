@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  database:
+    container_name: database
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - ./database:/var/lib/mysql
+    networks:
+      - back-net
+    
+networks:
+  back-net:

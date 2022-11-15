@@ -1,0 +1,8 @@
+.idea
+.vscode/
+
+### Database volume ###
+database
+
+### .env ###
+.env
