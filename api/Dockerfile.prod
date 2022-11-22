@@ -1,0 +1,14 @@
+# On fixe la version de gradle à la 7.5.1, ce qui permet de ne pas utiliser gradlew 
+# qui télécharge la bonne version de gradle à chaque build
+FROM gradle:7.5.1-jdk17-alpine as builder
+ENV HOME=/api-build
+RUN mkdir $HOME
+COPY . /$HOME
+WORKDIR /$HOME
+
+RUN gradle war
+
+FROM tomcat:9.0.69-jdk17-corretto
+COPY --from=builder ./api-build/build/libs/api.war /usr/local/tomcat/webapps/
+EXPOSE 8080
+CMD ["catalina.sh", "run"]

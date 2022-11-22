@@ -6,6 +6,7 @@ services:
     container_name: api
     build: 
       context: ./api
+      dockerfile: Dockerfile.prod
     #image: image sur le registry
     restart: unless-stopped
     environment:
