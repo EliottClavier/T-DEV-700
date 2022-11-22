@@ -5,6 +5,13 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
+apply plugin: 'war'
+war {
+    archiveName = 'api.war'
+    baseName = 'api'
+    version = '0.0.1'
+}
+
 group = 'com.api'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
@@ -13,6 +20,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+}
+
+bootRun {
+    systemProperties = System.properties
 }
 
 repositories {
@@ -30,6 +41,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+task getDeps(type: Copy) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from configurations.compileClasspath into "libs/"
+    from configurations.runtimeClasspath into "libs/"
 }
 
 tasks.named('test') {
