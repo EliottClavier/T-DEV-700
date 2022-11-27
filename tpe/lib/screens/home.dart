@@ -9,9 +9,9 @@ class PaymentTerminalApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: PaymentTerminalStatefulWidget(),
+      home: const PaymentTerminalStatefulWidget(),
       theme: ThemeData(
-          scaffoldBackgroundColor: Color(0xFF03045F),
+          scaffoldBackgroundColor: const Color(0xFF03045F),
           primarySwatch: Colors.blue,
           fontFamily: "Montserrat"),
     );

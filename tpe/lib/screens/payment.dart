@@ -54,7 +54,11 @@ class _PaymentScreenStatefulWidgetState
                   "Montant: 0.00 €",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    fontSize: 32,
+                    letterSpacing: 0.02,
+                    height: 1.2,
                   ),
                 ),
               ],
