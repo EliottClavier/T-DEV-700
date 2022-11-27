@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:tpe/screens/home.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
-  const PaymentSuccessScreen({super.key});
+  const PaymentSuccessScreen({super.key, required this.price});
 
   static const String _title = 'Payment method';
+  final String price;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: const PaymentSuccessScreenStatefulWidget(),
+      home: PaymentSuccessScreenStatefulWidget(
+        price: price,
+      ),
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF1EBE4B),
           fontFamily: "Montserrat"),
@@ -18,7 +22,9 @@ class PaymentSuccessScreen extends StatelessWidget {
 }
 
 class PaymentSuccessScreenStatefulWidget extends StatefulWidget {
-  const PaymentSuccessScreenStatefulWidget({super.key});
+  const PaymentSuccessScreenStatefulWidget({super.key, this.price});
+
+  final String? price;
 
   @override
   State<PaymentSuccessScreenStatefulWidget> createState() =>
@@ -39,7 +45,11 @@ class _PaymentSuccessScreenStatefulWidgetState
   }
 
   void _onBackHome() {
-    print("Back home");
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
   }
 
   @override
@@ -61,8 +71,8 @@ class _PaymentSuccessScreenStatefulWidgetState
               children: <Widget>[
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>[
-                    Text(
+                  children: <Widget>[
+                    const Text(
                       "Paiement réalisé avec succès",
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -74,9 +84,9 @@ class _PaymentSuccessScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "Votre paiement de 0.00 € a bien été réalisé",
+                      "Votre paiement de ${widget.price} a bien été réalisé",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w300,
                         color: Colors.white,
                         fontSize: 15,

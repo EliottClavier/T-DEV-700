@@ -1,15 +1,22 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:tpe/screens/payment_success.dart';
+import 'package:tpe/screens/payment_error.dart';
 
 class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key});
+  const PaymentScreen({super.key, required this.price});
 
+  final String price;
   static const String _title = 'Payment method';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: const PaymentScreenStatefulWidget(),
+      home: PaymentScreenStatefulWidget(
+        price: price,
+      ),
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF03045F),
           primarySwatch: Colors.blue,
@@ -19,7 +26,9 @@ class PaymentScreen extends StatelessWidget {
 }
 
 class PaymentScreenStatefulWidget extends StatefulWidget {
-  const PaymentScreenStatefulWidget({super.key});
+  const PaymentScreenStatefulWidget({super.key, required this.price});
+
+  final String price;
 
   @override
   State<PaymentScreenStatefulWidget> createState() =>
@@ -39,6 +48,20 @@ class _PaymentScreenStatefulWidgetState
     super.dispose();
   }
 
+  void _onPaymentSent() {
+    Random random = Random();
+    StatelessWidget screen = random.nextBool()
+        ? PaymentSuccessScreen(
+            price: widget.price,
+          )
+        : const PaymentErrorScreen();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => screen,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,11 +72,11 @@ class _PaymentScreenStatefulWidgetState
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const <Widget>[
+              children: <Widget>[
                 Text(
-                  "Montant: 0.00 €",
+                  "Montant: ${widget.price}",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                     fontSize: 32,
@@ -65,14 +88,26 @@ class _PaymentScreenStatefulWidgetState
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const <Widget>[
-                Image(image: AssetImage("assets/img/qr_code.png")),
+              children: <Widget>[
+                IconButton(
+                  icon: Image.asset('assets/img/qr_code.png'),
+                  iconSize: 300,
+                  onPressed: () {
+                    _onPaymentSent();
+                  },
+                )
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const <Widget>[
-                Image(image: AssetImage("assets/img/nfc.png")),
+              children: <Widget>[
+                IconButton(
+                  icon: Image.asset('assets/img/nfc.png'),
+                  iconSize: 300,
+                  onPressed: () {
+                    _onPaymentSent();
+                  },
+                )
               ],
             ),
           ],
