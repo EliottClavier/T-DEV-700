@@ -1,15 +1,18 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:tpe/screens/payment.dart';
 
-class PaymentTerminalApp extends StatelessWidget {
-  const PaymentTerminalApp({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
-  static const String _title = 'Flutter Code Sample';
+  static const String _title = 'Payment Terminal Home';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: const PaymentTerminalStatefulWidget(),
+      home: const HomeScreenStatefulWidget(),
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF03045F),
           primarySwatch: Colors.blue,
@@ -18,21 +21,34 @@ class PaymentTerminalApp extends StatelessWidget {
   }
 }
 
-class PaymentTerminalStatefulWidget extends StatefulWidget {
-  const PaymentTerminalStatefulWidget({super.key});
+class HomeScreenStatefulWidget extends StatefulWidget {
+  const HomeScreenStatefulWidget({super.key});
 
   @override
-  State<PaymentTerminalStatefulWidget> createState() =>
-      _PaymentTerminalStatefulWidgetState();
+  State<HomeScreenStatefulWidget> createState() =>
+      _HomeScreenStatefulWidgetState();
 }
 
-class _PaymentTerminalStatefulWidgetState
-    extends State<PaymentTerminalStatefulWidget> with TickerProviderStateMixin {
+class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget>
+    with TickerProviderStateMixin {
   late AnimationController controller;
   late CurvedAnimation _animation;
 
+  String getPrice() {
+    Random rng = Random();
+    var price = rng.nextInt(100);
+    return "${price.toString()}.00 €";
+  }
+
   void _onClick(PointerEvent details) {
-    print("clicked");
+    String price = getPrice();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PaymentScreen(
+          price: price,
+        ),
+      ),
+    );
   }
 
   @override
@@ -40,14 +56,24 @@ class _PaymentTerminalStatefulWidgetState
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
-    )..forward();
+    )
+      ..addListener(
+        () {
+          setState(() {});
+        },
+      )
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          controller.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          controller.forward();
+        }
+      });
 
     _animation = CurvedAnimation(
       parent: controller,
       curve: Curves.linear,
-    )..addStatusListener((AnimationStatus status) {
-        if (status == AnimationStatus.completed) print('completed');
-      });
+    );
 
     controller.repeat(reverse: true);
     super.initState();

@@ -5,13 +5,13 @@ import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
 
 //home
-//void main() => runApp(const PaymentTerminalApp());
+void main() => runApp(const HomeScreen());
 
 //Payment
-//void main() => runApp(const PaymentScreen());
+//void main() => runApp(const PaymentScreen(price: "10.00 €",));
 
 //Payment success
 //void main() => runApp(const PaymentSuccessScreen());
 
 //Payment error
-void main() => runApp(const PaymentErrorScreen());
+//void main() => runApp(const PaymentErrorScreen());

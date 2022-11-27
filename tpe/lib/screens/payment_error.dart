@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tpe/screens/home.dart';
 
 class PaymentErrorScreen extends StatelessWidget {
   const PaymentErrorScreen({super.key});
@@ -39,7 +40,11 @@ class _PaymentErrorScreenStatefulWidgetState
   }
 
   void _onBackHome() {
-    print("Back home");
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
   }
 
   @override
