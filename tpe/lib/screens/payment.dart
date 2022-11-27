@@ -49,11 +49,11 @@ class _PaymentScreenStatefulWidgetState
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
+              children: const <Widget>[
                 Text(
                   "Montant: 0.00 €",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -61,14 +61,14 @@ class _PaymentScreenStatefulWidgetState
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Image(image: AssetImage("assets/img/qr_code.png")),
+              children: const <Widget>[
+                Image(image: AssetImage("assets/img/qr_code.png")),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Image(image: AssetImage("assets/img/nfc.png")),
+              children: const <Widget>[
+                Image(image: AssetImage("assets/img/nfc.png")),
               ],
             ),
           ],
