@@ -31,7 +31,6 @@ class PaymentSuccessScreenStatefulWidget extends StatefulWidget {
       _PaymentSuccessScreenStatefulWidgetState();
 }
 
-/// AnimationControllers can be created with `vsync: this` because of TickerProviderStateMixin.
 class _PaymentSuccessScreenStatefulWidgetState
     extends State<PaymentSuccessScreenStatefulWidget> {
   @override
