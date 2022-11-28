@@ -40,9 +40,9 @@ ENV SHOP=/shop
 RUN mkdir $SHOP
 WORKDIR $SHOP
 RUN mkdir /apk
-COPY ./entrypoint.sh .
-COPY ./pubspec.yaml .
-COPY ./lib ./lib
-COPY ./android ./android
+COPY . .
+
+RUN yum install -y dos2unix
+RUN dos2unix /shop/entrypoint.sh
 
 CMD bash entrypoint.sh
