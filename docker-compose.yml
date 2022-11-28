@@ -21,6 +21,7 @@ services:
       - 8080:8080
     volumes:
       - ./api:/api
+      - ./apks:/apks
     networks:
       - back-net
     depends_on:
@@ -42,5 +43,10 @@ services:
     networks:
       - back-net
     
+volumes:
+  database-data:
+  api:
+  apks:
+
 networks:
   back-net:
