@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:shop/screens/home.dart';
+import 'package:shop/util/articles.dart';
+import 'package:shop/widgets/article_card.dart';
 
 
 class ListArticles extends StatelessWidget {
@@ -15,7 +17,12 @@ class ListArticles extends StatelessWidget {
       home: Container(
         color: Colors.white,
         child: Center(
-          child: Text('Liste des articles'),
+          child: ListView.builder(
+            itemCount: articles.length,
+            itemBuilder: (context, index) {
+              return ArticleCard(article: articles[index]);
+            },
+          ),
         ),
       ),
     );
