@@ -4,5 +4,8 @@
 ### Database volume ###
 database-data
 
+### APKS volume ###
+apks
+
 ### .env ###
 .env
