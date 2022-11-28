@@ -2,6 +2,20 @@ version: '3'
 
 services:
 
+  tpe:
+    container_name: tpe
+    build:
+      context: ./tpe
+    volumes:
+      - ./apks:/tpe/apk
+
+  shop:
+    container_name: shop
+    build:
+      context: ./shop
+    volumes:
+      - ./apks:/shop/apk
+
   api:
     container_name: api
     build: 
@@ -18,14 +32,16 @@ services:
       HIBERNATE_SHOW_SQL: ${HIBERNATE_SHOW_SQL}
       DEVTOOLS_REMOTE_SECRET: ${DEVTOOLS_REMOTE_SECRET}
       DEVTOOLS_LIVERELOAD_ENABLED: ${DEVTOOLS_LIVERELOAD_ENABLED}
+    volumes:
+      - ./apks:/apks
     ports:
       - 8080:8080
-    volumes:
-      - ./api:/api
     networks:
       - back-net
     depends_on:
       - database
+      - shop
+      - tpe
 
   database:
     container_name: database
@@ -42,6 +58,10 @@ services:
       - ./database-data:/var/lib/mysql
     networks:
       - back-net
-    
+  
+volumes:
+  apks:
+  database-data:
+  
 networks:
   back-net:
