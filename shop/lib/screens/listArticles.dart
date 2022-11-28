@@ -17,11 +17,24 @@ class ListArticles extends StatelessWidget {
       home: Container(
         color: Colors.white,
         child: Center(
-          child: ListView.builder(
-            itemCount: articles.length,
-            itemBuilder: (context, index) {
-              return ArticleCard(article: articles[index]);
-            },
+          child: Column(
+            children: <Widget>[
+              FlipInX(
+                child: const Image(
+                  image: AssetImage('images/logo_cash_manager.png'),
+                  width: 200,
+                  height: 200,
+                ),
+              ),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  children: List.generate(articles.length, (index) {
+                    return ArticleCard(article: articles[index]);
+                  }),
+                ),
+              ),
+            ],
           ),
         ),
       ),
