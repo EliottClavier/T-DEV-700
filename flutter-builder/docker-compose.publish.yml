@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  flutter-builder:
+    build:
+      context: .
+    image: eliottclavier/flutter-builder
