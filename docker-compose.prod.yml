@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+
+  tpe:
+    container_name: tpe
+    build:
+      context: ./tpe
+    volumes:
+      - ./apks:/tpe/apk
+
+  shop:
+    container_name: shop
+    build:
+      context: ./shop
+    volumes:
+      - ./apks:/shop/apk
+
+  api:
+    container_name: api
+    build: 
+      context: ./api
+      dockerfile: Dockerfile.prod
+    #image: image sur le registry
+    restart: unless-stopped
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO}
+      HIBERNATE_SHOW_SQL: ${HIBERNATE_SHOW_SQL}
+      DEVTOOLS_REMOTE_SECRET: ${DEVTOOLS_REMOTE_SECRET}
+      DEVTOOLS_LIVERELOAD_ENABLED: ${DEVTOOLS_LIVERELOAD_ENABLED}
+    volumes:
+      - ./apks:/apks
+    ports:
+      - 8080:8080
+    networks:
+      - back-net
+    depends_on:
+      - database
+      - shop
+      - tpe
+
+  database:
+    container_name: database
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - ./database-data:/var/lib/mysql
+    networks:
+      - back-net
+  
+volumes:
+  apks:
+  database-data:
+  
+networks:
+  back-net:
