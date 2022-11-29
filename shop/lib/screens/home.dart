@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:shop/screens/listArticles.dart';
-import 'package:shop/screens/router.dart';
+import 'package:shop/router/router.dart';
 
 
 class Home extends StatelessWidget {

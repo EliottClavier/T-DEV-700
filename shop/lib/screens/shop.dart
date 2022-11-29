@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:shop/widgets/navBar.dart';
+import 'package:shop/util/shop.dart';
+import 'package:shop/widgets/shop_card.dart';
 
 
 class Shop extends StatelessWidget {
@@ -25,6 +27,14 @@ class Shop extends StatelessWidget {
                   image: AssetImage('images/logo_cash_manager.png'),
                   width: 200,
                   height: 200,
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: shop_articles.length,
+                  itemBuilder: (context, index) {
+                    return ShopCard(article: shop_articles[index]);
+                  },
                 ),
               ),
               NavBar(parentContext: context,),

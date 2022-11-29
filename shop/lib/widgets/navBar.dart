@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:shop/screens/listArticles.dart';
 import 'package:shop/screens/shop.dart';
-import 'package:shop/screens/router.dart';
+import 'package:shop/router/router.dart';
 class NavBar extends StatelessWidget {
   final BuildContext parentContext;
   late final int selectedPage;
