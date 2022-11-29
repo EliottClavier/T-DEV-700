@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +31,8 @@ class NfcReaderScreenWidget extends StatefulWidget {
 }
 
 class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
+  String nfcDataString = "";
+
   @override
   void initState() {
     super.initState();
@@ -41,10 +45,38 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     _disposeNfc();
   }
 
+  String getFormatedDataItem(int item) {
+    return item.toString().length == 2
+        ? "0${item.toString()}"
+        : item.toString().length == 1
+            ? "00${item.toString()}"
+            : item.toString();
+  }
+
+  String getFormatedDataFromNfcData(List<int> nfcData) {
+    var result = "";
+    for (var dataItem in nfcData) {
+      result += result.isEmpty
+          ? getFormatedDataItem(dataItem)
+          : "-${getFormatedDataItem(dataItem)}";
+    }
+    return result;
+  }
+
+  void setNfcData(Map<String, dynamic> nfcData) {
+    List<int> identifier = [];
+    nfcData.forEach((key, value) {
+      if (key == "isodep" && value["identifier"] is List<int>) {
+        identifier = (value["identifier"]);
+      }
+    });
+    nfcDataString = getFormatedDataFromNfcData(identifier);
+  }
+
   void _initNfc() async {
     try {
       await widget.nfcManager.startSession(onDiscovered: (NfcTag tag) {
-        print('Discovered tag: ${tag.data}');
+        setNfcData(tag.data);
         return Future<void>.value();
       });
     } on PlatformException catch (e) {
@@ -69,7 +101,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: const <Widget>[
             Text(
-              'NFC Reader',
+              "Paiement NFC",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 30,
