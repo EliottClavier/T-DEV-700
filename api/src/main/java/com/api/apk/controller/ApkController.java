@@ -1,4 +1,4 @@
-package com.api.api.controller;
+package com.api.apk.controller;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
