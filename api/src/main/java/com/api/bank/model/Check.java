@@ -2,6 +2,7 @@ package com.api.bank.model;
 
 import lombok.Data;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
@@ -13,6 +14,7 @@ public class Check extends Base {
 
     @Column(nullable=false, unique=true, length=250)
     private String checkToken;
+    private String soldAmount;
 
     private Date expirationDate;
 
