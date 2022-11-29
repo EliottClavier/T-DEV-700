@@ -3,6 +3,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:shop/screens/home.dart';
 import 'package:shop/util/articles.dart';
 import 'package:shop/widgets/article_card.dart';
+import 'package:shop/widgets/navBar.dart';
 
 
 class ListArticles extends StatelessWidget {
@@ -10,7 +11,7 @@ class ListArticles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Liste des articles',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -34,6 +35,7 @@ class ListArticles extends StatelessWidget {
                   }),
                 ),
               ),
+              const NavBar(),
             ],
           ),
         ),
