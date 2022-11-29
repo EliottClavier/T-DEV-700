@@ -11,7 +11,7 @@ class ArticleCard extends StatelessWidget {
       child: Card(
         child: Container(
           width: 150,
-          height: 300,
+          height: 150,
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(
@@ -26,8 +26,9 @@ class ArticleCard extends StatelessWidget {
               )
             ],
           ),
-          child: Stack(
+          child: Column(
             children: <Widget>[
+              const Padding(padding: EdgeInsets.all(10)),
               Image.asset(
                 article["img"],
                 height: MediaQuery.of(context).size.height / 10,
@@ -35,20 +36,24 @@ class ArticleCard extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
               Center(
-                child: Container(
-                  height: MediaQuery.of(context).size.height / 6,
-                  width: MediaQuery.of(context).size.height / 6,
-                  child: Center(
-                    child: Text(
-                      article["name"],
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                child: Text(
+                  article["name"],
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Center(
+                child: Text(
+                  article["price"],
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
