@@ -1,8 +1,9 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+
 import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
+import 'package:tpe/screens/nfc_reader.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key, required this.price});
@@ -61,6 +62,14 @@ class _PaymentScreenStatefulWidgetState
     );
   }
 
+  void _onNfcSelected() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const NfcReaderScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +113,7 @@ class _PaymentScreenStatefulWidgetState
                   icon: Image.asset('assets/img/nfc.png'),
                   iconSize: 300,
                   onPressed: () {
-                    _onPaymentSent();
+                    _onNfcSelected();
                   },
                 )
               ],
