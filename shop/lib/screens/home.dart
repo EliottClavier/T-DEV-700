@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:shop/screens/listArticles.dart';
+import 'package:shop/screens/router.dart';
 
 
 class Home extends StatelessWidget {
@@ -8,7 +11,7 @@ class Home extends StatelessWidget {
 
   void initState(BuildContext context) async {
     Future.delayed(Duration(seconds: 2), () {
-      Navigator.pushNamed(context, ListArticles.pageName);
+      RouterShop.pushRoute(context,ListArticles.pageName);
     });
   }
 
