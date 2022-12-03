@@ -1,13 +1,11 @@
 package com.api.bank.controller;
 
-import com.api.bank.model.Account;
+import com.api.bank.model.entity.Account;
 import com.api.bank.model.ObjectResponse;
 import com.api.bank.repository.AccountRepository;
-import com.api.bank.service.AccountService;
 import com.api.bank.service.BaseService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +17,7 @@ public class AccountController {
     @Autowired
     private BaseService<Account, AccountRepository> accountService;
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ObjectResponse> get(@PathVariable UUID id){
         return ResponseEntity.ok(accountService.get(id));
     }

@@ -1,6 +1,6 @@
 package com.api.bank.service;
 
-import com.api.bank.model.Base;
+import com.api.bank.model.entity.Base;
 import com.api.bank.model.ObjectResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

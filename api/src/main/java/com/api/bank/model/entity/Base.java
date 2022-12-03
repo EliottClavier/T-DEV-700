@@ -1,4 +1,4 @@
-package com.api.bank.model;
+package com.api.bank.model.entity;
 
 import lombok.AccessLevel;
 import lombok.Setter;

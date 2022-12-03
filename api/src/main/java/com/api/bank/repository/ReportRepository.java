@@ -1,6 +1,6 @@
 package com.api.bank.repository;
 
-import com.api.bank.model.Report;
+import com.api.bank.model.entity.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

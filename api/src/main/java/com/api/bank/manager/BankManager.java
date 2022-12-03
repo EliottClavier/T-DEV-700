@@ -1,6 +1,6 @@
 package com.api.bank.manager;
 
-import com.api.bank.model.Report;
+import com.api.bank.model.entity.Report;
 
 import java.util.UUID;
 

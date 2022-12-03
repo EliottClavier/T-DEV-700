@@ -1,7 +1,5 @@
-package com.api.bank.model;
+package com.api.bank.model.entity;
 
-
-import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;

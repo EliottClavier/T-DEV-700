@@ -1,4 +1,4 @@
-package com.api.bank.model;
+package com.api.bank.model.entity;
 
 public class Currency extends Base {
 
