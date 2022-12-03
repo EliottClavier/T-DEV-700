@@ -20,7 +20,7 @@ public class Account extends Base {
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToOne(orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "card_id")
     private Card card;
 
@@ -31,8 +31,6 @@ public class Account extends Base {
     public void setCard(Card card) {
         this.card = card;
     }
-
-
 
     public Client getClient() {
         return client;

@@ -15,18 +15,9 @@ public class Card extends Base {
 
     private Date expirationDate;
 
-    @OneToOne(mappedBy = "card", orphanRemoval = true)
-    private Account account;
 
 
 
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
 
     public Card() {
         super();
