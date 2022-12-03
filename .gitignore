@@ -4,6 +4,10 @@
 ### Database volume ###
 database-data
 
+### Redis volume ###
+redis-data
+
+
 ### APKS volume ###
 apks
 

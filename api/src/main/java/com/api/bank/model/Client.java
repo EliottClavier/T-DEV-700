@@ -10,6 +10,7 @@ import java.util.UUID;
 
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Client extends Base {
 
     @Column( nullable=false, length=100)

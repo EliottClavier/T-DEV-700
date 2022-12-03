@@ -7,6 +7,7 @@ import java.util.Date;
 
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Card extends Base {
 
     @Column(nullable=false, unique=true, length=50)
@@ -14,9 +15,10 @@ public class Card extends Base {
 
     private Date expirationDate;
 
-    @OneToOne(orphanRemoval = true)
-    @JoinColumn(name = "account_id")
+    @OneToOne(mappedBy = "card", orphanRemoval = true)
     private Account account;
+
+
 
     public Account getAccount() {
         return account;

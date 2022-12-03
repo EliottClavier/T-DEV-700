@@ -7,6 +7,7 @@ import java.util.Date;
 
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Operation extends Base {
 
     @Column( nullable=false, length=25)
@@ -21,14 +22,14 @@ public class Operation extends Base {
     private Date operationDate;
 
     @ManyToOne()
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "id_report", nullable = false)
     private Report type;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Account account;
 
     @ManyToOne()
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "id_type_operation", nullable = false)
     private OperationType operationType;
 
     public Operation() {

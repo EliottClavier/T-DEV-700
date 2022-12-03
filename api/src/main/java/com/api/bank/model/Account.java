@@ -8,6 +8,7 @@ import java.util.List;
 
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Account extends Base {
 
     private int sold;
@@ -19,7 +20,8 @@ public class Account extends Base {
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToOne(mappedBy = "account", orphanRemoval = true)
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "card_id")
     private Card card;
 
     public Card getCard() {
@@ -29,6 +31,8 @@ public class Account extends Base {
     public void setCard(Card card) {
         this.card = card;
     }
+
+
 
     public Client getClient() {
         return client;
