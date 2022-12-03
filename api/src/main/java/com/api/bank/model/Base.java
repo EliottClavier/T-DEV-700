@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import java.util.Date;
 import java.util.UUID;
 
-@Data
+
 @Entity
 public class Base {
 

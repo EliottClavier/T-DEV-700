@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @SpringBootApplication
-@EntityScan("com.api.bank.model")
-@ComponentScan(basePackages= {"com.api.bank.repository"})
+//@EntityScan("com.api.bank.model")
+//@ComponentScan(basePackages= {"com.api.bank.repository"})
 @EnableJpaRepositories("com.api.bank.repository")
 public class ApiApplication {
 

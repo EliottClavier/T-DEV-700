@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.util.List;
 
-@Data
+
 @Entity
 public class Account extends Base {
 
@@ -15,12 +15,28 @@ public class Account extends Base {
     @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
     private List<Operation> operations;
 
-    @OneToOne(mappedBy ="account", fetch = FetchType.EAGER)
-    private Card card;
-
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "client_id")
     private Client client;
 
+    @OneToOne(mappedBy = "account", orphanRemoval = true)
+    private Card card;
+
+    public Card getCard() {
+        return card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
 //    @OneToOne(mappedBy = "Account", fetch = FetchType.EAGER)
 //    @JoinColumn(name = "id")
 //    private Card check;

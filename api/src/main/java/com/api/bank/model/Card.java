@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
+
 @Entity
 public class Card extends Base {
 
@@ -14,9 +14,17 @@ public class Card extends Base {
 
     private Date expirationDate;
 
-    @OneToOne()
-    @Column(name="id", nullable=false)
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "account_id")
     private Account account;
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
 
     public Card() {
         super();

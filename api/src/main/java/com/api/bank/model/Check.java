@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import java.util.Date;
 
-@Data
+
 @Entity
 public class Check extends Base {
 

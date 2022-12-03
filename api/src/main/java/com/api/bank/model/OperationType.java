@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
-@Data
+
 @Entity
 public class OperationType extends Base {
 
