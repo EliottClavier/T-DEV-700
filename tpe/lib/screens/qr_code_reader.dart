@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
 
 import 'package:tpe/screens/payment.dart';
+import 'package:tpe/utils/snackbar.dart';
 
 class QrCodeReaderScreen extends StatelessWidget {
   const QrCodeReaderScreen({super.key, required this.price});
@@ -111,9 +114,15 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
     return description.substring(indexOfDot + 1);
   }
 
+  Future<void> testToast() async {
+    await Future.delayed(const Duration(seconds: 3));
+    showSnackBar(context, "Success", "success", 3);
+  }
+
   @override
   void initState() {
     super.initState();
+    testToast();
   }
 
   @override
