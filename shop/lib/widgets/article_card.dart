@@ -17,9 +17,8 @@ class ArticleCard extends StatelessWidget {
             var quantity = 1;
             for(var shopArticle in shop_articles){
               if(shopArticle['name'] == article['name']){
-                quantity = shopArticle['quantity'] + 1;
-                shop_articles.remove(shopArticle);
-                break;
+                shopArticle['quantity'] = shopArticle['quantity'] + 1;
+                return;
               }
             }
             var shopArticle = {
