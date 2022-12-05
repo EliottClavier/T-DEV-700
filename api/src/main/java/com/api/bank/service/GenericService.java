@@ -1,18 +1,19 @@
 package com.api.bank.service;
 
-import com.api.bank.model.ObjectResponse;
 import com.api.bank.model.entity.Base;
-import com.api.bank.repository.GenericRepository;
+import com.api.bank.model.ObjectResponse;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+
 @Service
-public class GenericService<T extends Base, T1 extends GenericRepository<T>> {
+public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
 
+    protected T entity;
 
-    private T1 repository;
-
-    private T entity;
+    protected T1 repository;
 
     public GenericService(T1 repository) {
         this.repository = repository;
@@ -21,25 +22,33 @@ public class GenericService<T extends Base, T1 extends GenericRepository<T>> {
         this.repository = null;
     }
 
-
     public ObjectResponse add(T entity) {
         try {
             repository.save(entity);
             repository.flush();
-
-            return new ObjectResponse("Success", entity, true);
+            return new ObjectResponse("Success", entity);
         } catch (Exception e) {
-            return new ObjectResponse(e.getMessage(), false);
+            return new ObjectResponse(e.getMessage());
         }
     }
 
-    public ObjectResponse remove(T entity) {
+    public ObjectResponse delete(T entity) {
         try {
             repository.delete(entity);
             repository.flush();
-            return new ObjectResponse("Success", true);
+            return new ObjectResponse("Success");
         } catch (Exception e) {
-            return new ObjectResponse(e.getMessage(), false);
+            return new ObjectResponse(e.getMessage());
+        }
+    }
+
+    public ObjectResponse deleteByUUID(String id) {
+        try {
+            repository.deleteById(UUID.fromString(id));
+            repository.flush();
+            return new ObjectResponse("Success");
+        } catch (Exception e) {
+            return new ObjectResponse(e.getMessage());
         }
     }
 
@@ -47,20 +56,27 @@ public class GenericService<T extends Base, T1 extends GenericRepository<T>> {
         try {
             repository.save(entity);
             repository.flush();
-            return new ObjectResponse("Success", entity, true);
+            return new ObjectResponse("Success", entity);
         } catch (Exception e) {
-            return new ObjectResponse(e.getMessage(), false);
+            return new ObjectResponse(e.getMessage());
         }
     }
 
-    public ObjectResponse get(String id) {
+    public ObjectResponse getAll(){
+        try {
+            List<T> entities = repository.findAll();
+            return new ObjectResponse("Success", entities);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ObjectResponse("Error");
+        }
+    }
+    public ObjectResponse get(String id){
         try {
             T entity = repository.findById(UUID.fromString(id)).get();
-            return new ObjectResponse("Success", entity, true);
+            return new ObjectResponse("Success", entity);
         } catch (Exception e) {
-            return new ObjectResponse("Error", false);
+            return new ObjectResponse("Error");
         }
     }
-
-
 }

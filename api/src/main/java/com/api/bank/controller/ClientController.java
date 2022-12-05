@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController()
-@RequestMapping(path = "/client")
+@RequestMapping(path = "/bank/client")
 public class ClientController {
 
 //    @Autowired
@@ -40,7 +40,7 @@ public class ClientController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<ObjectResponse> delete(@RequestBody Client data){
-        return ResponseEntity.ok(clientService.remove(data));
+        return ResponseEntity.ok(clientService.delete(data));
     }
 
 }
