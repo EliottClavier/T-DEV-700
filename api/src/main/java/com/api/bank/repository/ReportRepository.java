@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Repository
 @Transactional
-public interface ReportRepository extends JpaRepository<Report, UUID> {
+public interface ReportRepository extends GenericRepository<Report> {
 
 }
 

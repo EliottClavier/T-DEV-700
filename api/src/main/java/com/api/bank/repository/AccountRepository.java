@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 @Transactional
-public interface AccountRepository extends JpaRepository<Account, UUID> {
+public interface AccountRepository extends GenericRepository<Account> {
 }

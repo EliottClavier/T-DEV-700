@@ -10,6 +10,6 @@ import java.util.UUID;
 @Repository
 @Transactional
 
-public interface ClientRepository extends JpaRepository<Client, UUID>{
+public interface ClientRepository extends GenericRepository<Client>{
 
 }
