@@ -2,11 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:shop/util/shop.dart';
+import 'package:shop/screens/shop.dart';
 
 class ShopCard extends StatefulWidget {
   final Map article;
-
-  const ShopCard({super.key, required this.article});
+  final ShopState shop = ShopState();
+  final Function onQuantityChanged;
+  ShopCard({super.key, required this.article, required this.onQuantityChanged});
 
   @override
   State<ShopCard> createState() => _ShopCard();
@@ -21,6 +23,7 @@ class _ShopCard extends State<ShopCard> {
         break;
       }
     }
+    widget.onQuantityChanged();
     setState(() {
       widget.article['quantity'] = quantity;
     });

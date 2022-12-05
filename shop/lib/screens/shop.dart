@@ -5,11 +5,28 @@ import 'package:shop/widgets/navBar.dart';
 import 'package:shop/util/shop.dart';
 import 'package:shop/widgets/shop_card.dart';
 
-
-class Shop extends StatelessWidget {
+class Shop extends StatefulWidget {
   static const String pageName = '/shop';
+  String? total = totalPrice();
+  Shop({super.key});
 
-  const Shop({super.key});
+  @override
+  State<Shop> createState() => ShopState();
+}
+
+class ShopState extends State<Shop> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void changerTotal() {
+    setState(() {
+      widget.total = totalPrice();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,7 +50,7 @@ class Shop extends StatelessWidget {
                 child: ListView.builder(
                   itemCount: shop_articles.length,
                   itemBuilder: (context, index) {
-                    return ShopCard(article: shop_articles[index]);
+                    return ShopCard(article: shop_articles[index], onQuantityChanged: changerTotal);
                   },
                 ),
               ),
@@ -43,7 +60,7 @@ class Shop extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     // ignore: prefer_interpolation_to_compose_strings
-                    '${'TOTAL : ' + totalPrice()}€',
+                    'TOTAL : ${widget.total} €',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 25,

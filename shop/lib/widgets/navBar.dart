@@ -4,26 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:shop/screens/listArticles.dart';
 import 'package:shop/screens/shop.dart';
 import 'package:shop/router/router.dart';
-class NavBar extends StatelessWidget {
+
+class NavBar extends StatefulWidget {
   final BuildContext parentContext;
-  late final int selectedPage;
+  late int selectedPage;
 
   NavBar({super.key, required this.parentContext});
 
   void selectPage() {
-    switch (parentContext.toString()) {
-      case 'ListArticles':
-        selectedPage = 0;
-        break;
-      case 'Shop':
-        selectedPage = 1;
-        break;
+    if (parentContext.toString().contains('ListArticles') == true) {
+      selectedPage = 0;
+    } else if (parentContext.toString().contains('Shop') == true) {
+      selectedPage = 1;
     }
   }
 
   @override
+  State<NavBar> createState() => _NavBar();
+}
+
+class _NavBar extends State<NavBar> {
+  @override
   Widget build(BuildContext context) {
-    selectPage();
+    widget.selectPage();
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       backgroundColor: const Color.fromARGB(255, 184, 72, 96),
@@ -35,10 +38,10 @@ class NavBar extends StatelessWidget {
         // Respond to item press.
         switch (value) {
           case 0:
-            RouterShop.pushRoute(parentContext, ListArticles.pageName);
+            RouterShop.pushRoute(widget.parentContext, ListArticles.pageName);
             break;
           case 1:
-            RouterShop.pushRoute(parentContext, Shop.pageName);
+            RouterShop.pushRoute(widget.parentContext, Shop.pageName);
             break;
           default:
         }
@@ -54,7 +57,7 @@ class NavBar extends StatelessWidget {
           icon: Icon(Icons.shopping_cart),
         ),
       ],
-      currentIndex: selectedPage,
+      currentIndex: widget.selectedPage,
     );
   }
 }
