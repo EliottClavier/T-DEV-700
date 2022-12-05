@@ -1,9 +1,9 @@
 package com.api.tpe.repository;
 
-import com.api.tpe.model.Tpe;
+import com.api.tpe.model.TpeRedis;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TpeRepository extends CrudRepository<Tpe, String> {
+public interface TpeRepository extends CrudRepository<TpeRedis, String> {
 }

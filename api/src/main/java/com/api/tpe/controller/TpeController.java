@@ -1,6 +1,6 @@
 package com.api.tpe.controller;
 
-import com.api.tpe.model.Tpe;
+import com.api.tpe.model.TpeRedis;
 
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,11 +34,11 @@ public class TpeController {
     }
 
     @RequestMapping(path = "/", method = RequestMethod.POST)
-    public ResponseEntity<String> addTpe(@RequestBody Tpe tpe) {
-        if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpe.getId())) {
+    public ResponseEntity<String> addTpe(@RequestBody TpeRedis tpeRedis) {
+        if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeRedis.getId())) {
             return new ResponseEntity<>("TPE already registered.", HttpStatus.CONFLICT);
-        } else if (tpe.isValid()) {
-            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpe.getId(), tpe.getIp());
+        } else if (tpeRedis.isValid()) {
+            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getIp());
             return new ResponseEntity<>("TPE registered.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("TPE not valid.", HttpStatus.BAD_REQUEST);
@@ -47,9 +46,9 @@ public class TpeController {
     }
 
     @RequestMapping(path = "/{mac}", method = RequestMethod.PUT)
-    public ResponseEntity<String> updateTpe(@PathVariable("mac") String mac, @RequestBody Tpe tpe) {
-        if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, mac) && tpe.isValid()) {
-            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpe.getId(), tpe.getIp());
+    public ResponseEntity<String> updateTpe(@PathVariable("mac") String mac, @RequestBody TpeRedis tpeRedis) {
+        if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, mac) && tpeRedis.isValid()) {
+            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getIp());
             return new ResponseEntity<>("TPE updated.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("TPE not found.", HttpStatus.NOT_FOUND);
@@ -70,11 +69,11 @@ public class TpeController {
     public void sendTpe(@RequestBody String tpeString) {
         Gson gson = new Gson();
         try {
-            Tpe tpe = gson.fromJson(tpeString, Tpe.class);
-            if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpe.getId())) {
+            TpeRedis tpeRedis = gson.fromJson(tpeString, TpeRedis.class);
+            if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeRedis.getId())) {
                 this.simpMessagingTemplate.convertAndSend("/public/register", "TPE already registered.");
-            } else if (tpe.isValid()) {
-                customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpe.getId(), tpe.getIp());
+            } else if (tpeRedis.isValid()) {
+                customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getIp());
                 this.simpMessagingTemplate.convertAndSend("/public/register", "TPE registered.");
             } else {
                 this.simpMessagingTemplate.convertAndSend("/public/register", "TPE not valid.");
