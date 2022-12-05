@@ -14,7 +14,7 @@ public class Check extends Base {
     private int soldAmount;
 
 //    @Column(name = "expi_date")
-    private Date expirationDate;
+    private int nbDayOfValidity;
 
 //    @OneToOne(orphanRemoval = true)
 //    @JoinColumn(name = "account_id", nullable = false)
