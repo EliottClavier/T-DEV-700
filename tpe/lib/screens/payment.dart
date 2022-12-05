@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:tpe/screens/api_connexion.dart';
 import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
 
@@ -61,6 +62,12 @@ class _PaymentScreenStatefulWidgetState
     );
   }
 
+  void _apiConnexion() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: ((context) => const MyApp())));
+    //MaterialPageRoute(builder: ((context) => const ApiConnexionWidget())));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +99,7 @@ class _PaymentScreenStatefulWidgetState
                   icon: Image.asset('assets/img/qr_code.png'),
                   iconSize: 300,
                   onPressed: () {
-                    _onPaymentSent();
+                    _apiConnexion();
                   },
                 )
               ],
