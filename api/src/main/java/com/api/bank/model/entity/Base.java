@@ -28,22 +28,11 @@ public abstract class Base {
     @Setter(value = AccessLevel.PRIVATE)
     private Instant createdAt;
 
-
-    public Instant getModifiedAt() {
-        return modifiedAt;
-    }
-
-    public void setModifiedAt(Instant modifiedAt) {
-        this.modifiedAt = modifiedAt;
-    }
-
     @LastModifiedDate
     @Setter(value = AccessLevel.PRIVATE)
     private Instant modifiedAt;
 
-    public UUID getId() {
-        return id;
-    }
+
 
     public Base(UUID id) {
         this.id = id;

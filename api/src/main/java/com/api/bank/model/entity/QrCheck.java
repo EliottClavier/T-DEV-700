@@ -6,14 +6,14 @@ import lombok.Setter;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import java.util.Date;
 
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Getter
 @Setter
-public class Check extends Base {
+
+public class QrCheck extends Base {
 
 
     private String checkToken;
@@ -23,6 +23,10 @@ public class Check extends Base {
 
 
     private int nbDayOfValidity;
+
+    public QrCheck() {
+        super();
+    }
 
 
 
