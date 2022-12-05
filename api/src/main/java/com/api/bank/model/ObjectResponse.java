@@ -6,18 +6,14 @@ import lombok.Data;
 public class ObjectResponse {
     private String message;
     private Object data;
-    private boolean status;
 
-    public ObjectResponse(String message, Object data, boolean status) {
+    public ObjectResponse(String message, Object data) {
         this.message = message;
         this.data = data;
-        this.status = status;
     }
-    public ObjectResponse(String message, boolean status) {
+
+    public ObjectResponse(String message) {
         this.message = message;
-        this.status = status;
     }
-
-
 }
 
