@@ -2,7 +2,7 @@
 # qui télécharge la bonne version de gradle à chaque build
 FROM gradle:7.5.1-jdk17
 
-RUN apt-get install bash
+RUN apt-get update && apt-get install -y bash dos2unix
 
 ENV HOME=/api
 RUN mkdir $HOME
@@ -12,4 +12,5 @@ WORKDIR $HOME
 RUN gradle --no-daemon --warning-mode all --console=plain getDeps
 
 EXPOSE 8080
+RUN dos2unix entrypoint.sh
 CMD bash entrypoint.sh

@@ -1,9 +1,11 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:tpe/screens/api_connexion.dart';
+
 import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
+import 'package:tpe/screens/nfc_reader.dart';
+import 'package:tpe/screens/qr_code_reader.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key, required this.price});
@@ -66,59 +68,76 @@ class _PaymentScreenStatefulWidgetState
     Navigator.of(context)
         .push(MaterialPageRoute(builder: ((context) => const MyApp())));
     //MaterialPageRoute(builder: ((context) => const ApiConnexionWidget())));
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "Montant: ${widget.price}",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    fontSize: 32,
-                    letterSpacing: 0.02,
-                    height: 1.2,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                IconButton(
-                  icon: Image.asset('assets/img/qr_code.png'),
-                  iconSize: 300,
-                  onPressed: () {
-                    _apiConnexion();
-                  },
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                IconButton(
-                  icon: Image.asset('assets/img/nfc.png'),
-                  iconSize: 300,
-                  onPressed: () {
-                    _onPaymentSent();
-                  },
-                )
-              ],
-            ),
-          ],
+    void _onNfcSelected() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => NfcReaderScreen(price: widget.price),
         ),
-      ),
-    );
+      );
+    }
+
+    void _onQrCodeSelected() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => QrCodeReaderScreen(price: widget.price),
+        ),
+      );
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Montant: ${widget.price}",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      fontSize: 32,
+                      letterSpacing: 0.02,
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    icon: Image.asset('assets/img/qr_code.png'),
+                    iconSize: 300,
+                    onPressed: () {
+                      _apiConnexion();
+                      _onQrCodeSelected();
+                    },
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    icon: Image.asset('assets/img/nfc.png'),
+                    iconSize: 300,
+                    onPressed: () {
+                      _onNfcSelected();
+                    },
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }
