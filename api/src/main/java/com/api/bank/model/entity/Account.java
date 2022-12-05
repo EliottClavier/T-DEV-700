@@ -16,14 +16,14 @@ public class Account extends Base {
 
     private int sold;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "account", cascade=CascadeType.ALL)
     private List<Operation> operations;
 
-    @OneToOne(orphanRemoval = true)
+    @OneToOne(cascade=CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "card_id")
     private Card card;
 
