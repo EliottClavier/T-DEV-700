@@ -10,10 +10,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@SpringBootApplication
+
 //@EntityScan("com.api.bank.model")
 //@ComponentScan(basePackages= {"com.api.bank.repository"})
 @EnableJpaRepositories("com.api.bank.repository")
+@SpringBootApplication(scanBasePackages = {"com.api.apk", "com.api.tpe", "com.api.bank"})
 public class ApiApplication {
 
 
