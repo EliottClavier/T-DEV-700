@@ -12,8 +12,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/tpe")
-public class TpeController {
+@RequestMapping(path = "/tpe-manager/tpe")
+public class TpeRedisController {
 
     public static final String HASH_KEY_NAME = "TPE";
 
@@ -23,7 +23,7 @@ public class TpeController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    @RequestMapping(path = "/", method = RequestMethod.GET)
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public ResponseEntity<?> getAllTpe() {
         return new ResponseEntity<>(customRedisTemplate.opsForHash().values(HASH_KEY_NAME), HttpStatus.OK);
     }
@@ -33,7 +33,7 @@ public class TpeController {
         return new ResponseEntity<>(customRedisTemplate.opsForHash().get(HASH_KEY_NAME, mac), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/", method = RequestMethod.POST)
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<String> addTpe(@RequestBody TpeRedis tpeRedis) {
         if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeRedis.getId())) {
             return new ResponseEntity<>("TPE already registered.", HttpStatus.CONFLICT);

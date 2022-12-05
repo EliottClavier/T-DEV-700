@@ -5,5 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TpeRepository extends CrudRepository<TpeRedis, String> {
+public interface TpeRedisRepository extends CrudRepository<TpeRedis, String> {
 }
