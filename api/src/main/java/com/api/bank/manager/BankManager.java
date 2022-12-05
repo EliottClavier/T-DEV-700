@@ -1,12 +1,13 @@
 package com.api.bank.manager;
 
+import com.api.bank.model.TransactionModel;
 import com.api.bank.model.entity.Report;
 
 import java.util.UUID;
 
 public class BankManager {
 
-    public Report HandleCardOperation() {
+    public TransactionModel HandleCardOperation() {
         String res = "";
         UUID OperationId = UUID.randomUUID();
         // Check expirationDate, sold, etc

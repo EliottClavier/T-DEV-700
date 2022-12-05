@@ -14,15 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 //@EntityScan("com.api.bank.model")
 //@ComponentScan(basePackages= {"com.api.bank.repository"})
 @EnableJpaRepositories("com.api.bank.repository")
-@SpringBootApplication(scanBasePackages = {"com.api.apk", "com.api.tpe", "com.api.bank"})
+@SpringBootApplication(scanBasePackages = {"com.api","com.api.apk", "com.api.tpe", "com.api.bank.controller"})
 public class ApiApplication {
 
 
 
     public static void main(String[] args) {
         SpringApplication.run(ApiApplication.class, args);
-
-
 
     }
 

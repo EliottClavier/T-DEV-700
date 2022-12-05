@@ -18,7 +18,7 @@ public class AccountController {
     private BaseService<Account, AccountRepository> accountService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ObjectResponse> get(@PathVariable UUID id){
+    public ResponseEntity<ObjectResponse> get(@PathVariable String id){
         return ResponseEntity.ok(accountService.get(id));
     }
 
@@ -28,7 +28,7 @@ public class AccountController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ObjectResponse> update(@RequestBody Account data, @PathVariable UUID id){
+    public ResponseEntity<ObjectResponse> update(@RequestBody Account data, @PathVariable String id){
         return ResponseEntity.ok(accountService.update(data));
     }
 

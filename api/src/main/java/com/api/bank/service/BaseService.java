@@ -18,16 +18,16 @@ public class BaseService<T extends Base, T1 extends JpaRepository<T, UUID>> {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public ObjectResponse add(Account data) {
+    public ObjectResponse add(T data) {
         try {
-//            T entity = (T) objectMapper.convertValue(data, Object.class);
+
             System.out.println("add");
             repository.save(entity);
             repository.flush();
 
             return new ObjectResponse("Success", entity, true);
         } catch (Exception e) {
-            return new ObjectResponse(e.getMessage(),false);
+            return new ObjectResponse(e.getMessage(), false);
         }
     }
 
@@ -39,32 +39,30 @@ public class BaseService<T extends Base, T1 extends JpaRepository<T, UUID>> {
             repository.flush();
             return new ObjectResponse("Success", true);
         } catch (Exception e) {
-            return new ObjectResponse(e.getMessage(),false);
+            return new ObjectResponse(e.getMessage(), false);
         }
     }
 
     public ObjectResponse update(T entity) {
         try {
             System.out.println("update");
-            T originEntity = repository.findById(entity.getId()).get(); // get the entity from the database
-
-            repository.save(originEntity);
+            repository.save(entity);
             repository.flush();
             return new ObjectResponse("Success", entity, true);
         } catch (Exception e) {
-            return new ObjectResponse(e.getMessage(),false);
+            return new ObjectResponse(e.getMessage(), false);
         }
     }
-        public ObjectResponse get (UUID id){
-            try {
-                System.out.println("get");
-                T entity = repository.findById(id).get();
-                return new ObjectResponse("Success", entity, true);
-            } catch (Exception e) {
-                return new ObjectResponse("Error", false);
-            }
-        }
 
+    public ObjectResponse get(String id) {
+        try {
+            System.out.println("get");
+            T entity = repository.findById(UUID.fromString(id)).get();
+            return new ObjectResponse("Success", entity, true);
+        } catch (Exception e) {
+            return new ObjectResponse("Error", false);
+        }
+    }
 
 
 }
