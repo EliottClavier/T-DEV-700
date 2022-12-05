@@ -4,6 +4,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
 
 import 'package:tpe/screens/payment.dart';
+import 'package:tpe/screens/payment_sending.dart';
 import 'package:tpe/utils/snackbar.dart';
 
 class QrCodeReaderScreen extends StatelessWidget {
@@ -90,6 +91,7 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) {
+      onDataReaded(scanData);
       setState(() {
         result = scanData;
       });
@@ -114,15 +116,23 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
     return description.substring(indexOfDot + 1);
   }
 
-  Future<void> testToast() async {
-    await Future.delayed(const Duration(seconds: 3));
-    showSnackBar(context, "Success", "success", 3);
+  void onDataReaded(Barcode data) {
+    showSnackBar(context, "Scan réussi", "success", 3);
+    paymentSendingScreen(data.code.toString());
+  }
+
+  void paymentSendingScreen(String data) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PaymentSendingScreen(
+            paymentData: data, price: widget.price, paymentMethod: "qr_code"),
+      ),
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    testToast();
   }
 
   @override
