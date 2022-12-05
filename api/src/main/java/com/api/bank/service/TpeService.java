@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 @Service
@@ -28,6 +29,24 @@ public class TpeService extends GenericService<Tpe, TpeRepository> {
         }
     }
 
+    public ObjectResponse getTpeStatus(String id) {
+        try {
+            Tpe tpe = tpeRepository.findById(UUID.fromString(id)).get();
+            if (tpe.getWhitelisted()) {
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("status", true);
+                map.put("token", "Bearer token");
+                return new ObjectResponse("Tpe whitelisted.", map, HttpStatus.OK);
+            } else {
+                return new ObjectResponse("Tpe not whitelisted.", HttpStatus.FORBIDDEN);
+            }
+        } catch (IllegalArgumentException e) {
+            return new ObjectResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ObjectResponse(e.getMessage(), HttpStatus.CONFLICT);
+        }
+    }
+
     public ObjectResponse updateTpeStatus(String id, Boolean whitelisted) {
         try {
             Tpe tpe = tpeRepository.findById(UUID.fromString(id)).get();
@@ -45,6 +64,5 @@ public class TpeService extends GenericService<Tpe, TpeRepository> {
             return new ObjectResponse(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
-
 }
 

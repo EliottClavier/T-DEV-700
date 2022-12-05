@@ -1,5 +1,10 @@
 package com.api.tpe.controller;
 
+import com.api.bank.model.ObjectResponse;
+import com.api.bank.model.entity.Tpe;
+import com.api.bank.repository.TpeRepository;
+import com.api.tpe.model.Message;
+import com.api.tpe.model.MessageType;
 import com.api.tpe.model.TpeRedis;
 
 import com.google.gson.Gson;
@@ -22,6 +27,9 @@ public class TpeRedisController {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+
+    @Autowired
+    private TpeRepository tpeRepository;
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public ResponseEntity<?> getAllTpe() {
@@ -67,19 +75,32 @@ public class TpeRedisController {
 
     @MessageMapping("/connect")
     public void sendTpe(@RequestBody String tpeString) {
+        String responseDestination = "/public/connect";
         Gson gson = new Gson();
+        Message message = new Message("Processing", MessageType.ERROR);
+
         try {
             TpeRedis tpeRedis = gson.fromJson(tpeString, TpeRedis.class);
-            if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeRedis.getId())) {
-                this.simpMessagingTemplate.convertAndSend("/public/connect", "TPE already registered.");
-            } else if (tpeRedis.isValid()) {
-                customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getIp());
-                this.simpMessagingTemplate.convertAndSend("/public/connect", "TPE registered.");
+            Tpe tpe = tpeRepository.findByMac(tpeRedis.getId());
+
+            if (tpe.getWhitelisted()) {
+                if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeRedis.getId())) {
+                    message.setMessage("TPE already registered.");
+                } else if (tpeRedis.isValid()) {
+                    customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getIp());
+                    message.setMessage("TPE registered.");
+                    message.setType(MessageType.SUCCESS);
+                } else {
+                    message.setMessage("TPE not valid.");
+                }
             } else {
-                this.simpMessagingTemplate.convertAndSend("/public/connect", "TPE not valid.");
+                message.setMessage("TPE not whitelisted.");
             }
+        } catch (IllegalArgumentException e) {
+            message.setMessage("TPE not found.");
         } catch (Exception e) {
-            this.simpMessagingTemplate.convertAndSend("/public/connect", "There was an error while registring your TPE.");
+            message.setMessage("Error registring TPE.");
         }
+        this.simpMessagingTemplate.convertAndSend(responseDestination, message);
     }
 }
