@@ -25,9 +25,9 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
 
     public ObjectResponse add(T data) {
         try {
-            repository.save(data);
+            T newEntity = repository.save(data);
             repository.flush();
-            return new ObjectResponse("Success", entity, HttpStatus.CREATED);
+            return new ObjectResponse("Success", newEntity, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ObjectResponse(e.getMessage(), HttpStatus.CONFLICT);
         }

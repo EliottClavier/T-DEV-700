@@ -23,19 +23,25 @@ public class TpeController {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<ObjectResponse> register(@RequestBody Tpe tpe) {
-        ObjectResponse response = tpeService.add(tpe);
+        ObjectResponse response = tpeService.registerTpe(tpe);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @RequestMapping(path = "/{mac}/whitelist", method = RequestMethod.PUT)
-    public ResponseEntity<ObjectResponse> whitelistTpe(@PathVariable("mac") String mac) {
-        ObjectResponse response = tpeService.updateTpeStatus(mac, true);
+    @RequestMapping(path = "/{uuid}/whitelist", method = RequestMethod.PUT)
+    public ResponseEntity<ObjectResponse> whitelistTpe(@PathVariable("uuid") String uuid) {
+        ObjectResponse response = tpeService.updateTpeStatus(uuid, true);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @RequestMapping(path = "/{mac}/blacklist", method = RequestMethod.PUT)
-    public ResponseEntity<ObjectResponse> blacklistTpe(@PathVariable("mac") String mac) {
-        ObjectResponse response = tpeService.updateTpeStatus(mac, false);
+    @RequestMapping(path = "/{uuid}/blacklist", method = RequestMethod.PUT)
+    public ResponseEntity<ObjectResponse> blacklistTpe(@PathVariable("uuid") String uuid) {
+        ObjectResponse response = tpeService.updateTpeStatus(uuid, false);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @RequestMapping(path = "/{uuid}", method = RequestMethod.DELETE)
+    public ResponseEntity<ObjectResponse> deleteTpe(@PathVariable("uuid") String uuid) {
+        ObjectResponse response = tpeService.deleteByUUID(uuid);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

@@ -6,6 +6,7 @@ import com.api.bank.repository.TpeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.UUID;
 
@@ -19,13 +20,27 @@ public class TpeService extends GenericService<Tpe, TpeRepository> {
         super(tpeRepository);
     }
 
+    public ObjectResponse registerTpe(@RequestBody Tpe tpe) {
+        if (!tpeRepository.existsByMac(tpe.getMac())) {
+            return add(tpe);
+        } else {
+            return new ObjectResponse("Tpe already registered", HttpStatus.CONFLICT);
+        }
+    }
+
     public ObjectResponse updateTpeStatus(String id, Boolean whitelisted) {
         try {
             Tpe tpe = tpeRepository.findById(UUID.fromString(id)).get();
-            tpe.setWhitelisted(whitelisted);
-            tpeRepository.save(tpe);
-            tpeRepository.flush();
-            return new ObjectResponse("Success", tpe, HttpStatus.OK);
+            if (tpe.getWhitelisted() != whitelisted) {
+                tpe.setWhitelisted(whitelisted);
+                tpeRepository.save(tpe);
+                tpeRepository.flush();
+                return new ObjectResponse("Success", tpe, HttpStatus.OK);
+            } else {
+                return new ObjectResponse(String.format("Tpe already %s", whitelisted ? "whitelisted" : "blacklisted"), HttpStatus.CONFLICT);
+            }
+        } catch (IllegalArgumentException e) {
+            return new ObjectResponse(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ObjectResponse(e.getMessage(), HttpStatus.CONFLICT);
         }

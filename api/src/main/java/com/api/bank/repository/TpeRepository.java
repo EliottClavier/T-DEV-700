@@ -9,4 +9,6 @@ import javax.transaction.Transactional;
 @Transactional
 public interface TpeRepository extends GenericRepository<Tpe> {
     Tpe findByMac(String mac);
+
+    Boolean existsByMac(String mac);
 }
