@@ -1,24 +1,30 @@
 package com.api.bank.model.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import java.util.Date;
 
 
-//@Entity
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Getter
+@Setter
 public class Check extends Base {
 
-//    @Column(name = "token")
+
     private String checkToken;
 
-//    @Column(name = "sold_amt")
+
     private int soldAmount;
 
-//    @Column(name = "expi_date")
+
     private int nbDayOfValidity;
 
-//    @OneToOne(orphanRemoval = true)
-//    @JoinColumn(name = "account_id", nullable = false)
-//    private Account account;
+
 
 
 }

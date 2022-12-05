@@ -1,10 +1,15 @@
 package com.api.bank.model.entity;
 
+import lombok.Data;
+import lombok.Getter;
+
 import javax.persistence.*;
 import java.util.Date;
 
 
 @Entity
+@Data
+@Getter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Card extends Base {
 
@@ -12,10 +17,6 @@ public class Card extends Base {
     private String cardId;
 
     private Date expirationDate;
-
-
-
-
 
     public Card() {
         super();

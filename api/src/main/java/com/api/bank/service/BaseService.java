@@ -1,5 +1,6 @@
 package com.api.bank.service;
 
+import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.Base;
 import com.api.bank.model.ObjectResponse;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,9 +18,9 @@ public class BaseService<T extends Base, T1 extends JpaRepository<T, UUID>> {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public ObjectResponse add(JsonNode data) {
+    public ObjectResponse add(Account data) {
         try {
-            T entity = (T) objectMapper.convertValue(data, Object.class);
+//            T entity = (T) objectMapper.convertValue(data, Object.class);
             System.out.println("add");
             repository.save(entity);
             repository.flush();

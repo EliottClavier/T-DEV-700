@@ -1,6 +1,7 @@
 package com.api.bank.model.entity;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,7 +14,9 @@ import java.util.UUID;
 
 
 @MappedSuperclass
-public class Base {
+@Getter
+@Setter
+public abstract class Base {
 
     @Id
     @GeneratedValue(generator = "UUID")

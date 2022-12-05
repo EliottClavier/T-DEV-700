@@ -12,7 +12,6 @@ public class BankManager {
         // Check expirationDate, sold, etc
         //TODO Crediter et debiter les comptes vendeurs et crediteurs  et enregistrer en bdd
 
-
         return null;
     }
 

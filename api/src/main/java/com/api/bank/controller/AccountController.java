@@ -23,7 +23,7 @@ public class AccountController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectResponse> add(@RequestBody JsonNode data){
+    public ResponseEntity<ObjectResponse> add(@RequestBody Account data){
         return ResponseEntity.ok(accountService.add(data));
     }
 

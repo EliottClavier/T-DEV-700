@@ -14,15 +14,6 @@ public class AccountService extends BaseService<Account, AccountRepository > {
     @Autowired
     private ObjectMapper objectMapper;
 
-//    public ResponseEntity addAccount(JsonNode accountData) {
-//        Account account  = objectMapper.convertValue(accountData, Account.class);
-//        accountRepository.saveAndFlush(account);
-//        return ResponseEntity.ok(accountData);
-//    }
-//    public ResponseEntity<JsonNode> getAllAccount() {
-//        Account account  = accountRepository.
-//
-//        return ResponseEntity.ok(accountData);
-//    }
+
 }
 
