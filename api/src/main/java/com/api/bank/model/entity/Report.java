@@ -14,4 +14,8 @@ import javax.persistence.InheritanceType;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Report extends Base{
     private String label;
+
+    public Report() {
+        super();
+    }
 }
