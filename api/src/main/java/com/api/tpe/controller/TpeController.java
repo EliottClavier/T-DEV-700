@@ -2,10 +2,14 @@ package com.api.tpe.controller;
 
 import com.api.tpe.model.Tpe;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +20,9 @@ public class TpeController {
 
     @Autowired
     private RedisTemplate<String, String> customRedisTemplate;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public ResponseEntity<?> getAllTpe() {
@@ -56,6 +63,24 @@ public class TpeController {
             return new ResponseEntity<>("TPE removed.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("TPE not found.", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @MessageMapping("/register")
+    public void sendTpe(@RequestBody String tpeString) {
+        Gson gson = new Gson();
+        try {
+            Tpe tpe = gson.fromJson(tpeString, Tpe.class);
+            if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpe.getId())) {
+                this.simpMessagingTemplate.convertAndSend("/public/register", "TPE already registered.");
+            } else if (tpe.isValid()) {
+                customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpe.getId(), tpe.getIp());
+                this.simpMessagingTemplate.convertAndSend("/public/register", "TPE registered.");
+            } else {
+                this.simpMessagingTemplate.convertAndSend("/public/register", "TPE not valid.");
+            }
+        } catch (Exception e) {
+            this.simpMessagingTemplate.convertAndSend("/public/register", "There was an error while registring your TPE.");
         }
     }
 }

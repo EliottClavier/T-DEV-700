@@ -23,7 +23,7 @@ public class Tpe implements Serializable {
     public String ip;
 
     public Boolean isValid() {
-        return !id.isEmpty() && !ip.isEmpty();
+        return id != null && !id.isEmpty() && ip != null && !ip.isEmpty();
     }
 
 }
