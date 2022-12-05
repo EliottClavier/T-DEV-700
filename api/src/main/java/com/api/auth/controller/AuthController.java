@@ -5,6 +5,7 @@ import com.api.auth.model.LoginCredentials;
 import com.api.auth.repository.ManagerRepository;
 import com.api.auth.security.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -32,19 +33,6 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @PostMapping("/register")
-    public Map<String, Object> registerHandler(@RequestBody Manager manager){
-        if (managerRepository.findByUsername(manager.getUsername()).isPresent()) {
-            return Collections.singletonMap("message", "Username already exists");
-        } else {
-            String encodedPass = passwordEncoder.encode(manager.getPassword());
-            manager.setPassword(encodedPass);
-            manager = managerRepository.save(manager);
-            String token = jwtUtil.generateToken(manager.getUsername());
-            return Collections.singletonMap("token", token);
-        }
-    }
 
     @PostMapping("/login")
     public Map<String, Object> loginHandler(@RequestBody LoginCredentials body){

@@ -35,6 +35,8 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       JWT_SECRET: ${JWT_SECRET}
+      DEFAULT_MANAGER_USERNAME: ${DEFAULT_MANAGER_USERNAME}
+      DEFAULT_MANAGER_PASSWORD: ${DEFAULT_MANAGER_PASSWORD}
     volumes:
       - ./apks:/apks
     ports:
