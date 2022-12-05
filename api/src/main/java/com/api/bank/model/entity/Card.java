@@ -2,13 +2,14 @@ package com.api.bank.model.entity;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
 
 
 @Entity
-@Data
+@Setter
 @Getter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Card extends Base {

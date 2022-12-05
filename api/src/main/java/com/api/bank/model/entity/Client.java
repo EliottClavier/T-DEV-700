@@ -17,24 +17,17 @@ import java.util.UUID;
 public class Client extends Base {
 
     @Column( nullable=false, length=100)
-    private String fistname;
+    private String firstname;
     @Column( nullable=false, length=100)
     private String lastname;
 
     @OneToOne(mappedBy = "client", orphanRemoval = true)
     private Account account;
 
-    public Account getAccount() {
-        return account;
-    }
 
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-
-    public Client(UUID id, String fistname, String lastname) {
+    public Client(UUID id, String firstname, String lastname) {
         super(id);
-        this.fistname = fistname;
+        this.firstname = firstname;
         this.lastname = lastname;
     }
 
