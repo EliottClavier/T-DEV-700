@@ -68,7 +68,7 @@ class ArticleCard extends StatelessWidget {
                 ),
                 Center(
                   child: Text(
-                    article["price"],
+                    "${article["price"]}€",
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 15,

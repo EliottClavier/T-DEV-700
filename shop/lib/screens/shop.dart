@@ -37,6 +37,39 @@ class Shop extends StatelessWidget {
                   },
                 ),
               ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Text(
+                    // ignore: prefer_interpolation_to_compose_strings
+                    '${'TOTAL : ' + totalPrice()}€',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 25,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/checkout');
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color.fromARGB(255, 255, 142, 13),
+                      ),
+                    ),
+                    child: const Text(
+                      'PAYER',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
               NavBar(parentContext: context,),
             ],
           ),

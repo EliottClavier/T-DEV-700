@@ -98,7 +98,7 @@ class _ShopCard extends State<ShopCard> {
                       const SizedBox(width: 10),
                       Center(
                         child: Text(
-                          widget.article["price"].toString(),
+                          "${widget.article["price"]}€",
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 15,
