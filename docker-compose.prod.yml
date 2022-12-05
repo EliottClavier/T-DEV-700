@@ -34,6 +34,7 @@ services:
       DEVTOOLS_LIVERELOAD_ENABLED: ${DEVTOOLS_LIVERELOAD_ENABLED}
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - ./apks:/apks
     ports:
