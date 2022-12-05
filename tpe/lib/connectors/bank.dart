@@ -24,6 +24,7 @@ Future<dynamic> sendQrCodeData(String data) async {
   return Future.value(true);
 }
 
-void sendNfcData(String data) {
+Future<dynamic> sendNfcData(String data) {
   print("Nfc data sent : ${data}");
+  return Future.value(true);
 }
