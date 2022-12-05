@@ -13,10 +13,12 @@ import javax.persistence.InheritanceType;
 @Setter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Tpe extends Base {
-    private String macId;
-    private String TokenRegister;
+
+    private String mac;
+    private Boolean whitelisted;
 
     public Tpe() {
         super();
+        this.whitelisted = false;
     }
 }

@@ -48,7 +48,7 @@ public class TpeRedisController {
     @RequestMapping(path = "/{mac}", method = RequestMethod.PUT)
     public ResponseEntity<String> updateTpe(@PathVariable("mac") String mac, @RequestBody TpeRedis tpeRedis) {
         if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, mac) && tpeRedis.isValid()) {
-            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getIp());
+            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, mac, tpeRedis.getIp());
             return new ResponseEntity<>("TPE updated.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("TPE not found.", HttpStatus.NOT_FOUND);
@@ -65,21 +65,21 @@ public class TpeRedisController {
         }
     }
 
-    @MessageMapping("/register")
+    @MessageMapping("/connect")
     public void sendTpe(@RequestBody String tpeString) {
         Gson gson = new Gson();
         try {
             TpeRedis tpeRedis = gson.fromJson(tpeString, TpeRedis.class);
             if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeRedis.getId())) {
-                this.simpMessagingTemplate.convertAndSend("/public/register", "TPE already registered.");
+                this.simpMessagingTemplate.convertAndSend("/public/connect", "TPE already registered.");
             } else if (tpeRedis.isValid()) {
                 customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getIp());
-                this.simpMessagingTemplate.convertAndSend("/public/register", "TPE registered.");
+                this.simpMessagingTemplate.convertAndSend("/public/connect", "TPE registered.");
             } else {
-                this.simpMessagingTemplate.convertAndSend("/public/register", "TPE not valid.");
+                this.simpMessagingTemplate.convertAndSend("/public/connect", "TPE not valid.");
             }
         } catch (Exception e) {
-            this.simpMessagingTemplate.convertAndSend("/public/register", "There was an error while registring your TPE.");
+            this.simpMessagingTemplate.convertAndSend("/public/connect", "There was an error while registring your TPE.");
         }
     }
 }

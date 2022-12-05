@@ -8,4 +8,5 @@ import javax.transaction.Transactional;
 @Repository
 @Transactional
 public interface TpeRepository extends GenericRepository<Tpe> {
+    Tpe findByMac(String mac);
 }
