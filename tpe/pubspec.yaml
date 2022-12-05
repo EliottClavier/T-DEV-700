@@ -28,6 +28,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   nfc_manager: ^3.2.0
+  qr_code_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:
@@ -42,6 +43,7 @@ flutter:
     - assets/img/qr_code.png
     - assets/img/x-circle.png
     - assets/img/check-circle.png
+    - assets/img/arrow-left.png
   fonts:
     - family: Montserrat
       fonts:

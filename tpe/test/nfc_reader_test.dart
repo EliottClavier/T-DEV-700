@@ -6,7 +6,7 @@ import 'package:tpe/screens/nfc_reader.dart';
 void main() {
   testWidgets('NFC data formatter test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const NfcReaderScreen());
+    await tester.pumpWidget(const NfcReaderScreen(price: "1.00"));
 
     NfcReaderScreenWidgetState nfcReaderScreenWidgetState =
         NfcReaderScreenWidgetState();
