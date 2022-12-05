@@ -32,9 +32,20 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
         }
     }
 
-    public ObjectResponse remove(T entity) {
+    public ObjectResponse delete(T entity) {
         try {
             repository.delete(entity);
+            repository.flush();
+            return new ObjectResponse("Success");
+        } catch (Exception e) {
+            return new ObjectResponse(e.getMessage());
+        }
+    }
+
+    public ObjectResponse deleteByUUID(String id) {
+        try {
+            UUID uuid = UUID.fromString(id);
+            repository.deleteById(uuid);
             repository.flush();
             return new ObjectResponse("Success");
         } catch (Exception e) {

@@ -8,5 +8,4 @@ import java.util.UUID;
 
 @NoRepositoryBean
 public interface GenericRepository<T> extends JpaRepository<T, UUID> {
-    public List<T> findAll();
 }

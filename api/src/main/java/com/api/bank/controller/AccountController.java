@@ -33,8 +33,8 @@ public class AccountController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ObjectResponse> delete(@RequestBody Account data){
-        return ResponseEntity.ok(accountService.remove(data));
+    public ResponseEntity<ObjectResponse> delete(@RequestBody Account entity){
+        return ResponseEntity.ok(accountService.delete(entity));
     }
 }
 
