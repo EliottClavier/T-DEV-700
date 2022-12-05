@@ -15,4 +15,8 @@ import javax.persistence.InheritanceType;
 public class Tpe extends Base {
     private String macId;
     private String TokenRegister;
+
+    public Tpe() {
+        super();
+    }
 }

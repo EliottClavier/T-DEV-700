@@ -27,23 +27,6 @@ public class Account extends Base {
     @JoinColumn(name = "card_id")
     private Card card;
 
-    public Card getCard() {
-        return card;
-    }
-
-    public void setCard(Card card) {
-        this.card = card;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-
     public Account() {
         super();
     }
