@@ -29,11 +29,7 @@ class HomeScreenStatefulWidget extends StatefulWidget {
       _HomeScreenStatefulWidgetState();
 }
 
-class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget>
-    with TickerProviderStateMixin {
-  late AnimationController controller;
-  late CurvedAnimation _animation;
-
+class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   String getPrice() {
     Random rng = Random();
     var price = rng.nextInt(100);
@@ -53,35 +49,11 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget>
 
   @override
   void initState() {
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )
-      ..addListener(
-        () {
-          setState(() {});
-        },
-      )
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          controller.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          controller.forward();
-        }
-      });
-
-    _animation = CurvedAnimation(
-      parent: controller,
-      curve: Curves.linear,
-    );
-
-    controller.repeat(reverse: true);
     super.initState();
   }
 
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
   }
 
@@ -98,12 +70,8 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  CircularProgressIndicator(
-                    value: controller.value,
-                    color: Colors.white,
-                    strokeWidth: 3,
-                    semanticsLabel: 'Circular progress indicator',
-                  ),
+                  Image.asset("assets/gif/home_loader.gif",
+                      width: 300, height: 300),
                 ],
               )
             ],
