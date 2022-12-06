@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:tpe/screens/payment.dart';
+import 'package:tpe/screens/payment_sending.dart';
+import 'package:tpe/utils/snackbar.dart';
 
 class NfcReaderScreen extends StatelessWidget {
   const NfcReaderScreen({super.key, required this.price});
@@ -76,6 +78,25 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
       }
     });
     nfcDataString = getFormatedDataFromNfcData(identifier);
+    var snackBarMessage =
+        nfcDataString.isNotEmpty ? "Scan NFC réussi" : "Erreur de scan";
+    showSnackBar(context, snackBarMessage, "success", 2);
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      dispose();
+      sendPayment(nfcDataString);
+    });
+  }
+
+  void sendPayment(String nfcDataString) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PaymentSendingScreen(
+          price: widget.price,
+          paymentData: nfcDataString,
+          paymentMethod: "nfc",
+        ),
+      ),
+    );
   }
 
   void _initNfc() async {
@@ -90,11 +111,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
   }
 
   void _disposeNfc() async {
-    try {
-      await widget.nfcManager.stopSession();
-    } on PlatformException catch (e) {
-      print('Error: $e');
-    }
+    widget.nfcManager.stopSession();
   }
 
   void _onBackButtonPressed() {
@@ -114,17 +131,10 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: const <Widget>[
-            Text(
-              "Paiement NFC",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              'Place your phone near a NFC tag',
+          children: <Widget>[
+            Image.asset("assets/gif/animation_nfc.gif"),
+            const Text(
+              "Veuillez scanner votre carte",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
