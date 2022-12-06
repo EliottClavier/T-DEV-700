@@ -50,6 +50,7 @@ class _PaymentScreenStatefulWidgetState
   }
 
   void _onPaymentSent() {
+    dispose();
     Random random = Random();
     StatelessWidget screen = random.nextBool()
         ? PaymentSuccessScreen(
@@ -64,11 +65,12 @@ class _PaymentScreenStatefulWidgetState
   }
 
   void _onNfcSelected() {
-    Navigator.of(context).push(
+    /* Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => NfcReaderScreen(price: widget.price),
       ),
-    );
+    ); */
+    Navigator.pop(context);
   }
 
   void _onQrCodeSelected() {
@@ -79,7 +81,7 @@ class _PaymentScreenStatefulWidgetState
     );
   }
 
-  @override
+  /* @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
@@ -106,12 +108,34 @@ class _PaymentScreenStatefulWidgetState
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                IconButton(
-                  icon: Image.asset('assets/img/qr_code.png'),
-                  iconSize: 300,
-                  onPressed: () {
-                    _onQrCodeSelected();
-                  },
+                Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  child: IconButton(
+                    icon: Image.asset('assets/img/qr_code.png'),
+                    iconSize: 300,
+                    onPressed: () {
+                      _onQrCodeSelected();
+                    },
+                  ),
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  transform: Matrix4.translationValues(0, -85, 0),
+                  child: const Text(
+                    "Payer par chèque",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      fontSize: 25,
+                      letterSpacing: 0.02,
+                      height: 1.2,
+                    ),
+                  ),
                 )
               ],
             ),
@@ -127,9 +151,137 @@ class _PaymentScreenStatefulWidgetState
                 )
               ],
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  transform: Matrix4.translationValues(0, -60, 0),
+                  child: const Text(
+                    "Payer par NFC",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      fontSize: 25,
+                      letterSpacing: 0.02,
+                      height: 1.2,
+                    ),
+                  ),
+                )
+              ],
+            ),
           ],
         ),
       ),
     );
+  } */
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 35),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Text(
+                "Montant: ${widget.price}",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  fontSize: 32,
+                  letterSpacing: 0.02,
+                  height: 1.2,
+                ),
+              ),
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: IconButton(
+                      icon: Image.asset('assets/img/qr_code.png'),
+                      iconSize: 300,
+                      onPressed: () {
+                        _onQrCodeSelected();
+                      },
+                    ),
+                  ),
+                  const Positioned(
+                    bottom: 45,
+                    child: Text(
+                      "Payer par chèque",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        fontSize: 25,
+                        letterSpacing: 0.02,
+                        height: 1.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: IconButton(
+                        icon: Image.asset('assets/img/nfc.png'),
+                        iconSize: 300,
+                        onPressed: () {
+                          _onNfcSelected();
+                        },
+                      ),
+                    ),
+                    const Positioned(
+                      bottom: 45,
+                      child: Text(
+                        "Payer par NFC",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          fontSize: 25,
+                          letterSpacing: 0.02,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                  ]),
+              /* IconButton(
+                icon: Image.asset('assets/img/nfc.png'),
+                iconSize: 300,
+                onPressed: () {
+                  _onNfcSelected();
+                },
+              ),
+              Container(
+                transform: Matrix4.translationValues(0, -60, 0),
+                child: const Text(
+                  "Payer par NFC",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    fontSize: 25,
+                    letterSpacing: 0.02,
+                    height: 1.2,
+                  ),
+                ),
+              ) */
+            ],
+          ),
+        ),
+      ),
+    ));
   }
 }

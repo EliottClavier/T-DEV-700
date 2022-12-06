@@ -1,4 +1,6 @@
 import 'dart:ffi';
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +42,15 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +110,7 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   }
 
   void _onBackButtonPressed() {
+    dispose();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => PaymentScreen(
@@ -140,7 +152,10 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
 
   @override
   void dispose() {
-    controller?.stopCamera();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      controller?.stopCamera();
+      controller?.dispose();
+    });
     super.dispose();
   }
 }

@@ -77,6 +77,7 @@ class _PaymentSendingScreenStatefulWidgetState
         price: widget.price,
       );
     }
+    dispose();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => screen,

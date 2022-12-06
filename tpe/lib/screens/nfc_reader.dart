@@ -115,6 +115,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
   }
 
   void _onBackButtonPressed() {
+    dispose();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => PaymentScreen(
