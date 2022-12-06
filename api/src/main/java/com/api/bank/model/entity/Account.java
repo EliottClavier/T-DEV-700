@@ -27,6 +27,10 @@ public class Account extends Base {
     @JoinColumn(name = "card_id")
     private Card card;
 
+//    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinColumn(name = "card_id")
+//    private QrCheck qrCheck;
+
     public Account() {
         super();
     }

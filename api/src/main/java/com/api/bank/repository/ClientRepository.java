@@ -10,4 +10,6 @@ import javax.transaction.Transactional;
 
 public interface ClientRepository extends GenericRepository<Client>{
 
+    Client findClientByOrganisationName(String name);
+
 }

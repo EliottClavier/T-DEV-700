@@ -1,6 +1,7 @@
 package com.api.bank.repository;
 
 import com.api.bank.model.entity.Account;
+import com.api.bank.model.entity.Client;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
@@ -10,6 +11,8 @@ import javax.transaction.Transactional;
 public interface AccountRepository extends GenericRepository<Account> {
 
     Account findAccountByCard_CardId(String accountId);
+
+    Account findAccountByClient(Client client);
 
 
 

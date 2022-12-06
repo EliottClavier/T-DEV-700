@@ -28,7 +28,4 @@ public class QrCheck extends Base {
         super();
     }
 
-
-
-
 }

@@ -7,5 +7,5 @@ import javax.persistence.*;
 
 public enum OperationType {
     WITHDRAW,
-    CREDIT
+    DEPOSIT,
 }

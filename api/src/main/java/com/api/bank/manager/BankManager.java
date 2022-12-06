@@ -1,79 +1,135 @@
 package com.api.bank.manager;
 
-import com.api.bank.model.entity.Account;
-import com.api.bank.model.entity.Card;
-import com.api.bank.model.entity.OperationStatus;
-import com.api.bank.model.transaction.CardTransaction;
-import com.api.bank.model.transaction.CheckTransaction;
-import com.api.bank.model.transaction.TransactionResult;
-import com.api.bank.model.transaction.TransactionStatus;
+import com.api.bank.model.BankConstants;
+import com.api.bank.model.ObjectResponse;
+import com.api.bank.model.entity.*;
+import com.api.bank.model.exception.BankTransactionException;
+import com.api.bank.model.transaction.*;
 import com.api.bank.repository.AccountRepository;
-import com.api.bank.repository.CardRepository;
-import com.api.bank.repository.GenericRepository;
+import com.api.bank.repository.ClientRepository;
 import com.api.bank.repository.OperationRepository;
 import com.api.bank.service.AccountService;
-import com.api.bank.service.CardService;
-import com.api.bank.service.GenericService;
+import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
 @Component
-public class BankManager
-    private final AccountRepository accountRepository;
-    private final OperationRepository operationRepository;
+public class BankManager {
     private final AccountService accountService;
     private final OperationService operationService;
+    private final ClientService clientService;
+
+    private TransactionModel actualTransaction;
 
 
-
-    public BankManager(OperationRepository operationRepository, AccountRepository accountRepository) {
-
-        this.accountRepository = accountRepository;
-        this.operationRepository = operationRepository;
+    public BankManager(OperationRepository operationRepository, AccountRepository accountRepository, ClientRepository clientRepository) {
 
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
+        this.clientService = new ClientService(clientRepository);
     }
 
-    public TransactionResult HandleCardOperation(CardTransaction transaction) {
+    @Transactional(rollbackFor = {BankTransactionException.class, Exception.class})
+    public TransactionResult HandleTransaction(TransactionModel transaction) {
 
-        // TODO Ecrire en base qu'une operation est en cours pour le compte debiteur
+        try {
+            this.actualTransaction = transaction;
+            Account withdrawAccount;
+            if (transaction.getPaymentMethod() == PaymentMethod.CARD) {
+                withdrawAccount = accountService.getAccountByCardId(transaction.getCardId());
+            } else {
+                withdrawAccount = clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
+            }
+            // Is the card valid ?
+            if (withdrawAccount == null || withdrawAccount.getCard() == null)
+                throw new BankTransactionException(TransactionStatus.CARD_ERROR, transaction.getOperationId(), "Card not found");
 
-        var clientAccount = accountService.getAccountByCardId(transaction.cardId);
+            // Is the expiration date card's valid ?
+            if (withdrawAccount.getCard().getExpirationDate().before(new Date()))
+                throw new BankTransactionException(TransactionStatus.CARD_ERROR, transaction.getOperationId(), "Card expired");
 
-        if (clientAccount.getCard() == null)
-            return new TransactionResult(TransactionStatus.CARD_ERROR, transaction.OperationId, "Card not found");
+            // Is an operation is already in progress ?
+            if (operationService.isOtherOperationIsPending(transaction.getOperationId()))
+                throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
-        if (clientAccount.getCard().getExpirationDate().before(new Date()))
-            return new TransactionResult(TransactionStatus.CARD_ERROR, transaction.OperationId, "Card expired");
+            // Add the operation to the list of pending operations
+            var clientOperation = createOperation(transaction, withdrawAccount, OperationStatus.PENDING, OperationType.DEPOSIT, PaymentMethod.CARD);
+            if (!operationService.add(clientOperation).isValid())
+                throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
-        if (clientAccount.getSold() < transaction.getAmount())
-            return new TransactionResult(TransactionStatus.INSUFFICIENT_FUNDS_ERROR, transaction.OperationId, "Insufficient funds");
+            // Is the account debited has enough money ?
+            if (withdrawAccount.getSold() < transaction.getAmount())
+                throw new BankTransactionException(TransactionStatus.INSUFFICIENT_FUNDS_ERROR, transaction.getOperationId(), "Insufficient funds");
 
-        if( operationService.isOtherOperationIsPending(transaction.OperationId))
-            return new TransactionResult(TransactionStatus.OPERATION_PENDING_ERROR, transaction.OperationId, "Operation pending");
+            // Debit the account and update the operation status
+            if (setSoldAccount(withdrawAccount, transaction).isValid()) {
+                this.persistOperationStatus(OperationStatus.CLOSED, clientOperation);
+            } else {
+                this.persistOperationStatus(OperationStatus.CANCELED, clientOperation);
+                throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
+            }
 
-        //TODO Completer la transaction debiteur
-        //TODO Ecrire en base qu'une operation est terminée pour le compte debiteur
+            Account shopAccount = getShopAccountbyToken(transaction.getTokenShop());
+            var shopOperation = createOperation(transaction, shopAccount, OperationStatus.PENDING, OperationType.DEPOSIT, PaymentMethod.CARD);
 
-        //TODO Ecrire en base qu'une operation est en cours pour le compte crediteur
-        //TODO Ecrire la transaction crediteur
-        //TODO Ecrire en base qu'une operation est terminée pour le compte crediteur
+            if (!operationService.add(shopOperation).isValid())
+                throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
-        //TODO Ecrire en base le solde mis à jour pour le compte debiteur
-        //TODO Ecrire en base le solde mis à jour pour le compte crediteur
+            shopAccount.setSold(shopAccount.getSold() + transaction.getAmount());
+            var resShop = accountService.update(shopAccount);
 
-        return new TransactionResult(TransactionStatus.SUCCESS, transaction.OperationId, "Transaction success");
+            if (resShop.isValid()) {
+
+                if (!this.persistOperationStatus(OperationStatus.CLOSED, shopOperation))
+                    throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
+
+                return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "Payment has been validated");
+            } else {
+
+                this.persistOperationStatus(OperationStatus.CANCELED, shopOperation);
+//                this.persistOperationStatus(OperationStatus.CANCELED, clientOperation);
+
+                throw new BankTransactionException(TransactionStatus.PAYMENT_ERROR, transaction.getOperationId(), "Payment error was occurred");
+            }
+        } catch (
+                BankTransactionException e) {
+
+            return new TransactionResult(e.getTransactionStatus(), e.getOperationId(), e.getMessage());
+
+        } catch (
+                Exception e) {
+
+            return new TransactionResult(TransactionStatus.FAILED, transaction.getOperationId(), e.getMessage());
+        }
 
     }
 
-    public TransactionResult HandleCheckOperation() {
-        //TODO
-        return null;
+    private Operation createOperation(TransactionModel transaction, Account account, OperationStatus opeStatus, OperationType opeType, PaymentMethod payMethod) {
+        return new Operation(transaction.getOperationId(), transaction.getLabel(), transaction.getAmount(),
+                transaction.getDate(), account, opeStatus, opeType, payMethod);
+
     }
+
+    private Account getShopAccountbyToken(String tokenShop) {
+        // String shopAccountId = JWTUtils.validateTokenAndRetrieveSubject(transaction.tokenShop);
+        String shopAccountId = UUID.randomUUID().toString();
+        return (Account) accountService.get(shopAccountId).getData();
+
+    }
+
+    private ObjectResponse setSoldAccount(Account clientAccount, TransactionModel transaction) {
+        clientAccount.setSold(clientAccount.getSold() - transaction.getAmount());
+        return accountService.update(clientAccount);
+    }
+
+    boolean persistOperationStatus(OperationStatus status, Operation operation) {
+        operation.setOperationStatus(status);
+        return operationService.update(operation).isValid();
+    }
+
+
 }

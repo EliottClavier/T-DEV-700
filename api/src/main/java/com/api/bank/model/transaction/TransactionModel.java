@@ -1,16 +1,21 @@
 package com.api.bank.model.transaction;
 
+import com.api.bank.model.entity.PaymentMethod;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public abstract class TransactionModel {
+public class TransactionModel {
 
-    public String OperationId;
-    public int amount;
-    public String tokenShop;
-    public String tokenTpe;
-    public Date date;
+    private String OperationId;
+    private String label;
+    private String cardId;
+    private String checkToken;
+    private int amount;
+    private String tokenShop;
+    private String tokenTpe;
+    private Date date;
+    private PaymentMethod paymentMethod;
 }
 

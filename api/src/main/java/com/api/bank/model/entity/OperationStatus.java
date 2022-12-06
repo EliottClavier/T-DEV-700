@@ -4,5 +4,5 @@ public enum OperationStatus {
     PENDING,
     CLOSED,
     CANCELED,
-    ERROR,
+
 }

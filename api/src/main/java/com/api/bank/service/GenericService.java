@@ -11,8 +11,6 @@ import java.util.UUID;
 @Service
 public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
 
-    private T entity;
-
     private T1 repository;
 
     public GenericService(T1 repository) {
@@ -26,7 +24,7 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
         try {
             repository.save(entity);
             repository.flush();
-            return new ObjectResponse("Success", entity);
+            return new ObjectResponse("Success", entity, true);
         } catch (Exception e) {
             return new ObjectResponse(e.getMessage());
         }
@@ -56,9 +54,9 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
         try {
             repository.save(entity);
             repository.flush();
-            return new ObjectResponse("Success", entity);
+            return new ObjectResponse("Success", entity, true);
         } catch (Exception e) {
-            return new ObjectResponse(e.getMessage());
+            return new ObjectResponse(e.getMessage(), null, false);
         }
     }
 

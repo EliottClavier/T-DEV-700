@@ -15,4 +15,7 @@ public class ClientService extends GenericService<Client, ClientRepository> {
         super(clientRepository);
     }
 
+    public Client getClientByOrganisationName(String name){
+        return clientRepository.findClientByOrganisationName(name);
+    }
 }
