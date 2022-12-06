@@ -56,7 +56,6 @@ class _PaymentSendingScreenStatefulWidgetState
   void initState() {
     super.initState();
 
-    //Simulate request to bank
     Future.delayed(const Duration(milliseconds: 3000), () {
       sendData();
     });

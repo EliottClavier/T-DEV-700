@@ -1,5 +1,3 @@
-import 'dart:ffi';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
