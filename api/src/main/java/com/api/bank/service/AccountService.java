@@ -15,5 +15,8 @@ public class AccountService extends GenericService<Account, AccountRepository > 
         super(accountRepository);
     }
 
+    public Account getAccountByCardId(String cardId){
+        return accountRepository.findAccountByCard_CardId(cardId);
+    }
 }
 

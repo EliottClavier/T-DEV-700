@@ -11,9 +11,9 @@ import java.util.UUID;
 @Service
 public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
 
-    protected T entity;
+    private T entity;
 
-    protected T1 repository;
+    private T1 repository;
 
     public GenericService(T1 repository) {
         this.repository = repository;

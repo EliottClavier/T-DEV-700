@@ -23,7 +23,6 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-//    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<ObjectResponse> get(@PathVariable String id){
         return ResponseEntity.ok(clientService.get(id));
     }

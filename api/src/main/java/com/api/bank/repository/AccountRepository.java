@@ -8,4 +8,10 @@ import javax.transaction.Transactional;
 @Repository
 @Transactional
 public interface AccountRepository extends GenericRepository<Account> {
+
+    Account findAccountByCard_CardId(String accountId);
+
+
+
+
 }

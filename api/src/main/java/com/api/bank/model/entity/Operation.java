@@ -28,11 +28,15 @@ public class Operation extends Base {
     @JoinColumn(name = "id_report", nullable = false)
     private Report type;
 
+
     @ManyToOne(cascade = CascadeType.ALL)
     private Account account;
 
-    @ManyToOne()
-    @JoinColumn(name = "id_type_operation", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OperationStatus operationStatus;
+
+
+    @Enumerated(EnumType.STRING)
     private OperationType operationType;
 
     public Operation() {
