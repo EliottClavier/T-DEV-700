@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:shop/widgets/navBar.dart';
 import 'package:shop/util/shop.dart';
 import 'package:shop/widgets/shop_card.dart';
+import 'package:shop/widgets/separation.dart';
 
 class Shop extends StatefulWidget {
   static const String pageName = '/shop';
@@ -54,16 +55,17 @@ class ShopState extends State<Shop> {
                   },
                 ),
               ),
+              const Separation(),
               const SizedBox(height: 10),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   Text(
-                    // ignore: prefer_interpolation_to_compose_strings
                     'TOTAL : ${widget.total} €',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 25,
+                      decoration: TextDecoration.none,
                     ),
                     textAlign: TextAlign.center,
                   ),
