@@ -5,9 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
 
@@ -15,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @RedisHash(value = "TPE")
-public class Tpe implements Serializable {
+public class TpeRedis implements Serializable {
 
     @Id
     // Id = Adresse MAC
@@ -23,7 +20,7 @@ public class Tpe implements Serializable {
     public String ip;
 
     public Boolean isValid() {
-        return !id.isEmpty() && !ip.isEmpty();
+        return id != null && !id.isEmpty() && ip != null && !ip.isEmpty();
     }
 
 }
