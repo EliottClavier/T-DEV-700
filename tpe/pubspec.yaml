@@ -46,6 +46,9 @@ flutter:
     - assets/img/x-circle.png
     - assets/img/check-circle.png
     - assets/img/arrow-left.png
+    - assets/gif/animation_nfc.gif
+    - assets/gif/home_loader.gif
+    - assets/gif/payment_loader.gif
   fonts:
     - family: Montserrat
       fonts:

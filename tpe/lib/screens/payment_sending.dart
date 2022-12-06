@@ -51,42 +51,13 @@ class PaymentSendingScreenStatefulWidget extends StatefulWidget {
 }
 
 class _PaymentSendingScreenStatefulWidgetState
-    extends State<PaymentSendingScreenStatefulWidget>
-    with TickerProviderStateMixin {
-  late AnimationController controller;
-  late CurvedAnimation _animation;
-
+    extends State<PaymentSendingScreenStatefulWidget> {
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )
-      ..addListener(
-        () {
-          setState(() {});
-        },
-      )
-      ..addStatusListener(
-        (status) {
-          if (status == AnimationStatus.completed) {
-            controller.reverse();
-          } else if (status == AnimationStatus.dismissed) {
-            controller.forward();
-          }
-        },
-      );
-
-    _animation = CurvedAnimation(
-      parent: controller,
-      curve: Curves.linear,
-    );
-
-    controller.repeat(reverse: true);
 
     //Simulate request to bank
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 3000), () {
       sendData();
     });
   }
@@ -123,13 +94,22 @@ class _PaymentSendingScreenStatefulWidgetState
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                CircularProgressIndicator(
-                  value: controller.value,
-                  color: Colors.white,
-                  strokeWidth: 3,
-                  semanticsLabel: 'Circular progress indicator',
+              children: const [
+                Text(
+                  "Paiement en cours",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset("assets/gif/payment_loader.gif",
+                    width: 200, height: 200),
               ],
             ),
           ],
