@@ -1,4 +1,4 @@
-package com.api.api.controller;
+package com.api.apk.controller;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -46,7 +46,7 @@ public class ApkController {
         return new ResponseEntity<>(isResource, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/tpe.apk", method = RequestMethod.GET)
+    @RequestMapping(path = "/tpe.apk", method = RequestMethod.GET, produces = "application/apk")
     public ResponseEntity<InputStreamResource> getTpeApk() throws IOException {
         File file = getApkFile("/apks/tpe.apk");
         InputStreamResource isResource = new InputStreamResource(new FileInputStream(file));

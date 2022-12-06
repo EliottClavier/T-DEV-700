@@ -4,14 +4,18 @@ import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:tpe/screens/payment.dart';
+
 class NfcReaderScreen extends StatelessWidget {
-  const NfcReaderScreen({super.key});
+  const NfcReaderScreen({super.key, required this.price});
+
+  final String price;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'NFC Reader',
-      home: NfcReaderScreenWidget(),
+      home: NfcReaderScreenWidget(price: price),
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF03045F),
         primarySwatch: Colors.blue,
@@ -22,9 +26,10 @@ class NfcReaderScreen extends StatelessWidget {
 }
 
 class NfcReaderScreenWidget extends StatefulWidget {
-  NfcReaderScreenWidget({super.key});
+  NfcReaderScreenWidget({super.key, required this.price});
 
   final NfcManager nfcManager = NfcManager.instance;
+  final String price;
 
   @override
   State<NfcReaderScreenWidget> createState() => NfcReaderScreenWidgetState();
@@ -92,6 +97,16 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     }
   }
 
+  void _onBackButtonPressed() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PaymentScreen(
+          price: widget.price,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,6 +133,17 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _onBackButtonPressed();
+        },
+        backgroundColor: Colors.white,
+        child: IconButton(
+            onPressed: _onBackButtonPressed,
+            color: Colors.white,
+            icon: Image.asset("assets/img/arrow-left.png")),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
     );
   }
 }

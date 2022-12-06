@@ -1,17 +1,16 @@
-package com.api.api;
+package com.api;
+
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@SpringBootApplication
+
+@EnableJpaRepositories("com.api.bank.repository")
+@SpringBootApplication(scanBasePackages = {"com.api", "com.api.apk", "com.api.tpe", "com.api.bank"})
 public class ApiApplication {
-    @RequestMapping("/")
-    public String home() {
-        return "<h1>API is running !<h1>";
-    }
 
     public static void main(String[] args) {
         SpringApplication.run(ApiApplication.class, args);
