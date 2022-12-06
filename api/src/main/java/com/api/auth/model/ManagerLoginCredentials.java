@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class LoginCredentials {
+public class ManagerLoginCredentials {
     private String username;
     private String password;
 }

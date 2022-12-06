@@ -1,10 +1,13 @@
 package com.api.auth.security;
 
+import com.api.auth.security.details.service.ManagerDetailsService;
+import com.api.auth.security.details.service.TpeDetailsService;
+import com.api.auth.security.providers.ManagerAuthenticationProvider;
+import com.api.auth.security.providers.TpeAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,15 +24,15 @@ public class SecurityConfig {
 
     private final JWTFilter filter;
     private final ManagerDetailsService mds;
+    private final TpeDetailsService tds;
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder()
-    {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, ProviderManager authenticationManager) throws Exception {
         http.csrf().disable()
             .httpBasic().disable()
             .cors()
@@ -37,8 +40,9 @@ public class SecurityConfig {
             .authorizeHttpRequests()
             .antMatchers("/auth/**").permitAll()
             .antMatchers("/bank/tpe/**").hasRole("MANAGER")
+            .antMatchers("/tpe-manager/**").hasRole("TPE")
             .and()
-            .userDetailsService(mds)
+            .authenticationManager(authenticationManager)
             .exceptionHandling()
             .authenticationEntryPoint(
                 (request, response, authException) ->
@@ -52,13 +56,24 @@ public class SecurityConfig {
 
         return http.build();
     }
+    @Bean
+    public ProviderManager authenticationManager() {
+        return new ProviderManager(managerAuthenticationProvider(), tpeAuthenticationProvider());
+    }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception{
-        return httpSecurity.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(mds)
-                .passwordEncoder(passwordEncoder())
-                .and()
-                .build();
+    public ManagerAuthenticationProvider managerAuthenticationProvider() {
+        ManagerAuthenticationProvider managerAuthenticationProvider = new ManagerAuthenticationProvider();
+        managerAuthenticationProvider.setUserDetailsService(mds);
+        managerAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return managerAuthenticationProvider;
+    }
+
+    @Bean
+    public TpeAuthenticationProvider tpeAuthenticationProvider() {
+        TpeAuthenticationProvider tpeAuthenticationProvider = new TpeAuthenticationProvider();
+        tpeAuthenticationProvider.setUserDetailsService(tds);
+        tpeAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return tpeAuthenticationProvider;
     }
 }

@@ -1,4 +1,4 @@
-package com.api.auth.security;
+package com.api.auth.security.details.service;
 
 import com.api.auth.entity.Manager;
 import com.api.auth.repository.ManagerRepository;
@@ -14,13 +14,13 @@ import java.util.Optional;
 
 @Component
 public class ManagerDetailsService implements UserDetailsService {
-
     @Autowired
     private ManagerRepository managerRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Manager> managerRes = managerRepository.findByUsername(username);
+        System.out.println(managerRes);
         if(managerRes.isEmpty())
             throw new UsernameNotFoundException("Could not findUser with username = " + username);
         Manager manager = managerRes.get();

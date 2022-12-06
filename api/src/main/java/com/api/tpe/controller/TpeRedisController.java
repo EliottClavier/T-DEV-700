@@ -81,7 +81,7 @@ public class TpeRedisController {
 
         try {
             TpeRedis tpeRedis = gson.fromJson(tpeString, TpeRedis.class);
-            Tpe tpe = tpeRepository.findByMac(tpeRedis.getId());
+            Tpe tpe = tpeRepository.findByMac(tpeRedis.getId()).get();
 
             if (tpe.getWhitelisted()) {
                 if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeRedis.getId())) {
