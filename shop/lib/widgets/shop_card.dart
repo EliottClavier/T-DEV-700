@@ -8,7 +8,8 @@ class ShopCard extends StatefulWidget {
   final Map article;
   final ShopState shop = ShopState();
   final Function onQuantityChanged;
-  ShopCard({super.key, required this.article, required this.onQuantityChanged});
+  final Function onRemove;
+  ShopCard({super.key, required this.article, required this.onQuantityChanged, required this.onRemove});
 
   @override
   State<ShopCard> createState() => _ShopCard();
@@ -17,7 +18,10 @@ class ShopCard extends StatefulWidget {
 class _ShopCard extends State<ShopCard> {
 
   void quantityModifier(int quantity) {
-    for (var shopArticle in shop_articles) {
+    if (quantity == 0) {
+      removeArticle();
+    } else {
+      for (var shopArticle in shop_articles) {
       if (shopArticle['name'] == widget.article['name']) {
         shopArticle['quantity'] = quantity;
         break;
@@ -27,6 +31,12 @@ class _ShopCard extends State<ShopCard> {
     setState(() {
       widget.article['quantity'] = quantity;
     });
+    }
+  }
+
+  void removeArticle() {
+    shop_articles.remove(widget.article);
+    widget.onRemove();
   }
 
   @override
@@ -118,8 +128,31 @@ class _ShopCard extends State<ShopCard> {
                 child: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    shop_articles.remove(widget.article);
-                    setState(() {});
+                    // Dialogue to confirm deletion
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Supprimer l'article"),
+                          content: const Text("Voulez-vous vraiment supprimer cet article ?"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("Annuler"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            TextButton(
+                              child: const Text("Supprimer"),
+                              onPressed: () {
+                                removeArticle();
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
               ),

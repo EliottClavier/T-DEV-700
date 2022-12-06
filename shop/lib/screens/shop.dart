@@ -1,10 +1,13 @@
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:shop/widgets/navBar.dart';
 import 'package:shop/util/shop.dart';
 import 'package:shop/widgets/shop_card.dart';
 import 'package:shop/widgets/separation.dart';
+import 'package:shop/router/router.dart';
 
 class Shop extends StatefulWidget {
   static const String pageName = '/shop';
@@ -17,6 +20,8 @@ class Shop extends StatefulWidget {
 
 class ShopState extends State<Shop> {
 
+  List articlesInShop = shop_articles;
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +30,12 @@ class ShopState extends State<Shop> {
   void changerTotal() {
     setState(() {
       widget.total = totalPrice();
+    });
+  }
+
+  void removeArticle() {
+    setState(() {
+      articlesInShop = shop_articles;
     });
   }
 
@@ -49,9 +60,9 @@ class ShopState extends State<Shop> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: shop_articles.length,
+                  itemCount: articlesInShop.length,
                   itemBuilder: (context, index) {
-                    return ShopCard(article: shop_articles[index], onQuantityChanged: changerTotal);
+                    return ShopCard(article: articlesInShop[index], onQuantityChanged: changerTotal, onRemove: removeArticle);
                   },
                 ),
               ),
