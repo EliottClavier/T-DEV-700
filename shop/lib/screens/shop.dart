@@ -87,7 +87,7 @@ class ShopState extends State<Shop> {
                 ],
               ),
               const SizedBox(height: 20),
-              NavBar(parentContext: context,),
+              NavBar(parentContext: context, total: widget.total,),
             ],
           ),
         ),

@@ -5,8 +5,9 @@ import 'package:shop/util/shop.dart';
 
 class ArticleCard extends StatelessWidget {
   final Map article;
+  final Function onQuantityChanged;
 
-  ArticleCard({required this.article});
+  ArticleCard({required this.article, required this.onQuantityChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +19,7 @@ class ArticleCard extends StatelessWidget {
             for(var shopArticle in shop_articles){
               if(shopArticle['name'] == article['name']){
                 shopArticle['quantity'] = shopArticle['quantity'] + 1;
+                onQuantityChanged();
                 return;
               }
             }
@@ -28,6 +30,7 @@ class ArticleCard extends StatelessWidget {
               'quantity': quantity,
             };
             shop_articles.add(shopArticle);
+            onQuantityChanged();
           }),
           child: Container(
             width: 150,

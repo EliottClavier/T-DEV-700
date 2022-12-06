@@ -3,13 +3,16 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:shop/screens/listArticles.dart';
 import 'package:shop/screens/shop.dart';
+import 'package:shop/util/shop.dart';
 import 'package:shop/router/router.dart';
 
 class NavBar extends StatefulWidget {
   final BuildContext parentContext;
+  final String? total;
   late int selectedPage;
+  
 
-  NavBar({super.key, required this.parentContext});
+  NavBar({super.key, required this.parentContext, required this.total});
 
   void selectPage() {
     if (parentContext.toString().contains('ListArticles') == true) {
@@ -20,10 +23,11 @@ class NavBar extends StatefulWidget {
   }
 
   @override
-  State<NavBar> createState() => _NavBar();
+  State<NavBar> createState() => NavBarState();
 }
 
-class _NavBar extends State<NavBar> {
+class NavBarState extends State<NavBar> {
+
   @override
   Widget build(BuildContext context) {
     widget.selectPage();
@@ -52,9 +56,37 @@ class _NavBar extends State<NavBar> {
           label: 'Home',
           icon: Icon(Icons.home),
         ),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
+          icon: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              const Icon(Icons.shopping_cart),
+              Positioned(
+                left: 10,
+                top: -5,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 10,
+                    minHeight: 8,
+                  ),
+                  child: Text(
+                    '${widget.total}€',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            ],
+          ),
           label: 'Panier',
-          icon: Icon(Icons.shopping_cart),
         ),
       ],
       currentIndex: widget.selectedPage,
