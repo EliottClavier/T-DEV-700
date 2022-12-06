@@ -1,11 +1,13 @@
 package com.api.bank.model.entity;
 
+import com.api.bank.model.enums.OperationStatus;
+import com.api.bank.model.enums.OperationType;
+import com.api.bank.model.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
-
 
 @Entity
 @Getter
@@ -24,16 +26,14 @@ public class Operation extends Base {
 
     private Date operationDate;
 
-//    @ManyToOne()
-//    @JoinColumn(name = "id_report", nullable = false)
-//    private Report type;
+    @ManyToOne(cascade = CascadeType.ALL )
+    private QrCheck qrCheck;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Account account;
 
     @Enumerated(EnumType.STRING)
     private OperationStatus operationStatus;
-
 
     @Enumerated(EnumType.STRING)
     private OperationType operationType;
@@ -48,7 +48,7 @@ public class Operation extends Base {
         }
     }
 
-    public Operation( String operationId,
+    public Operation(String operationId,
                      String label, int amount,
                      Date operationDate,
                      Account account, OperationStatus operationStatus,

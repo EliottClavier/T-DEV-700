@@ -1,5 +1,6 @@
 package com.api.bank.model.transaction;
 
+import com.api.bank.model.enums.TransactionStatus;
 import lombok.Data;
 
 @Data

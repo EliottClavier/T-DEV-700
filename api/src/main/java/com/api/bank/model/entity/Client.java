@@ -2,6 +2,7 @@ package com.api.bank.model.entity;
 
 
 
+import com.api.bank.model.enums.SocialReasonStatus;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,4 +1,4 @@
-package com.api.bank.model.entity;
+package com.api.bank.model.enums;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -3,6 +3,10 @@ package com.api.bank.manager;
 import com.api.bank.model.BankConstants;
 import com.api.bank.model.ObjectResponse;
 import com.api.bank.model.entity.*;
+import com.api.bank.model.enums.OperationStatus;
+import com.api.bank.model.enums.OperationType;
+import com.api.bank.model.enums.PaymentMethod;
+import com.api.bank.model.enums.TransactionStatus;
 import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.*;
 import com.api.bank.repository.AccountRepository;
@@ -23,7 +27,6 @@ public class BankManager {
     private final OperationService operationService;
     private final ClientService clientService;
 
-    private TransactionModel actualTransaction;
 
 
     public BankManager(OperationRepository operationRepository, AccountRepository accountRepository, ClientRepository clientRepository) {
@@ -36,9 +39,11 @@ public class BankManager {
     @Transactional(rollbackFor = {BankTransactionException.class, Exception.class})
     public TransactionResult HandleTransaction(TransactionModel transaction) {
 
+        Account withdrawAccount;
+        PaymentMethod paymentMethod = transaction.getPaymentMethod();
+
         try {
-            this.actualTransaction = transaction;
-            Account withdrawAccount;
+
             if (transaction.getPaymentMethod() == PaymentMethod.CARD) {
                 withdrawAccount = accountService.getAccountByCardId(transaction.getCardId());
             } else {
@@ -57,7 +62,7 @@ public class BankManager {
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
             // Add the operation to the list of pending operations
-            var clientOperation = createOperation(transaction, withdrawAccount, OperationStatus.PENDING, OperationType.DEPOSIT, PaymentMethod.CARD);
+            var clientOperation = createOperation(transaction, withdrawAccount, OperationStatus.PENDING, OperationType.DEPOSIT, paymentMethod);
             if (!operationService.add(clientOperation).isValid())
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
@@ -74,7 +79,7 @@ public class BankManager {
             }
 
             Account shopAccount = getShopAccountbyToken(transaction.getTokenShop());
-            var shopOperation = createOperation(transaction, shopAccount, OperationStatus.PENDING, OperationType.DEPOSIT, PaymentMethod.CARD);
+            var shopOperation = createOperation(transaction, shopAccount, OperationStatus.PENDING, OperationType.DEPOSIT, paymentMethod);
 
             if (!operationService.add(shopOperation).isValid())
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
@@ -98,7 +103,7 @@ public class BankManager {
         } catch (
                 BankTransactionException e) {
 
-            return new TransactionResult(e.getTransactionStatus(), e.getOperationId(), e.getMessage());
+            return new TransactionResult(e.getTransactionStatus(), transaction.getOperationId(), e.getMessage());
 
         } catch (
                 Exception e) {

@@ -1,7 +1,7 @@
 package com.api.bank.service;
 
 import com.api.bank.model.entity.Operation;
-import com.api.bank.model.entity.OperationStatus;
+import com.api.bank.model.enums.OperationStatus;
 import com.api.bank.repository.GenericRepository;
 import com.api.bank.repository.OperationRepository;
 

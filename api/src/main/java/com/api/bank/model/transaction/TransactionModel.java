@@ -1,6 +1,6 @@
 package com.api.bank.model.transaction;
 
-import com.api.bank.model.entity.PaymentMethod;
+import com.api.bank.model.enums.PaymentMethod;
 import lombok.Data;
 
 import java.util.Date;
