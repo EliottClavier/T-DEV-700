@@ -22,7 +22,7 @@ public class ManagerDetailsService implements UserDetailsService {
         Optional<Manager> managerRes = managerRepository.findByUsername(username);
         System.out.println(managerRes);
         if(managerRes.isEmpty())
-            throw new UsernameNotFoundException("Could not findUser with username = " + username);
+            throw new UsernameNotFoundException("Could not findUser with username = " + username + ".");
         Manager manager = managerRes.get();
         return new org.springframework.security.core.userdetails.User(username, manager.getPassword(),
         Collections.singletonList(new SimpleGrantedAuthority("ROLE_MANAGER")));

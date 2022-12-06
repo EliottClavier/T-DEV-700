@@ -20,12 +20,6 @@ public class TpeController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
-    public ResponseEntity<ObjectResponse> register(@RequestBody Tpe tpe) {
-        ObjectResponse response = tpeService.registerTpe(tpe);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
-
     @RequestMapping(path = "/{uuid}/whitelist", method = RequestMethod.PUT)
     public ResponseEntity<ObjectResponse> whitelistTpe(@PathVariable("uuid") String uuid) {
         ObjectResponse response = tpeService.updateTpeStatus(uuid, true);

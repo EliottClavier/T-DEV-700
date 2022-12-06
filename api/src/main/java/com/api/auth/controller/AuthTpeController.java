@@ -34,7 +34,7 @@ public class AuthTpeController {
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public Map<String, Object> registerHandler(@RequestBody Tpe tpe){
-        if (tpeRepository.findByMac(tpe.getMac()).isEmpty()){
+        if (!tpeRepository.existsByMac(tpe.getMac())) {
             String encodedPass = passwordEncoder.encode(tpe.getSerial());
             tpe.setSerial(encodedPass);
             tpe.setWhitelisted(false);
@@ -51,12 +51,11 @@ public class AuthTpeController {
         try {
             UsernamePasswordAuthenticationToken authInputToken =
                     new UsernamePasswordAuthenticationToken(body.getMac(), body.getSerial());
-
             tpeAuthenticationProvider.authenticate(authInputToken);
             String token = jwtUtil.generateToken(body.getMac(), "TPE Connection");
             return Collections.singletonMap("token", token);
-        } catch (AuthenticationException authExc){
-            return Collections.singletonMap("message", "Wrong credentials.");
+        } catch (AuthenticationException authExc) {
+            return Collections.singletonMap("message", authExc.getMessage());
         }
     }
 }

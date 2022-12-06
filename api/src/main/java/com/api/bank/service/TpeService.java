@@ -21,14 +21,6 @@ public class TpeService extends GenericService<Tpe, TpeRepository> {
         super(tpeRepository);
     }
 
-    public ObjectResponse registerTpe(@RequestBody Tpe tpe) {
-        if (!tpeRepository.existsByMac(tpe.getMac())) {
-            return add(tpe);
-        } else {
-            return new ObjectResponse("Tpe already registered", HttpStatus.CONFLICT);
-        }
-    }
-
     public ObjectResponse getTpeStatus(String id) {
         try {
             Tpe tpe = tpeRepository.findById(UUID.fromString(id)).get();
