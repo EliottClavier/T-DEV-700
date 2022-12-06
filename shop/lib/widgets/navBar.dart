@@ -39,7 +39,6 @@ class NavBarState extends State<NavBar> {
       selectedFontSize: 14,
       unselectedFontSize: 14,
       onTap: (value) {
-        // Respond to item press.
         switch (value) {
           case 0:
             RouterShop.pushRoute(widget.parentContext, ListArticles.pageName);
@@ -50,7 +49,6 @@ class NavBarState extends State<NavBar> {
           default:
         }
       },
-      // ignore: prefer_const_literals_to_create_immutables
       items: [
         const BottomNavigationBarItem(
           label: 'Home',

@@ -20,7 +20,7 @@ class ListArticlesState extends State<ListArticles> {
     super.initState();
   }
 
-  void changerTotal() {
+  void updateTotal() {
     setState(() {
       widget.total = totalPrice();
     });
@@ -49,7 +49,7 @@ class ListArticlesState extends State<ListArticles> {
                 child: GridView.count(
                   crossAxisCount: 2,
                   children: List.generate(articles.length, (index) {
-                    return ArticleCard(article: articles[index], onQuantityChanged: changerTotal);
+                    return ArticleCard(article: articles[index], onQuantityChanged: updateTotal);
                   }),
                 ),
               ),

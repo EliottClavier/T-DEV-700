@@ -27,7 +27,7 @@ class ShopState extends State<Shop> {
     super.initState();
   }
 
-  void changerTotal() {
+  void updateTotal() {
     setState(() {
       widget.total = totalPrice();
     });
@@ -62,7 +62,7 @@ class ShopState extends State<Shop> {
                 child: ListView.builder(
                   itemCount: articlesInShop.length,
                   itemBuilder: (context, index) {
-                    return ShopCard(article: articlesInShop[index], onQuantityChanged: changerTotal, onRemove: removeArticle);
+                    return ShopCard(article: articlesInShop[index], onQuantityChanged: updateTotal, onRemove: removeArticle);
                   },
                 ),
               ),
