@@ -1,7 +1,6 @@
 package com.api.bank.controller;
 
 import com.api.bank.model.ObjectResponse;
-import com.api.bank.model.entity.Tpe;
 import com.api.bank.service.TpeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,12 @@ public class TpeController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public ResponseEntity<ObjectResponse> getAllTpe() {
         ObjectResponse response = tpeService.getAll();
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @RequestMapping(path = "/{uuid}", method = RequestMethod.GET)
+    public ResponseEntity<ObjectResponse> getTpeById(@PathVariable("uuid") String uuid) {
+        ObjectResponse response = tpeService.getTpeById(uuid);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -37,11 +42,4 @@ public class TpeController {
         ObjectResponse response = tpeService.deleteByUUID(uuid);
         return new ResponseEntity<>(response, response.getStatus());
     }
-
-    @RequestMapping(path = "/{uuid}/status", method = RequestMethod.GET)
-    public ResponseEntity<ObjectResponse> isWhitelistTpe(@PathVariable("uuid") String uuid) {
-        ObjectResponse response = tpeService.getTpeStatus(uuid);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
-
 }

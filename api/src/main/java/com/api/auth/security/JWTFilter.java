@@ -1,6 +1,7 @@
 package com.api.auth.security;
 
 import com.api.auth.security.details.service.ManagerDetailsService;
+import com.api.auth.security.details.service.ShopDetailsService;
 import com.api.auth.security.details.service.TpeDetailsService;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Autowired
     private TpeDetailsService tpeDetailsService;
+
+    @Autowired
+    private ShopDetailsService shopDetailsService;
 
     @Autowired
     private JWTUtil jwtUtil;
@@ -59,7 +63,15 @@ public class JWTFilter extends OncePerRequestFilter {
                         if (SecurityContextHolder.getContext().getAuthentication() == null) {
                             SecurityContextHolder.getContext().setAuthentication(authToken);
                         }
+                    } else if (Objects.equals(subject, "Shop Connection")) {
+                        String name = jwtUtil.validateTokenAndRetrieveSubject(jwt, subject);
+                        UserDetails shopDetails = shopDetailsService.loadUserByUsername(name);
+                        authToken = new UsernamePasswordAuthenticationToken(name, shopDetails.getPassword(), shopDetails.getAuthorities());
+                        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                            SecurityContextHolder.getContext().setAuthentication(authToken);
+                        }
                     }
+
                 } catch(JWTVerificationException exc){
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT Token");
                 }

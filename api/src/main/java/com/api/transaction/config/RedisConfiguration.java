@@ -1,4 +1,4 @@
-package com.api.tpe.config;
+package com.api.transaction.config;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;

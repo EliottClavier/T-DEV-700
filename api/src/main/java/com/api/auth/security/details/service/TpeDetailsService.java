@@ -2,9 +2,7 @@ package com.api.auth.security.details.service;
 
 import com.api.bank.model.entity.Tpe;
 import com.api.bank.repository.TpeRepository;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,7 +26,7 @@ public class TpeDetailsService implements UserDetailsService {
         if (!tpe.getWhitelisted()) {
             throw new RuntimeException("TPE not whitelisted.");
         }
-        return new org.springframework.security.core.userdetails.User(mac, tpe.getSerial(),
+        return new org.springframework.security.core.userdetails.User(tpe.getMac(), tpe.getSerial(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_TPE")));
     }
 }

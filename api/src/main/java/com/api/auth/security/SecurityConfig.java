@@ -1,8 +1,10 @@
 package com.api.auth.security;
 
 import com.api.auth.security.details.service.ManagerDetailsService;
+import com.api.auth.security.details.service.ShopDetailsService;
 import com.api.auth.security.details.service.TpeDetailsService;
 import com.api.auth.security.providers.ManagerAuthenticationProvider;
+import com.api.auth.security.providers.ShopAuthenticationProvider;
 import com.api.auth.security.providers.TpeAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +27,7 @@ public class SecurityConfig {
     private final JWTFilter filter;
     private final ManagerDetailsService mds;
     private final TpeDetailsService tds;
+    private final ShopDetailsService sds;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -39,8 +42,10 @@ public class SecurityConfig {
             .and()
             .authorizeHttpRequests()
             .antMatchers("/auth/**").permitAll()
-            .antMatchers("/bank/tpe/**").hasRole("MANAGER")
+            .antMatchers("/bank/**").hasRole("MANAGER")
             .antMatchers("/tpe-manager/**").hasRole("TPE")
+            .antMatchers("/websocket-manager/tpe/**").hasRole("TPE")
+            .antMatchers("/websocket-manager/shop/**").hasRole("SHOP")
             .and()
             .authenticationManager(authenticationManager)
             .exceptionHandling()
@@ -58,7 +63,11 @@ public class SecurityConfig {
     }
     @Bean
     public ProviderManager authenticationManager() {
-        return new ProviderManager(managerAuthenticationProvider(), tpeAuthenticationProvider());
+        return new ProviderManager(
+            managerAuthenticationProvider(),
+            tpeAuthenticationProvider(),
+            shopAuthenticationProvider()
+        );
     }
 
     @Bean
@@ -75,5 +84,13 @@ public class SecurityConfig {
         tpeAuthenticationProvider.setUserDetailsService(tds);
         tpeAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return tpeAuthenticationProvider;
+    }
+
+    @Bean
+    public ShopAuthenticationProvider shopAuthenticationProvider() {
+        ShopAuthenticationProvider shopAuthenticationProvider = new ShopAuthenticationProvider();
+        shopAuthenticationProvider.setUserDetailsService(sds);
+        shopAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return shopAuthenticationProvider;
     }
 }

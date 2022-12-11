@@ -1,4 +1,4 @@
-package com.api.tpe.model;
+package com.api.transaction.model;
 
 public enum MessageType {
     SUCCESS,

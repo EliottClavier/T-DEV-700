@@ -24,7 +24,7 @@ public class ManagerDetailsService implements UserDetailsService {
         if(managerRes.isEmpty())
             throw new UsernameNotFoundException("Could not findUser with username = " + username + ".");
         Manager manager = managerRes.get();
-        return new org.springframework.security.core.userdetails.User(username, manager.getPassword(),
+        return new org.springframework.security.core.userdetails.User(manager.getUsername(), manager.getPassword(),
         Collections.singletonList(new SimpleGrantedAuthority("ROLE_MANAGER")));
     }
 }

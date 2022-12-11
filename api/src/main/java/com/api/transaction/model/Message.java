@@ -1,4 +1,4 @@
-package com.api.tpe.model;
+package com.api.transaction.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

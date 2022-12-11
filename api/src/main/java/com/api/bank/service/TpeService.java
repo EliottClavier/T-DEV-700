@@ -6,7 +6,6 @@ import com.api.bank.repository.TpeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -21,17 +20,10 @@ public class TpeService extends GenericService<Tpe, TpeRepository> {
         super(tpeRepository);
     }
 
-    public ObjectResponse getTpeStatus(String id) {
+    public ObjectResponse getTpeById(String id) {
         try {
             Tpe tpe = tpeRepository.findById(UUID.fromString(id)).get();
-            if (tpe.getWhitelisted()) {
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("status", true);
-                map.put("token", "Bearer token");
-                return new ObjectResponse("Tpe whitelisted.", map, HttpStatus.OK);
-            } else {
-                return new ObjectResponse("Tpe not whitelisted.", HttpStatus.FORBIDDEN);
-            }
+            return new ObjectResponse("TPE found.", tpe, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ObjectResponse(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
