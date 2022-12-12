@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QrCode Generator</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" >
+</head>
+<body>
+<div class="main-block">
+    <form action="/">
+        <input type="number" name="soldAmount" id="soldAmount" placeholder="Sold" min="10" required/>
+        <input type="number" name="nbDayBeforeExpiration" id="nbDayBeforeExpiration" placeholder="Days" min="10" required/>
+        <div class="btn-block">
+            <button onclick="sendAmount()">Submit</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
+
+
+<script>
+    function sendAmount(){
+        const amount = document.getElementById("soldAmount");
+        const days = document.getElementById("nbDayBeforeExpiration");
+        console.log(amount.value + " : " + days.value);
+    }
+</script>
+

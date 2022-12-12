@@ -14,21 +14,16 @@ import javax.persistence.InheritanceType;
 @Setter
 
 public class QrCheck extends Base {
-
-
     private String checkToken;
-
-
-    private int soldAmount;
-
-
+    private float soldAmount;
     private int nbDayOfValidity;
 
+    public QrCheck(float soldAmount, int nbDayOfValidity) {
+        super();
+        this.soldAmount = soldAmount;
+        this.nbDayOfValidity = nbDayOfValidity;
+    }
     public QrCheck() {
         super();
     }
-
-
-
-
 }

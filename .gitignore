@@ -11,5 +11,8 @@ redis-data
 ### APKS volume ###
 apks
 
+### QR Codes volume ###
+qr-code
+
 ### .env ###
 .env

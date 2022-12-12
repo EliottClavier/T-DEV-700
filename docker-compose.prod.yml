@@ -34,8 +34,10 @@ services:
       DEVTOOLS_LIVERELOAD_ENABLED: ${DEVTOOLS_LIVERELOAD_ENABLED}
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
+      QR_CODE_SECRET: ${QR_CODE_SECRET}
     volumes:
       - ./apks:/apks
+      - ./qr-code:/qr-code
     ports:
       - ${API_PORT}:${API_PORT}
     networks:
@@ -77,6 +79,7 @@ volumes:
   database-data:
   redis-data:
   apks:
+  qr-code:
   
 networks:
   back-net:
