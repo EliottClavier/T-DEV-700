@@ -13,17 +13,15 @@ import java.time.Instant;
 import java.util.UUID;
 
 
-
-
 @Getter
 @Setter
 @MappedSuperclass
 public abstract class Base {
 
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator" )
-    @Column(name="id", length=36, columnDefinition = "VARCHAR(36)", updatable = false, nullable = false)
+    @Id()
+//    @GeneratedValue(generator = "UUID2", strategy = GenerationType.IDENTITY)
+//    @GenericGenerator(name = "UUID2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", length = 36, columnDefinition = "VARCHAR(36)")
     @Type(type = "uuid-char")
     private UUID id;
 
@@ -32,20 +30,23 @@ public abstract class Base {
     private Instant createdAt;
 
     @LastModifiedDate
-    @Setter(value = AccessLevel.PRIVATE)
     private Instant modifiedAt;
-
-
 
     public Base(UUID id) {
         this.id = id;
-        if(createdAt == null) {
-            createdAt =  Instant.now();
-        }
+        init();
     }
+
     public Base() {
-        if(createdAt == null) {
+        init();
+    }
+
+    private void init() {
+        if (createdAt == null) {
             createdAt = Instant.now();
+        }
+        if (id == null) {
+            id = UUID.randomUUID();
         }
     }
 }

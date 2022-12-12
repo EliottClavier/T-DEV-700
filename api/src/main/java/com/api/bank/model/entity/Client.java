@@ -14,12 +14,12 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Embeddable()
 public class Client extends Base {
 
     @Column( nullable=false, length=100)
     private SocialReasonStatus socialReason;
-
     @Column( unique = true, length=100)
     private String organisationName;
     @Column( length=100)
@@ -27,7 +27,8 @@ public class Client extends Base {
     @Column( length=100)
     private String lastname;
 
-    @OneToOne(mappedBy = "client", orphanRemoval = true)
+   @OneToOne(mappedBy = "client", orphanRemoval = true)
+//    @Transient
     private Account account;
 
 

@@ -5,6 +5,7 @@ import com.api.bank.model.ObjectResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,9 +23,9 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
 
     public ObjectResponse add(T entity) {
         try {
-            repository.save(entity);
+            var res = repository.save(entity);
             repository.flush();
-            return new ObjectResponse("Success", entity, true);
+            return new ObjectResponse("Success", res, true);
         } catch (Exception e) {
             return new ObjectResponse(e.getMessage());
         }
@@ -52,6 +53,7 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
 
     public ObjectResponse update(T entity) {
         try {
+            entity.setModifiedAt(Instant.now());
             repository.save(entity);
             repository.flush();
             return new ObjectResponse("Success", entity, true);

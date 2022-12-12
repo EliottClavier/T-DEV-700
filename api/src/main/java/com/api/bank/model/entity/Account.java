@@ -21,6 +21,7 @@ public class Account extends Base {
 
     @OneToOne(cascade=CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "client_id")
+    //@Embedded()
     private Client client;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
