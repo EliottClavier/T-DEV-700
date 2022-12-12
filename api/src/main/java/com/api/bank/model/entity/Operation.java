@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -51,15 +52,15 @@ public class Operation extends Base {
     public Operation(String operationId,
                      String label, int amount,
                      Date operationDate,
-                     Account account, OperationStatus operationStatus,
+                     Account account, QrCheck qrCheck, OperationStatus operationStatus,
                      OperationType operationType, PaymentMethod paymentMethod) {
         super();
         this.operationId = operationId;
         this.label = label;
         this.amount = amount;
         this.operationDate = operationDate;
-
         this.account = account;
+        this.qrCheck = qrCheck;
         this.operationStatus = operationStatus;
         this.operationType = operationType;
         this.paymentMethod = paymentMethod;

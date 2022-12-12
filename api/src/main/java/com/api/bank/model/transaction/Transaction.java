@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class TransactionModel {
+public class Transaction {
 
     private String OperationId;
     private String label;
@@ -14,8 +14,9 @@ public class TransactionModel {
     private String checkToken;
     private int amount;
     private String tokenShop;
-    private String tokenTpe;
     private Date date;
     private PaymentMethod paymentMethod;
+
+
 }
 

@@ -5,6 +5,7 @@ public enum TransactionStatus {
     FAILED,
     PAYMENT_ERROR,
     CARD_ERROR,
+    CHECK_ERROR,
     INSUFFICIENT_FUNDS_ERROR,
     OPERATION_PENDING_ERROR,
 }

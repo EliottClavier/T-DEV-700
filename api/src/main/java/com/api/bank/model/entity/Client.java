@@ -30,6 +30,8 @@ public class Client extends Base {
     @OneToOne(mappedBy = "client", orphanRemoval = true)
     private Account account;
 
+
+
     public Client(UUID id, String firstname, String lastname, SocialReasonStatus socialReasonStatus) {
         super(id);
         this.socialReason = socialReasonStatus;

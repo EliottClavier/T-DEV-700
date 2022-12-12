@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 
@@ -29,4 +30,9 @@ public class QrCheck extends Base {
         super();
     }
 
+    public Date getExpirationDate() {
+        Date expirationDate = new Date();
+        expirationDate.setTime(expirationDate.getTime() + (long) nbDayOfValidity * 24 * 60 * 60 * 1000);
+        return expirationDate;
+    }
 }

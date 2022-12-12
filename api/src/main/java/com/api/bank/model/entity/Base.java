@@ -14,9 +14,10 @@ import java.util.UUID;
 
 
 
-@MappedSuperclass
+
 @Getter
 @Setter
+@MappedSuperclass
 public abstract class Base {
 
     @Id

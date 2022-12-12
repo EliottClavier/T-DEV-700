@@ -19,50 +19,72 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Queue;
 import java.util.UUID;
 
 @Component
+
 public class BankManager {
+
     private final AccountService accountService;
     private final OperationService operationService;
     private final ClientService clientService;
 
+    private Queue<Transaction> transactionQueue;
 
+    private BankManager bankManager;
 
     public BankManager(OperationRepository operationRepository, AccountRepository accountRepository, ClientRepository clientRepository) {
 
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
         this.clientService = new ClientService(clientRepository);
+
     }
 
     @Transactional(rollbackFor = {BankTransactionException.class, Exception.class})
-    public TransactionResult HandleTransaction(TransactionModel transaction) {
+    public TransactionResult HandleTransaction(Transaction transaction) {
 
         Account withdrawAccount;
         PaymentMethod paymentMethod = transaction.getPaymentMethod();
+        QrCheck qrcheck = null;
 
         try {
 
             if (transaction.getPaymentMethod() == PaymentMethod.CARD) {
                 withdrawAccount = accountService.getAccountByCardId(transaction.getCardId());
+
+                // Is the card valid ?
+                if (withdrawAccount == null || withdrawAccount.getCard() == null)
+                    throw new BankTransactionException(TransactionStatus.CARD_ERROR, transaction.getOperationId(), "Card not found");
+
+                // Is the expiration date card's valid ?
+                if (withdrawAccount.getCard().getExpirationDate().before(new Date()))
+                    throw new BankTransactionException(TransactionStatus.CARD_ERROR, transaction.getOperationId(), "Card expired");
+
             } else {
                 withdrawAccount = clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
-            }
-            // Is the card valid ?
-            if (withdrawAccount == null || withdrawAccount.getCard() == null)
-                throw new BankTransactionException(TransactionStatus.CARD_ERROR, transaction.getOperationId(), "Card not found");
+                //TODO qrcheck = operationService.getQrCheckByToken(transaction.getCheckToken());
 
-            // Is the expiration date card's valid ?
-            if (withdrawAccount.getCard().getExpirationDate().before(new Date()))
-                throw new BankTransactionException(TransactionStatus.CARD_ERROR, transaction.getOperationId(), "Card expired");
+                // Is the check valid ?
+                if (qrcheck == null)
+                    throw new BankTransactionException(TransactionStatus.CHECK_ERROR, transaction.getOperationId(), "Check not found");
+
+                // Is the check expired ?
+                if (qrcheck.getExpirationDate().before(new Date()))
+                    throw new BankTransactionException(TransactionStatus.CHECK_ERROR, transaction.getOperationId(), "Check expired");
+
+                // Is the check amount valid ?
+                if (qrcheck.getSoldAmount() < transaction.getAmount())
+                    throw new BankTransactionException(TransactionStatus.INSUFFICIENT_FUNDS_ERROR, transaction.getOperationId(), "Check amount invalid");
+            }
 
             // Is an operation is already in progress ?
             if (operationService.isOtherOperationIsPending(transaction.getOperationId()))
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
             // Add the operation to the list of pending operations
-            var clientOperation = createOperation(transaction, withdrawAccount, OperationStatus.PENDING, OperationType.DEPOSIT, paymentMethod);
+            var clientOperation = createOperation(transaction, withdrawAccount, qrcheck, OperationStatus.PENDING, OperationType.DEPOSIT, paymentMethod);
             if (!operationService.add(clientOperation).isValid())
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
@@ -78,8 +100,8 @@ public class BankManager {
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
             }
 
-            Account shopAccount = getShopAccountbyToken(transaction.getTokenShop());
-            var shopOperation = createOperation(transaction, shopAccount, OperationStatus.PENDING, OperationType.DEPOSIT, paymentMethod);
+            Account shopAccount = getShopAccountByToken(transaction.getTokenShop());
+            var shopOperation = createOperation(transaction, shopAccount, qrcheck, OperationStatus.PENDING, OperationType.DEPOSIT, paymentMethod);
 
             if (!operationService.add(shopOperation).isValid())
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
@@ -110,28 +132,26 @@ public class BankManager {
 
             return new TransactionResult(TransactionStatus.FAILED, transaction.getOperationId(), e.getMessage());
         }
-
     }
 
-    private Operation createOperation(TransactionModel transaction, Account account, OperationStatus opeStatus, OperationType opeType, PaymentMethod payMethod) {
+    private Operation createOperation(Transaction transaction, Account account, QrCheck qrCheck, OperationStatus opeStatus, OperationType opeType, PaymentMethod payMethod) {
         return new Operation(transaction.getOperationId(), transaction.getLabel(), transaction.getAmount(),
-                transaction.getDate(), account, opeStatus, opeType, payMethod);
-
+                transaction.getDate(), account, qrCheck, opeStatus, opeType, payMethod);
     }
 
-    private Account getShopAccountbyToken(String tokenShop) {
+    private Account getShopAccountByToken(String tokenShop) {
         // String shopAccountId = JWTUtils.validateTokenAndRetrieveSubject(transaction.tokenShop);
         String shopAccountId = UUID.randomUUID().toString();
         return (Account) accountService.get(shopAccountId).getData();
 
     }
 
-    private ObjectResponse setSoldAccount(Account clientAccount, TransactionModel transaction) {
+    private ObjectResponse setSoldAccount(Account clientAccount, Transaction transaction) {
         clientAccount.setSold(clientAccount.getSold() - transaction.getAmount());
         return accountService.update(clientAccount);
     }
 
-    boolean persistOperationStatus(OperationStatus status, Operation operation) {
+    private boolean persistOperationStatus(OperationStatus status, Operation operation) {
         operation.setOperationStatus(status);
         return operationService.update(operation).isValid();
     }
