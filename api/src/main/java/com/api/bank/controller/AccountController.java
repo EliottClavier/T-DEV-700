@@ -19,7 +19,7 @@ public class AccountController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ObjectResponse> get(@PathVariable String id){
-        return ResponseEntity.ok(accountService.get(UUID.fromString(id)));
+        return ResponseEntity.ok(accountService.get(id));
     }
 
     @PostMapping("/add")

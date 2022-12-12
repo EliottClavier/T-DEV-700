@@ -1,5 +1,6 @@
 package com.api.bank.repository;
 
+import com.api.bank.model.entity.Shop;
 import com.api.bank.model.entity.Tpe;
 import org.springframework.stereotype.Repository;
 
@@ -8,8 +9,8 @@ import java.util.Optional;
 
 @Repository
 @Transactional
-public interface TpeRepository extends GenericRepository<Tpe> {
-    Optional<Tpe> findByMac(String mac);
+public interface ShopRepository extends GenericRepository<Shop> {
+    Optional<Shop> findByName(String mac);
 
-    Boolean existsByMac(String mac);
+    Boolean existsByName(String mac);
 }

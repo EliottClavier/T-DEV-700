@@ -15,13 +15,8 @@ import javax.persistence.InheritanceType;
 
 public class QrCheck extends Base {
 
-
     private String checkToken;
-
-
     private int soldAmount;
-
-
     private int nbDayOfValidity;
 
     public QrCheck() {
