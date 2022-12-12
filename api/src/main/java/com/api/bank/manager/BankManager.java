@@ -15,6 +15,7 @@ import com.api.bank.repository.OperationRepository;
 import com.api.bank.service.AccountService;
 import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +27,12 @@ import java.util.UUID;
 
 public class BankManager {
 
-    private final AccountService accountService;
-    private final OperationService operationService;
-    private final ClientService clientService;
+    @Autowired
+    private  AccountService accountService;
+    @Autowired
+    private  OperationService operationService;
+    @Autowired
+    private  ClientService clientService;
 
     private Queue<Transaction> transactionQueue;
 
@@ -41,9 +45,10 @@ public class BankManager {
         this.clientService = new ClientService(clientRepository);
 
     }
+    public BankManager() {    }
 
     @Transactional(rollbackFor = {BankTransactionException.class, Exception.class})
-    public TransactionResult HandleTransaction(Transaction transaction) {
+    public TransactionResult HandleTransaction(BankTransaction transaction) {
 
         Account withdrawAccount;
         PaymentMethod paymentMethod = transaction.getPaymentMethod();
@@ -100,7 +105,7 @@ public class BankManager {
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
             }
 
-            Account shopAccount = getShopAccountByToken(transaction.getTokenShop());
+            Account shopAccount = getShopAccountByToken(transaction.getShopId());
             var shopOperation = createOperation(transaction, shopAccount, qrcheck, OperationStatus.PENDING, OperationType.DEPOSIT, paymentMethod);
 
             if (!operationService.add(shopOperation).isValid())
@@ -134,7 +139,7 @@ public class BankManager {
         }
     }
 
-    private Operation createOperation(Transaction transaction, Account account, QrCheck qrCheck, OperationStatus opeStatus, OperationType opeType, PaymentMethod payMethod) {
+    private Operation createOperation(BankTransaction transaction, Account account, QrCheck qrCheck, OperationStatus opeStatus, OperationType opeType, PaymentMethod payMethod) {
         return new Operation(transaction.getOperationId(), transaction.getLabel(), transaction.getAmount(),
                 transaction.getDate(), account, qrCheck, opeStatus, opeType, payMethod);
     }
@@ -143,10 +148,9 @@ public class BankManager {
         // String shopAccountId = JWTUtils.validateTokenAndRetrieveSubject(transaction.tokenShop);
         String shopAccountId = UUID.randomUUID().toString();
         return (Account) accountService.get(shopAccountId).getData();
-
     }
 
-    private ObjectResponse setSoldAccount(Account clientAccount, Transaction transaction) {
+    private ObjectResponse setSoldAccount(Account clientAccount, BankTransaction transaction) {
         clientAccount.setSold(clientAccount.getSold() - transaction.getAmount());
         return accountService.update(clientAccount);
     }
@@ -155,6 +159,4 @@ public class BankManager {
         operation.setOperationStatus(status);
         return operationService.update(operation).isValid();
     }
-
-
 }

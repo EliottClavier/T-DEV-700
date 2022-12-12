@@ -23,7 +23,7 @@ public class Operation extends Base {
     private String label;
 
     @Column(nullable = false)
-    private int amount;
+    private float amount;
 
     private Date operationDate;
 
@@ -50,7 +50,7 @@ public class Operation extends Base {
     }
 
     public Operation(String operationId,
-                     String label, int amount,
+                     String label, float amount,
                      Date operationDate,
                      Account account, QrCheck qrCheck, OperationStatus operationStatus,
                      OperationType operationType, PaymentMethod paymentMethod) {

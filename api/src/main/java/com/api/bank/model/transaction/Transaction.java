@@ -1,22 +1,20 @@
 package com.api.bank.model.transaction;
 
-import com.api.bank.model.enums.PaymentMethod;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
 public class Transaction {
+    private String tpeMac;
+    private String tpeSerial;
+    private String shopName;
+    private float amount;
+    public TransactionType type;
 
-    private String OperationId;
-    private String label;
-    private String cardId;
-    private String checkToken;
-    private int amount;
-    private String tokenShop;
-    private Date date;
-    private PaymentMethod paymentMethod;
-
-
+    public Transaction(String shopName, float amount) {
+        this.shopName = shopName;
+        this.amount = amount;
+    }
 }
-
