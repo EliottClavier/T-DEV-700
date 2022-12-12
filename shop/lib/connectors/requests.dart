@@ -12,13 +12,11 @@ import 'config/config.dart';
 class RequestsClass {
   static String token = "";
   static final String _ip = Token.ip;
-
+  static double totalAmount = 0.0;
+  static bool paymentValidate = false;
   static late StompClient _client;
 
-  static void connect(double amount) async {
-    print("Prix : "+amount.toString());
-    print("Token : "+token);
-    print("IP : "+_ip);
+  static connect(double amount) async {
     try {
       final response = await http.post(Uri.parse("http://$_ip/auth/shop/login"),
         headers: {
@@ -30,21 +28,21 @@ class RequestsClass {
       }));
       print(response);
       if (response.statusCode == 200) {
-        print("Reponse 200");
         token=Token.fromJson(jsonDecode(response.body)).token;
-        connectWebSocket(amount);
+        connectWebSocket();
+        totalAmount = amount;
       } else {
         print("Error : "+response.statusCode.toString()+" - "+response.body.toString());
       }
     } catch (e) {
       print(e);
     }
-    
   }
 
-  static void connectWebSocket(double amount) async {
-    if (token.isNotEmpty) {
-      _client = StompClient(
+  static void connectWebSocket() {
+    try {
+      if (token.isNotEmpty) {
+        _client = StompClient(
           config: StompConfig.SockJS(
             url: "http://$_ip/websocket-manager/shop/socket",
             onConnect: onConnectCallback,
@@ -52,33 +50,25 @@ class RequestsClass {
             stompConnectHeaders: {'Authorization': "Bearer $token"},
             webSocketConnectHeaders: {'Authorization': "Bearer $token", 'Connection': 'upgrade', 'Upgrade': 'WebSocket'},
           ),
-      );
-      if (_client.connected) {
-        print('Connected and try activate');
-        activateWebSocket(amount);
-      } else {
-        print("Not connected");
+        );
+        activateWebSocket();
       }
+    } catch (e) {
+      print(e);
     }
   }
 
-  static void activateWebSocket(double amount) {
+  static void activateWebSocket() {
     _client.activate();
-    print("Connected and try payment");
-    pay(amount);
   }
 
-  static void pay(double amount) {
-    print("Pay : "+amount.toString()+"€");
+  static void pay() {
+    print("Pay : "+totalAmount.toString()+"€");
     var json = {
       "shopName": "SHOP",
-      "amount": amount
+      "amount": totalAmount
     };
-    if (_client.connected) {
-      _client.send(destination: '/websocket-manager/shop/pay', body: jsonEncode(json));
-    } else {
-      print("Not connected");
-    }
+    _client.send(destination: '/websocket-manager/shop/pay', body: jsonEncode(json));
   }
 
   static void onConnectCallback(StompFrame connectFrame) {
@@ -97,5 +87,9 @@ class RequestsClass {
       print("Transaction cancelled");
       print(frame.body);
     });
+
+    if (!paymentValidate) {
+      pay();
+    }
   }
 }

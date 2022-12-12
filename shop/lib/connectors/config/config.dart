@@ -2,7 +2,7 @@
 
 class Token {
   String token = "";
-  static const String ip = "192.168.1.89:8080/api";
+  static const String ip = "10.29.125.89:8080/api";
 
   Token({required this.token});
 
