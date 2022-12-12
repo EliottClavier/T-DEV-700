@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -21,7 +22,8 @@ public abstract class Base {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name="id", length=32)
+    @Column(name="id", length=36, columnDefinition = "VARCHAR(36)", updatable = false, nullable = false)
+    @Type(type = "uuid-char")
     private UUID id;
 
     @CreatedDate

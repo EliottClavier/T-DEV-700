@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
 
 import 'package:tpe/screens/payment.dart';
+import 'package:tpe/screens/payment_sending.dart';
+import 'package:tpe/utils/snackbar.dart';
 
 class QrCodeReaderScreen extends StatelessWidget {
   const QrCodeReaderScreen({super.key, required this.price});
@@ -36,6 +40,15 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +100,7 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) {
+      onDataReaded(scanData);
       setState(() {
         result = scanData;
       });
@@ -94,6 +108,7 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   }
 
   void _onBackButtonPressed() {
+    dispose();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => PaymentScreen(
@@ -111,6 +126,23 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
     return description.substring(indexOfDot + 1);
   }
 
+  void onDataReaded(Barcode data) {
+    showSnackBar(context, "Scan réussi", "success", 2);
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      dispose();
+      paymentSendingScreen(data.code.toString());
+    });
+  }
+
+  void paymentSendingScreen(String data) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PaymentSendingScreen(
+            paymentData: data, price: widget.price, paymentMethod: "qr_code"),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -118,7 +150,10 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
 
   @override
   void dispose() {
-    controller?.stopCamera();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      controller?.stopCamera();
+      controller?.dispose();
+    });
     super.dispose();
   }
 }
