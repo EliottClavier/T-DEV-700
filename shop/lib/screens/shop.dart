@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:shop/connectors/requests.dart';
+import 'package:shop/screens/payment.dart';
 import 'package:shop/widgets/navBar.dart';
 import 'package:shop/util/shop.dart';
 import 'package:shop/widgets/shop_card.dart';
@@ -82,7 +84,8 @@ class ShopState extends State<Shop> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/checkout');
+                      RequestsClass.connect(double.parse(widget.total!));
+                      Navigator.pushNamed(context, Payment.pageName);
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
