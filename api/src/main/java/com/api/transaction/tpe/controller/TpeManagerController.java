@@ -7,11 +7,13 @@ import com.api.transaction.tpe.model.TpeManager;
 
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Controller
 public class TpeManagerController {
@@ -29,7 +31,7 @@ public class TpeManagerController {
             if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeManager.getId())) {
                 message.setMessage("TPE already connected to Redis.");
             } else if (tpeManager.isValid()) {
-                customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeManager.getId(), tpeManager.getIp());
+                customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeManager.getId(), tpeManager.getSerial());
                 message.setMessage("TPE available for transaction.");
                 message.setType(MessageType.SUCCESS);
             } else {
@@ -77,7 +79,7 @@ public class TpeManagerController {
 
     @MessageMapping("/tpe/cancel-transaction")
     public void cancelTransaction(@Payload String transactionData) {
-        String responseDestinationTpe = "/private/tpe/transaction-canceled";
+        String responseDestinationTpe = "/private/tpe/transaction-cancelled";
         String responseDestinationShop = "/private/shop/transaction-cancelled";
         Gson gson = new Gson();
         Message message = new Message("Processing", MessageType.ERROR);
@@ -90,5 +92,10 @@ public class TpeManagerController {
                 responseDestinationShop,
                 new Message("Transaction cancelled.", MessageType.ERROR)
         );
+    }
+
+    @EventListener
+    public void onDisconnectEvent(SessionDisconnectEvent event) {
+        System.out.println("Disconnect event: " + event);
     }
 }
