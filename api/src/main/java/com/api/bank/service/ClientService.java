@@ -12,7 +12,9 @@ public class ClientService extends GenericService<Client, ClientRepository> {
     public ClientRepository clientRepository;
 
     public ClientService(ClientRepository clientRepository) {
+
         super(clientRepository);
+        clientRepository = clientRepository;
     }
 
     public Client getClientByOrganisationName(String name){

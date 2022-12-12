@@ -22,7 +22,7 @@ public abstract class Base {
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator" )
     @Column(name="id", length=36, columnDefinition = "VARCHAR(36)", updatable = false, nullable = false)
     @Type(type = "uuid-char")
     private UUID id;

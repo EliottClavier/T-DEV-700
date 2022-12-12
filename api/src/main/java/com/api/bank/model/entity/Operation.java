@@ -16,7 +16,7 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Operation extends Base {
 
-    @Column(nullable = false, length = 25)
+    @Column(nullable = false, length = 36)
     private String operationId;
 
     @Column(nullable = false, length = 25)
