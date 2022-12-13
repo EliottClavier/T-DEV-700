@@ -1,19 +1,20 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
-import 'package:shop/screens/listArticles.dart';
+import 'package:shop/screens/shop.dart';
 import 'package:shop/router/router.dart';
 
 import 'package:shop/connectors/requests.dart';
 
 
-class Home extends StatelessWidget {
-  static const String pageName = '/';
+class Validation extends StatelessWidget {
+  static const String pageName = '/validation';
+
+  const Validation({super.key});
 
   void initState(BuildContext context) async {
-    Future.delayed(Duration(seconds: 2), () {
-      RouterShop.pushRoute(context,ListArticles.pageName);
+    Future.delayed(Duration(seconds: 3), () {
+      RouterShop.pushRoute(context,Shop.pageName);
     });
   }
 
@@ -26,12 +27,10 @@ class Home extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Container(
-        color: Colors.white,
-        child: Center(
-          child: FlipInX(
-            child: Image(
-              image: AssetImage('images/logo_cash_manager.png'),
-            ),
+        color: const Color.fromARGB(255, 56, 193, 114),
+        child: const Center(
+          child: Image(
+            image: AssetImage('images/validation.gif'),
           ),
         ),
       ),

@@ -7,7 +7,7 @@ import 'package:shop/widgets/navBar.dart';
 
 class ListArticles extends StatefulWidget {
   static const String pageName = '/listeArticles';
-  String? total = totalPrice();
+  String? total = totalArticles();
 
   @override
   State<ListArticles> createState() => ListArticlesState();
@@ -22,7 +22,7 @@ class ListArticlesState extends State<ListArticles> {
 
   void updateTotal() {
     setState(() {
-      widget.total = totalPrice();
+      widget.total = totalArticles();
     });
   }
 
