@@ -57,7 +57,6 @@ public class TpeManagerController {
         // For each transaction return value
         for (Object transaction : customRedisTemplate.opsForHash().values(HASH_KEY_NAME_TRANSACTION)) {
             TransactionRequest transactionRequest = new Gson().fromJson((String) transaction, TransactionRequest.class);
-            System.out.println(transactionRequest);
             if (transactionRequest.getTpeSessionId().equals(sessionId)) {
                 return transactionRequest;
             }
@@ -112,13 +111,13 @@ public class TpeManagerController {
 
                 // Make the Tpe available for a new transaction
                 TpeManager tpeManager = new TpeManager(user.getName(), sessionId);
-                Message message = this.registerTpeRedis(tpeManager);
+                this.registerTpeRedis(tpeManager);
 
                 // Send transaction done message to TPE
                 this.smt.convertAndSendToUser(
                         tpeManager.getId(),
                         destinationGenerator.getTpeTransactionStatusDest(sessionId),
-                        message
+                        new Message("Transaction done. TPE available for transaction.", MessageType.TRANSACTION_DONE)
                 );
 
                 // Send transaction done message to Shop

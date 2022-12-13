@@ -19,10 +19,8 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         /* Endpoints for TPE */
-        registry.addEndpoint("/websocket-manager/secured/tpe/socket").setAllowedOrigins("*");
         registry.addEndpoint("/websocket-manager/secured/tpe/socket").setAllowedOrigins("*").withSockJS();
         /* Endpoints for Shop */
-        registry.addEndpoint("/websocket-manager/secured/shop/socket").setAllowedOrigins("*");
         registry.addEndpoint("/websocket-manager/secured/shop/socket").setAllowedOrigins("*").withSockJS();
     }
 
