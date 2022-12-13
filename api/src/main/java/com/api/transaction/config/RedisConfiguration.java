@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableAutoConfiguration
 public class RedisConfiguration {
 
-    @Bean()
+    @Bean
     public RedisTemplate<String, String> customRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
 
