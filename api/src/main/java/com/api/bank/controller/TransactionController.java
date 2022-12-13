@@ -1,8 +1,6 @@
 package com.api.bank.controller;
 
 import com.api.bank.manager.BankManager;
-import com.api.bank.model.ObjectResponse;
-import com.api.bank.model.entity.Account;
 import com.api.bank.model.enums.TransactionStatus;
 import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.BankTransaction;
@@ -16,7 +14,6 @@ import com.api.bank.service.AccountService;
 import com.api.bank.service.CheckService;
 import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

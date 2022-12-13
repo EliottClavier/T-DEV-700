@@ -7,7 +7,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 
-
 @Entity
 @Getter
 @Setter
@@ -27,10 +26,6 @@ public class Account extends Base {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "card_id")
     private Card card;
-
-//    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JoinColumn(name = "card_id")
-//    private QrCheck qrCheck;
 
     public Account() {
         super();

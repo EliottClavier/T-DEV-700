@@ -1,10 +1,7 @@
 package com.api.bank.controller;
 
 import com.api.bank.model.ObjectResponse;
-import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.Client;
-import com.api.bank.repository.ClientRepository;
-import com.api.bank.service.AccountService;
 import com.api.bank.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

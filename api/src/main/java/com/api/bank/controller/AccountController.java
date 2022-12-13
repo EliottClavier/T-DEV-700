@@ -3,15 +3,9 @@ package com.api.bank.controller;
 import com.api.bank.model.entity.Account;
 import com.api.bank.model.ObjectResponse;
 import com.api.bank.repository.AccountRepository;
-import com.api.bank.repository.ClientRepository;
 import com.api.bank.service.AccountService;
-import com.api.bank.service.ClientService;
-import com.api.bank.service.GenericService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/bank/account")

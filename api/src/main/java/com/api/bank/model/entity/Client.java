@@ -1,15 +1,11 @@
 package com.api.bank.model.entity;
 
-
-
 import com.api.bank.model.enums.SocialReasonStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.UUID;
-
-
 
 @Entity
 @Getter
@@ -47,7 +43,6 @@ public class Client extends Base {
         this.firstname = firstname;
         this.lastname = lastname;
         this.organisationName = organisationName;
-
 
     }
 

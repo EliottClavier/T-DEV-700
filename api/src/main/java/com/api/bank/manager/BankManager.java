@@ -17,12 +17,8 @@ import com.api.bank.service.AccountService;
 import com.api.bank.service.CheckService;
 import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,12 +53,7 @@ public class BankManager {
     public BankManager() {
         super();
     }
-//    public BankManager() {
-//
-//        this.accountService = new AccountService(accountRepository);
-//        this.operationService = new OperationService(operationRepository);
-//        this.clientService = new ClientService(clientRepository);
-//    }
+
     public BankManager(AccountService accountService, OperationService operationService, ClientService clientService, CheckService checkService) {
 
         this.accountService = accountService;
@@ -110,7 +101,6 @@ public class BankManager {
             }
 
             // Is an operation is already in progress ?
-//            if (operationService.isOtherOperationIsPending(transaction.getOperationId()))
             if(operationService.isOperationPendingFor(withdrawAccount.getId()))
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
@@ -163,15 +153,10 @@ public class BankManager {
         }
     }
 
-//    @Contract("_, _, _, _, _, _ -> new")
     private @NotNull Operation createOperation(BankTransaction transaction, Account account, QrCheck qrCheck, OperationStatus opeStatus, OperationType opeType, PaymentMethod payMethod) {
         return new Operation(transaction.getOperationId(), transaction.getLabel(), transaction.getAmount(),
                 transaction.getDate(), account, qrCheck, opeStatus, opeType, payMethod);
     }
-
-//    private Account getShopAccountByToken(String shopId) {
-//        return (Account) accountService.get(shopId).getData();
-//    }
 
     private ObjectResponse setSoldAccount(Account clientAccount, BankTransaction transaction) {
         clientAccount.setSold(clientAccount.getSold() - transaction.getAmount());
