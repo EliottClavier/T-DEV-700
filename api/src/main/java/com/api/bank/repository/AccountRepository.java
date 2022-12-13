@@ -8,7 +8,6 @@ import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Repository
-@Transactional
 public interface AccountRepository extends GenericRepository<Account> {
 
     Account findAccountByCard_CardId(String cardId);

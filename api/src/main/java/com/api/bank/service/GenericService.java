@@ -2,8 +2,11 @@ package com.api.bank.service;
 
 import com.api.bank.model.entity.Base;
 import com.api.bank.model.ObjectResponse;
+import com.api.bank.model.exception.BankTransactionException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -21,6 +24,7 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
         this.repository = null;
     }
 
+    @Transactional()
     public ObjectResponse add(T entity) {
         try {
             var res = repository.save(entity);
@@ -31,6 +35,7 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BankTransactionException.class)
     public ObjectResponse delete(T entity) {
         try {
             repository.delete(entity);
@@ -51,6 +56,7 @@ public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BankTransactionException.class)
     public ObjectResponse update(T entity) {
         try {
             entity.setModifiedAt(Instant.now());

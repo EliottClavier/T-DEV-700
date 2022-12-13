@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Repository
-@Transactional
 public interface OperationRepository extends GenericRepository<Operation> {
 
     boolean existsOperationByOperationStatusIsLikeAndAccountIdIs(OperationStatus operationStatus, UUID accountId);
