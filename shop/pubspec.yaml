@@ -69,6 +69,7 @@ flutter:
   assets:
   - images/logo_cash_manager.png
   - images/waiting.gif
+  - images/validation.gif
   - images/aliments/abricot.png
   - images/aliments/banane.png
   - images/aliments/carotte.png

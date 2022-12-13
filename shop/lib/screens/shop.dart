@@ -10,9 +10,12 @@ import 'package:shop/util/shop.dart';
 import 'package:shop/widgets/shop_card.dart';
 import 'package:shop/widgets/separation.dart';
 import 'package:shop/router/router.dart';
+import 'package:shop/widgets/snackBar.dart';
+
 
 class Shop extends StatefulWidget {
   static const String pageName = '/shop';
+  static late BuildContext contextShop;
   String? total = totalPrice();
   Shop({super.key});
 
@@ -43,12 +46,9 @@ class ShopState extends State<Shop> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Panier',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Container(
+    Shop.contextShop = context;
+    return Scaffold(
+      body: Container(
         color: Colors.white,
         child: Center(
           child: Column(
@@ -84,7 +84,7 @@ class ShopState extends State<Shop> {
                   ),
                   TextButton(
                     onPressed: () {
-                      RequestsClass.connect(double.parse(widget.total!));
+                      RequestsClass.connect(double.parse(widget.total!), context);
                       Navigator.pushNamed(context, Payment.pageName);
                     },
                     style: ButtonStyle(

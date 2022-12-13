@@ -1,9 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:shop/screens/shop.dart';
-import 'package:shop/router/router.dart';
+import 'package:shop/widgets/snackBar.dart';
 
 
 class Payment extends StatelessWidget {
@@ -11,12 +10,8 @@ class Payment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Container(
+    return Scaffold(
+      body: Container(
         color: Colors.white,
         child: Center(
           child: Column(
@@ -30,6 +25,7 @@ class Payment extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, Shop.pageName);
+                  showSnackBar(context, "La transaction a été annulée", "error", 3);
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(
