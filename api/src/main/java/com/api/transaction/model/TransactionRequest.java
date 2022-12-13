@@ -1,5 +1,6 @@
 package com.api.transaction.model;
 
+import com.api.bank.model.enums.PaymentMethod;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.redis.core.RedisHash;
@@ -19,7 +20,7 @@ public class TransactionRequest implements Serializable {
 
     private float amount;
     public String paymentId;
-    public TransactionRequestType type;
+    public PaymentMethod paymentMethod;
 
     public TransactionRequest(String shopUsername, String shopSessionId, float amount) {
         this.id = UUID.randomUUID().toString();
@@ -34,7 +35,9 @@ public class TransactionRequest implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("{'id': %s, 'tpeSessionId': %s, 'tpeUsername': %s, 'shopSessionId': %s, 'shopUsername': %s, 'amount': %s, 'type': %s}",
-                id, tpeSessionId, tpeUsername, shopSessionId, shopUsername, amount, type);
+        return String.format(
+            "{'id': %s, 'tpeSessionId': %s, 'tpeUsername': %s, 'shopSessionId': %s, 'shopUsername': %s, 'amount': %s, 'paymentId': %s, 'paymentMethod': %s}",
+            id, tpeSessionId, tpeUsername, shopSessionId, shopUsername, amount, paymentId, paymentMethod
+        );
     }
 }

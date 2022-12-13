@@ -1,5 +1,6 @@
 package com.api.transaction.tpe.controller;
 
+import com.api.bank.model.enums.PaymentMethod;
 import com.api.transaction.data.DestinationGenerator;
 import com.api.transaction.model.*;
 
@@ -102,7 +103,7 @@ public class TpeManagerController {
             TransactionRequest transactionRequest = retrieveTransactionRequestByTpeSessionId(sessionId);
             if (transactionRequest != null) {
                 // Complete transaction request with new data
-                transactionRequest.setType(TransactionRequestType.valueOf(transactionRequestTpe.getType()));
+                transactionRequest.setPaymentMethod(PaymentMethod.valueOf(transactionRequestTpe.getType()));
                 transactionRequest.setPaymentId(transactionRequestTpe.getPaymentId());
 
                 // Execute transaction and remove it from Redis
