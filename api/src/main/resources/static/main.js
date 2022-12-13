@@ -1,6 +1,7 @@
 function sendJSON(){
     const amount = document.querySelector('#soldAmount');
     const days = document.querySelector('#nbDayBeforeExpiration');
+    const result = document.getElementById("result");
 
     // Creating a XHR object
     let xhr = new XMLHttpRequest();
@@ -17,6 +18,7 @@ function sendJSON(){
         if (xhr.readyState === 4 && xhr.status === 200) {
             // Print received data from server
             console.log("Everything is Okay !");
+            result.classList.add("view");
         }
     };
 

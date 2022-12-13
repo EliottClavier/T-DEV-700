@@ -20,7 +20,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /*
-* Creation class of the Qr-code used on the TPE.
+* Class creation of the Qr-code used on the TPE.
 */
 
 @RestController
