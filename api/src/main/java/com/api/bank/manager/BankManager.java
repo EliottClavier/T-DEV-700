@@ -39,7 +39,7 @@ public class BankManager {
     private CheckService checkService;
 
 
-    private Queue<Transaction> transactionQueue;
+    private Queue<BankTransaction> transactionQueue;
 
     private BankManager bankManager;
 
