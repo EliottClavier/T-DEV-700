@@ -18,6 +18,7 @@ import com.api.bank.service.OperationService;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -62,7 +63,7 @@ public class BankManager {
     }
 
 
-    @Transactional(rollbackFor = {BankTransactionException.class, Exception.class})
+    @Transactional(rollbackFor = {BankTransactionException.class, Exception.class}, propagation = Propagation.REQUIRES_NEW)
     public TransactionResult HandleTransaction(BankTransaction transaction) throws BankTransactionException {
 
         Account withdrawAccount;
