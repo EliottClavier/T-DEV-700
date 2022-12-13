@@ -69,7 +69,7 @@ public class ShopManagerController {
                         // Select a random TPE and delete it from TPE list
                         Object randomSessionId = this.customRedisTemplate.opsForHash().get(HASH_KEY_NAME_TPE, randomId);
                         TpeManager tpeManager = new TpeManager(randomId.toString(), randomSessionId.toString());
-                        this.customRedisTemplate.opsForHash().delete(HASH_KEY_NAME_TPE, tpeManager.getId());
+                        this.customRedisTemplate.opsForHash().delete(HASH_KEY_NAME_TPE, randomId);
 
                         // Create random identifier for the transaction and register it to REDIS
                         transactionRequest.setTpeUsername(tpeManager.getId());
@@ -104,6 +104,7 @@ public class ShopManagerController {
                     );
                 }
             } catch (Exception e) {
+                System.out.println(e.getMessage());
                 this.smt.convertAndSendToUser(
                         user.getName(),
                         destinationGenerator.getShopTransactionStatusDest(sessionId),

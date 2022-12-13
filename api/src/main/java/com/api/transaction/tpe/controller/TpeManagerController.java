@@ -103,7 +103,7 @@ public class TpeManagerController {
             TransactionRequest transactionRequest = retrieveTransactionRequestByTpeSessionId(sessionId);
             if (transactionRequest != null) {
                 // Complete transaction request with new data
-                transactionRequest.setType(TransactionRequestType.valueOf(transactionRequestTpe.getPaymentId()));
+                transactionRequest.setType(TransactionRequestType.valueOf(transactionRequestTpe.getType()));
                 transactionRequest.setPaymentId(transactionRequestTpe.getPaymentId());
 
                 // Execute transaction and remove it from Redis
@@ -117,7 +117,7 @@ public class TpeManagerController {
                 // Send transaction done message to TPE
                 this.smt.convertAndSendToUser(
                         tpeManager.getId(),
-                        destinationGenerator.getShopTransactionStatusDest(sessionId),
+                        destinationGenerator.getTpeTransactionStatusDest(sessionId),
                         message
                 );
 

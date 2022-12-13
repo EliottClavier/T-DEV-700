@@ -22,6 +22,7 @@ public class TransactionRequest implements Serializable {
     public TransactionRequestType type;
 
     public TransactionRequest(String shopUsername, String shopSessionId, float amount) {
+        this.id = UUID.randomUUID().toString();
         this.shopUsername = shopUsername;
         this.shopSessionId = shopSessionId;
         this.amount = amount;
@@ -33,7 +34,7 @@ public class TransactionRequest implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("{'id': %s, 'tpeSessionId': %s, 'shopSessionId': %s, 'amount': %s, 'type': %s}",
-                id, tpeSessionId, shopSessionId, amount, type);
+        return String.format("{'id': %s, 'tpeSessionId': %s, 'tpeUsername': %s, 'shopSessionId': %s, 'shopUsername': %s, 'amount': %s, 'type': %s}",
+                id, tpeSessionId, tpeUsername, shopSessionId, shopUsername, amount, type);
     }
 }
