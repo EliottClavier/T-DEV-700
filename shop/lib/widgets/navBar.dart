@@ -73,10 +73,10 @@ class NavBarState extends State<NavBar> {
                     minHeight: 8,
                   ),
                   child: Text(
-                    '${widget.total}€',
+                    '${widget.total}',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 9,
+                      fontSize: 14,
                     ),
                     textAlign: TextAlign.center,
                   ),
