@@ -17,7 +17,8 @@ public class OperationService extends GenericService<Operation, GenericRepositor
     }
 
     public boolean isOperationPendingFor(UUID accountId) {
-        return operationRepository.existsOperationByOperationStatusIsLikeAndAccountIdIs(OperationStatus.PENDING, accountId);
+        var res = operationRepository.existsOperationByOperationStatusIsLikeAndAccountIdIs(OperationStatus.PENDING, accountId);
+        return res;
     }
 }
 

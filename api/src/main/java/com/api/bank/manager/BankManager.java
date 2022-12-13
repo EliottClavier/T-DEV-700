@@ -10,13 +10,16 @@ import com.api.bank.model.enums.TransactionStatus;
 import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.*;
 import com.api.bank.repository.AccountRepository;
+import com.api.bank.repository.CheckRepository;
 import com.api.bank.repository.ClientRepository;
 import com.api.bank.repository.OperationRepository;
 import com.api.bank.service.AccountService;
+import com.api.bank.service.CheckService;
 import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -37,16 +40,19 @@ public class BankManager {
 //    @Autowired
     private  ClientService clientService;
 
+    private CheckService checkService;
+
 
     private Queue<Transaction> transactionQueue;
 
     private BankManager bankManager;
 
-    public BankManager(OperationRepository operationRepository, AccountRepository accountRepository, ClientRepository clientRepository) {
+    public BankManager(OperationRepository operationRepository, AccountRepository accountRepository, ClientRepository clientRepository, CheckRepository checkRepository) {
 
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
         this.clientService = new ClientService(clientRepository);
+        this.checkService = new CheckService(checkRepository);
     }
     public BankManager() {
         super();
@@ -57,11 +63,12 @@ public class BankManager {
 //        this.operationService = new OperationService(operationRepository);
 //        this.clientService = new ClientService(clientRepository);
 //    }
-    public BankManager(AccountService accountService, OperationService operationService, ClientService clientService) {
+    public BankManager(AccountService accountService, OperationService operationService, ClientService clientService, CheckService checkService) {
 
         this.accountService = accountService;
         this.operationService = operationService;
         this.clientService = clientService;
+        this.checkService = checkService;
     }
 
 
@@ -87,7 +94,7 @@ public class BankManager {
 
             } else {
                 withdrawAccount = clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
-                //TODO qrcheck = operationService.getQrCheckByToken(transaction.getCheckToken());
+                qrcheck = checkService.getCheckByCheckToken(transaction.getCheckToken());
 
                 // Is the check valid ?
                 if (qrcheck == null)

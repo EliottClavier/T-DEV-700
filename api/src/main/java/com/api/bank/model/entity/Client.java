@@ -14,8 +14,8 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Embeddable()
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//@Embeddable()
 public class Client extends Base {
 
     @Column( nullable=false, length=100)

@@ -19,12 +19,18 @@ public class AccountService extends GenericService<Account, AccountRepository> {
         super(accountRepository);
         this.accountRepository = accountRepository;
     }
+    public AccountService() {
+        super();
+    }
 
     public Account getAccountByCardId(String cardId){
         return accountRepository.findAccountByCard_CardId(cardId);
     }
     public Account getAccountByClientId(UUID clientId){
         return accountRepository.findAccountByClient_Id(clientId);
+    }
+    public Account getAccountByOwnerName(String owner){
+        return accountRepository.findAccountByClient_OrganisationName(owner);
     }
 
     public Account getAccountByClient(Client client){

@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/bank/client")
 public class ClientController {
 
-//    @Autowired
+    @Autowired
     private ClientService clientService;
 
-    public ClientController( ClientRepository clientrepo) {
+    public ClientController( ) {
         super();
-        this.clientService = new ClientService(clientrepo);
     }
 
     @GetMapping("/{id}")

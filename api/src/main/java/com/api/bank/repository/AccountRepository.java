@@ -15,6 +15,7 @@ public interface AccountRepository extends GenericRepository<Account> {
     Account findAccountByClient(Client client);
 
     Account findAccountByClient_Id(UUID clientId);
+    Account findAccountByClient_OrganisationName(String ownerName);
 
 
 

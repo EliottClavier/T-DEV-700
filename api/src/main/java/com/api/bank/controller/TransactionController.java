@@ -8,10 +8,12 @@ import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.BankTransaction;
 import com.api.bank.model.transaction.TransactionResult;
 import com.api.bank.repository.AccountRepository;
+import com.api.bank.repository.CheckRepository;
 import com.api.bank.repository.ClientRepository;
 import com.api.bank.repository.OperationRepository;
 import com.api.bank.service.AccountService;
 
+import com.api.bank.service.CheckService;
 import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +28,20 @@ public class TransactionController {
 
     private OperationService operationService;
 
+
     private ClientService clientService;
+    private CheckService checkService;
 
     private BankManager bankanager;
 
 
-    public TransactionController(AccountRepository accountRepository, OperationRepository operationRepository, ClientRepository clientRepository) {
+    public TransactionController(AccountRepository accountRepository, OperationRepository operationRepository, ClientRepository clientRepository, CheckRepository checkRepository) {
         super();
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
-        this.clientService = new ClientService(clientRepository);
-        bankanager = new BankManager( accountService,operationService, clientService);
+       this.clientService = new ClientService(clientRepository);
+       this.checkService = new CheckService(checkRepository);
+        this.bankanager = new BankManager( accountService,operationService, clientService, checkService);
     }
     @PostMapping("/add")
     public ResponseEntity<TransactionResult> add(@RequestBody BankTransaction data) {
