@@ -1,18 +1,17 @@
 package com.api.transaction.tpe.controller;
 
+import com.api.transaction.data.DestinationGenerator;
 import com.api.transaction.model.*;
 
 import com.api.transaction.tpe.model.TpeManager;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
 
@@ -22,8 +21,7 @@ public class TpeManagerController {
     public static final String HASH_KEY_NAME_TPE = "TPE";
     public static final String HASH_KEY_NAME_TRANSACTION = "TRANSACTION";
 
-    public static final String MESSAGE_PREFIX_SHOP = "/queue/shop";
-    public static final String MESSAGE_PREFIX_TPE = "/queue/tpe";
+    private final DestinationGenerator destinationGenerator = new DestinationGenerator();
 
     @Autowired
     private RedisTemplate<String, String> customRedisTemplate;
@@ -31,64 +29,66 @@ public class TpeManagerController {
     @Autowired
     private SimpMessagingTemplate smt;
 
-    public Message registerTpeRedis(TpeManager tpeManager, Message message) {
+    public Message registerTpeRedis(TpeManager tpeManager) {
+        Message message = new Message("Processing", MessageType.SYNCHRONIZATION_ERROR);
         try {
             if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME_TPE, tpeManager.getId())) {
-                message.setMessage("TPE already connected to Redis.");
+                message.setMessage("TPE already synchronised to Redis.");
+                message.setType(MessageType.ALREADY_SYNCHRONIZED);
             } else if (tpeManager.isValid()) {
                 customRedisTemplate.opsForHash().put(HASH_KEY_NAME_TPE, tpeManager.getId(), tpeManager.getSessionId());
                 message.setMessage("TPE available for transaction.");
-                message.setType(MessageType.SUCCESS);
+                message.setType(MessageType.SYNCHRONIZED);
             } else {
-                message.setMessage("TPE not valid.");
+                message.setMessage("Invalid TPE.");
+                message.setType(MessageType.TPE_INVALID);
             }
         } catch (IllegalArgumentException e) {
             message.setMessage("TPE not found.");
+            message.setType(MessageType.NOT_FOUND);
         } catch (Exception e) {
             message.setMessage("Error registering TPE.");
+            message.setType(MessageType.SYNCHRONIZATION_ERROR);
         }
         return message;
     }
 
-    public TransactionRequest retrieveTransactionRequest(String id) {
-        try {
-            Object object = this.customRedisTemplate.opsForHash().get(HASH_KEY_NAME_TRANSACTION, id);
-            return new Gson().fromJson(object.toString(), TransactionRequest.class);
-        } catch (Exception e) {
-            return null;
+    public TransactionRequest retrieveTransactionRequestByTpeSessionId(String sessionId) {
+        // For each transaction return value
+        for (Object transaction : customRedisTemplate.opsForHash().values(HASH_KEY_NAME_TRANSACTION)) {
+            TransactionRequest transactionRequest = new Gson().fromJson((String) transaction, TransactionRequest.class);
+            System.out.println(transactionRequest);
+            if (transactionRequest.getTpeSessionId().equals(sessionId)) {
+                return transactionRequest;
+            }
         }
-    }
-
-    public void sendTransactionFailedMessage(
-            String tpeId, String tpeSessionId,
-            String shopId, String shopSessionId
-    ) {
-        String destinationTpe = String.format("%s/transaction-failed/%s", MESSAGE_PREFIX_TPE, tpeSessionId);
-        String destinationShop = String.format("%s/transaction-failed/%s", MESSAGE_PREFIX_SHOP, shopSessionId);
-        this.smt.convertAndSendToUser(
-                tpeId, destinationTpe, new Message("Invalid transaction identifier.", MessageType.ERROR)
-        );
-        this.smt.convertAndSendToUser(
-                shopId, destinationShop, new Message("Transaction failed.", MessageType.ERROR)
-        );
+        return null;
     }
 
     public static void realizeTransaction(TransactionRequest transactionRequest) {
         System.out.println("Transaction realized: " + transactionRequest);
     }
 
-    @MessageMapping("/tpe/synchronise")
-    public void synchroniseTpeRedis(
-            @Payload String tpeString,
+    @MessageMapping("/tpe/synchronize")
+    public void synchronizeTpeRedis(
             Principal user,
             @Header("simpSessionId") String sessionId
     ) {
-        String destination = String.format("%s/synchronised/%s", MESSAGE_PREFIX_TPE, sessionId);
-        Gson gson = new Gson();
-        Message message = new Message("Processing", MessageType.ERROR);
-        TpeManager tpeManager = gson.fromJson(tpeString, TpeManager.class);
-        message = this.registerTpeRedis(tpeManager, message);
-        this.smt.convertAndSendToUser(user.getName(), destination, message);
+        try {
+            TpeManager tpeManager = new TpeManager(user.getName(), sessionId);
+            Message message = this.registerTpeRedis(tpeManager);
+            this.smt.convertAndSendToUser(
+                    user.getName(),
+                    destinationGenerator.getTpeSynchronizationStatusDest(sessionId),
+                    message
+            );
+        } catch (Exception e) {
+            this.smt.convertAndSendToUser(
+                    user.getName(),
+                    destinationGenerator.getTpeSynchronizationStatusDest(sessionId),
+                    new Message("Error synchronising TPE.", MessageType.SYNCHRONIZATION_ERROR)
+            );
+        }
     }
 
     @MessageMapping("/tpe/complete-transaction")
@@ -97,54 +97,89 @@ public class TpeManagerController {
             Principal user,
             @Header("simpSessionId") String sessionId
     ) {
-        String destinationTpe = String.format("%s/transaction-done/%s", MESSAGE_PREFIX_TPE, sessionId);
-        String destinationShop = String.format("%s/transaction-done", MESSAGE_PREFIX_SHOP);
-        Gson gson = new Gson();
-        Message message = new Message("Processing", MessageType.ERROR);
-        TransactionRequestTpe transactionRequestTpe = gson.fromJson(transactionData, TransactionRequestTpe.class);
-        TransactionRequest transactionRequest = retrieveTransactionRequest(transactionRequestTpe.getId());
-        TpeManager tpeManager = new TpeManager(transactionRequest.getTpeMac(), sessionId);
-        if (this.customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME_TRANSACTION, transactionRequest.getId())) {
-            realizeTransaction(transactionRequest);
-            this.customRedisTemplate.opsForHash().delete(HASH_KEY_NAME_TRANSACTION, transactionRequest.getId());
-            message = this.registerTpeRedis(tpeManager, message);
-            this.smt.convertAndSendToUser(tpeManager.getId(), destinationTpe, message);
-            this.smt.convertAndSendToUser(
-                    transactionRequest.getShopName(),
-                    destinationShop + transactionRequest.getShopSessionId(),
-                    new Message("Transaction done.", MessageType.SUCCESS)
-            );
+        if (!this.customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME_TPE, user.getName())) {
+            Gson gson = new Gson();
+            TransactionRequestTpe transactionRequestTpe = gson.fromJson(transactionData, TransactionRequestTpe.class);
+            TransactionRequest transactionRequest = retrieveTransactionRequestByTpeSessionId(sessionId);
+            if (transactionRequest != null) {
+                // Complete transaction request with new data
+                transactionRequest.setType(TransactionRequestType.valueOf(transactionRequestTpe.getPaymentId()));
+                transactionRequest.setPaymentId(transactionRequestTpe.getPaymentId());
+
+                // Execute transaction and remove it from Redis
+                realizeTransaction(transactionRequest);
+                this.customRedisTemplate.opsForHash().delete(HASH_KEY_NAME_TRANSACTION, transactionRequest.getId());
+
+                // Make the Tpe available for a new transaction
+                TpeManager tpeManager = new TpeManager(user.getName(), sessionId);
+                Message message = this.registerTpeRedis(tpeManager);
+
+                // Send transaction done message to TPE
+                this.smt.convertAndSendToUser(
+                        tpeManager.getId(),
+                        destinationGenerator.getShopTransactionStatusDest(sessionId),
+                        message
+                );
+
+                // Send transaction done message to Shop
+                this.smt.convertAndSendToUser(
+                        transactionRequest.getShopUsername(),
+                        destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
+                        new Message("Transaction done.", MessageType.TRANSACTION_DONE)
+                );
+            } else {
+                this.smt.convertAndSendToUser(
+                        user.getName(),
+                        destinationGenerator.getTpeTransactionStatusDest(sessionId),
+                        new Message("TPE not involved in any transaction.", MessageType.NOT_INVOLVED)
+                );
+            }
         } else {
-            sendTransactionFailedMessage(
-                    user.getName(), sessionId,
-                    transactionRequest.getShopName(), transactionRequest.getShopSessionId()
+            this.smt.convertAndSendToUser(
+                    user.getName(),
+                    destinationGenerator.getTpeTransactionStatusDest(sessionId),
+                    new Message("TPE still marked available while trying to complete a transaction.", MessageType.STILL_AVAILABLE)
             );
         }
     }
 
     @MessageMapping("/tpe/cancel-transaction")
     public void cancelTransaction(
-            @Payload String transactionData,
             Principal user,
             @Header("simpSessionId") String sessionId
     ) {
-        String destinationTpe = String.format("%s/transaction-cancelled/%s", MESSAGE_PREFIX_TPE, sessionId);
-        String destinationShop = String.format("%s/transaction-cancelled", MESSAGE_PREFIX_SHOP);
-        Gson gson = new Gson();
-        Message message = new Message("Processing", MessageType.ERROR);
-        TransactionRequest transactionRequest = gson.fromJson(transactionData, TransactionRequest.class);
-        TpeManager tpeManager = new TpeManager(transactionRequest.getTpeMac(), sessionId);
-        message = this.registerTpeRedis(tpeManager, message);
-        this.smt.convertAndSendToUser(user.getName(), destinationTpe, message);
-        this.smt.convertAndSendToUser(
-                transactionRequest.getShopName(),
-                destinationShop + transactionRequest.getShopSessionId(),
-                new Message("Transaction cancelled.", MessageType.ERROR)
-        );
-    }
+        if (!this.customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME_TPE, user.getName())) {
+            TransactionRequest transactionRequest = retrieveTransactionRequestByTpeSessionId(sessionId);
+            if (transactionRequest != null) {
+                TpeManager tpeManager = new TpeManager(user.getName(), sessionId);
+                Message message = this.registerTpeRedis(tpeManager);
 
-    @EventListener
-    public void onDisconnectEvent(SessionDisconnectEvent event) {
-        System.out.println("Disconnect event: " + event);
+                // Send message to TPE
+                this.smt.convertAndSendToUser(
+                        user.getName(),
+                        destinationGenerator.getTpeSynchronizationStatusDest(sessionId),
+                        message
+                );
+
+                // Send message to Shop
+                this.smt.convertAndSendToUser(
+                        transactionRequest.getShopUsername(),
+                        destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
+                        new Message("Transaction cancelled.", MessageType.TRANSACTION_CANCELLED)
+                );
+            } else {
+                this.smt.convertAndSendToUser(
+                        user.getName(),
+                        destinationGenerator.getShopTransactionStatusDest(sessionId),
+                        new Message("TPE not involved in any transaction.", MessageType.NOT_INVOLVED)
+                );
+            }
+        } else {
+            this.smt.convertAndSendToUser(
+                    user.getName(),
+                    destinationGenerator.getShopTransactionStatusDest(sessionId),
+                    new Message("TPE still marked available while trying to cancel a transaction.", MessageType.STILL_AVAILABLE)
+            );
+        }
     }
 }

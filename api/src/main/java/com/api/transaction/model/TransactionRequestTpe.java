@@ -8,7 +8,6 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 public class TransactionRequestTpe implements Serializable {
-    private String id;
-    private String mac;
+    private String paymentId;
     private String type;
 }

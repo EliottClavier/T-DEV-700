@@ -5,34 +5,35 @@ import lombok.Data;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @RedisHash(value = "TRANSACTION")
 public class TransactionRequest implements Serializable {
     private String id;
-    private String tpeMac;
-    private String shopName;
-    private String shopId;
+    private String tpeSessionId;
+    private String tpeUsername;
     private String shopSessionId;
+    private String shopUsername;
+
     private float amount;
+    public String paymentId;
     public TransactionRequestType type;
 
-    public TransactionRequest(TransactionRequestShop transactionRequestShop) {
-        this.id = transactionRequestShop.getId();
-        this.shopId = transactionRequestShop.getId();
-        this.shopName = transactionRequestShop.getName();
-        this.shopSessionId = transactionRequestShop.getSessionId();
-        this.amount = transactionRequestShop.getAmount();
+    public TransactionRequest(String shopUsername, String shopSessionId, float amount) {
+        this.shopUsername = shopUsername;
+        this.shopSessionId = shopSessionId;
+        this.amount = amount;
     }
 
     public Boolean isValid() {
-        return shopId != null && shopName != null && shopSessionId != null && amount > 0 && id != null;
+        return id != null && tpeSessionId != null && shopSessionId != null && amount > 0;
     }
 
     @Override
     public String toString() {
-        return String.format("{'id': %s, 'tpeMac': %s, 'shopName': %s, 'shopId': %s, 'shopSessionId': %s, 'amount': %s, 'type': %s}",
-                id, tpeMac, shopName, shopId, shopSessionId, amount, type);
+        return String.format("{'id': %s, 'tpeSessionId': %s, 'shopSessionId': %s, 'amount': %s, 'type': %s}",
+                id, tpeSessionId, shopSessionId, amount, type);
     }
 }
