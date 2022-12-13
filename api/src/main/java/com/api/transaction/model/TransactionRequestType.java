@@ -1,6 +1,6 @@
 package com.api.transaction.model;
 
-public enum TransactionType {
+public enum TransactionRequestType {
     NFC,
     QRCODE,
 }
