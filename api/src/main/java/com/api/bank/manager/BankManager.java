@@ -17,7 +17,7 @@ import com.api.bank.service.AccountService;
 import com.api.bank.service.CheckService;
 import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
-import org.jetbrains.annotations.NotNull;
+import com.sun.istack.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
