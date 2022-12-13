@@ -1,4 +1,4 @@
-package com.api.tpe.model;
+package com.api.transaction.tpe.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,15 +12,15 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @RedisHash(value = "TPE")
-public class TpeRedis implements Serializable {
+public class TpeManager implements Serializable {
 
     @Id
     // Id = Adresse MAC
     public String id;
-    public String ip;
+    public String serial;
 
     public Boolean isValid() {
-        return id != null && !id.isEmpty() && ip != null && !ip.isEmpty();
+        return id != null && !id.isEmpty() && serial != null && !serial.isEmpty();
     }
 
 }

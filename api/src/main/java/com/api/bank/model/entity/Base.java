@@ -3,7 +3,6 @@ package com.api.bank.model.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -19,8 +18,6 @@ import java.util.UUID;
 public abstract class Base {
 
     @Id()
-//    @GeneratedValue(generator = "UUID2", strategy = GenerationType.IDENTITY)
-//    @GenericGenerator(name = "UUID2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", length = 36, columnDefinition = "VARCHAR(36)")
     @Type(type = "uuid-char")
     private UUID id;
@@ -40,7 +37,6 @@ public abstract class Base {
     public Base() {
         init();
     }
-
     private void init() {
         if (createdAt == null) {
             createdAt = Instant.now();

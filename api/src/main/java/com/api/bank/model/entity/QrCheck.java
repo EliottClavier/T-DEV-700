@@ -14,13 +14,12 @@ import java.util.List;
 @Setter
 public class QrCheck extends Base {
 
-
+    @Column(nullable = false, unique = true)
     private String checkToken;
-
 
     private int soldAmount;
 
-
+    @Column(nullable = false)
     private int nbDayOfValidity;
 
     @OneToMany(mappedBy = "qrCheck", cascade= CascadeType.ALL)
@@ -28,6 +27,12 @@ public class QrCheck extends Base {
 
     public QrCheck() {
         super();
+        init();
+    }
+    private void init() {
+        if (nbDayOfValidity == 0) {
+            nbDayOfValidity = 365;
+        }
     }
 
     public Date getExpirationDate() {

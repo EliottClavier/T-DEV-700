@@ -1,4 +1,4 @@
-package com.api.tpe.config;
+package com.api.transaction.config;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableAutoConfiguration
 public class RedisConfiguration {
 
-    @Bean
+    @Bean()
     public RedisTemplate<String, String> customRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
 

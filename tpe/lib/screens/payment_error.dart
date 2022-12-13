@@ -39,6 +39,7 @@ class _PaymentErrorScreenStatefulWidgetState
   }
 
   void _onBackHome() {
+    dispose();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const HomeScreen(),
