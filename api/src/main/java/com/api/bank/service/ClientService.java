@@ -8,11 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClientService extends GenericService<Client, ClientRepository> {
 
-    @Autowired
+//    @Autowired
     public ClientRepository clientRepository;
 
     public ClientService(ClientRepository clientRepository) {
-        super(clientRepository);
-    }
 
+        super(clientRepository);
+        this.clientRepository = clientRepository;}
+
+    public Client getClientByOrganisationName(String name){
+        return clientRepository.findClientByOrganisationName(name);
+    }
 }
