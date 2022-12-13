@@ -16,6 +16,7 @@ import 'package:shop/widgets/snackBar.dart';
 class Shop extends StatefulWidget {
   static const String pageName = '/shop';
   static late BuildContext contextShop;
+  String? totalOfArticles = totalArticles();
   String? total = totalPrice();
   Shop({super.key});
 
@@ -35,6 +36,7 @@ class ShopState extends State<Shop> {
   void updateTotal() {
     setState(() {
       widget.total = totalPrice();
+      widget.totalOfArticles = totalArticles();
     });
   }
 
@@ -103,7 +105,7 @@ class ShopState extends State<Shop> {
                 ],
               ),
               const SizedBox(height: 20),
-              NavBar(parentContext: context, total: widget.total,),
+              NavBar(parentContext: context, total: widget.totalOfArticles,),
             ],
           ),
         ),

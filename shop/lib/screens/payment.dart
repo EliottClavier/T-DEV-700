@@ -8,6 +8,8 @@ import 'package:shop/widgets/snackBar.dart';
 class Payment extends StatelessWidget {
   static const String pageName = '/payment';
 
+  const Payment({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
