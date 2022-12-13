@@ -36,7 +36,7 @@ public class TpeManagerRedisController {
         if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, tpeRedis.getId())) {
             return new ResponseEntity<>("TPE already registered.", HttpStatus.CONFLICT);
         } else if (tpeRedis.isValid()) {
-            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getIp());
+            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, tpeRedis.getId(), tpeRedis.getSerial());
             return new ResponseEntity<>("TPE registered.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("TPE not valid.", HttpStatus.BAD_REQUEST);
@@ -46,7 +46,7 @@ public class TpeManagerRedisController {
     @RequestMapping(path = "/{mac}", method = RequestMethod.PUT)
     public ResponseEntity<String> updateTpe(@PathVariable("mac") String mac, @RequestBody TpeManager tpeRedis) {
         if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, mac) && tpeRedis.isValid()) {
-            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, mac, tpeRedis.getIp());
+            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, mac, tpeRedis.getSerial());
             return new ResponseEntity<>("TPE updated.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("TPE not found.", HttpStatus.NOT_FOUND);
