@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <title>QrCode Generator</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
@@ -8,22 +8,15 @@
 <body>
 <div class="main-block">
     <form action="/">
-        <input type="number" name="soldAmount" id="soldAmount" placeholder="Sold" min="10" required/>
-        <input type="number" name="nbDayBeforeExpiration" id="nbDayBeforeExpiration" placeholder="Days" min="10" required/>
+        <label for="soldAmount"><input type="number" name="soldAmount" id="soldAmount" placeholder="Sold" min="10" required/></label>
+        <label for="nbDayBeforeExpiration"><input type="number" name="nbDayBeforeExpiration" id="nbDayBeforeExpiration" placeholder="Days" min="10" required/></label>
         <div class="btn-block">
-            <button onclick="sendAmount()">Submit</button>
+            <button type="button" onclick="sendJSON()">Générer un QrCode</button>
         </div>
     </form>
 </div>
+
+<script src="main.js"></script>
 </body>
 </html>
-
-
-<script>
-    function sendAmount(){
-        const amount = document.getElementById("soldAmount");
-        const days = document.getElementById("nbDayBeforeExpiration");
-        console.log(amount.value + " : " + days.value);
-    }
-</script>
 

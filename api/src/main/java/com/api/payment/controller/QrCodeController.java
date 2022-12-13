@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -18,8 +19,12 @@ import java.util.*;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+/*
+* Creation class of the Qr-code used on the TPE.
+*/
+
 @RestController
-@RequestMapping(path = "/qr-code")
+@RequestMapping(path = "/payment/qr-code")
 public class QrCodeController {
 
     @Value("${default.qrcode.secret}")
@@ -91,10 +96,21 @@ public class QrCodeController {
 
     public static void generateQrcode(String check) throws WriterException, IOException
     {
-        String path = "/qr-code/test.png";
-        String charset = "UTF-8";
-        Map<EncodeHintType, ErrorCorrectionLevel> hashMap = new HashMap<>();
-        hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
-        qrcode(check, path, charset, 200, 200);
+        try {
+            UUID uuid = UUID.randomUUID();
+            String str = "qr-code-" + uuid.toString();
+            String path = "/qr-code/" + str + ".png";
+            String charset = "UTF-8";
+
+            FileWriter myWriter = new FileWriter("/qr-code/" + str + ".txt");
+            myWriter.write(check);
+            myWriter.close();
+
+            Map<EncodeHintType, ErrorCorrectionLevel> hashMap = new HashMap<>();
+            hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+            qrcode(check, path, charset, 250, 250);
+        } catch (Exception e) {
+            System.out.println("An error occurred : " + e);
+        }
     }
 }
