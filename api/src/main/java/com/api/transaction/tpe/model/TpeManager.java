@@ -13,14 +13,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 @RedisHash(value = "TPE")
 public class TpeManager implements Serializable {
-
     @Id
     // Id = Adresse MAC
-    public String id;
-    public String serial;
+    private String id;
+    private String sessionId;
 
     public Boolean isValid() {
-        return id != null && !id.isEmpty() && serial != null && !serial.isEmpty();
+        return id != null && !id.isEmpty() && sessionId != null && !sessionId.isEmpty();
     }
-
 }

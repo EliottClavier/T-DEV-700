@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @EnableJpaRepositories(value = {"com.api.bank.repository", "com.api.auth.repository"})
-@SpringBootApplication(scanBasePackages = {"com.api", "com.api.apk", "com.api.tpe", "com.api.bank", "com.api.auth"})
+@SpringBootApplication(scanBasePackages = {"com.api", "com.api.apk", "com.api.transaction", "com.api.transaction.shop", "com.api.bank", "com.api.transaction.tpe", "com.api.auth"})
 public class ApiApplication {
 
     public static void main(String[] args) {
