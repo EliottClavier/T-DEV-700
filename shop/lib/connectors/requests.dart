@@ -81,7 +81,7 @@ class RequestsClass {
     dynamic processing = _client.subscribe(destination: '/user/private/shop/processing', callback: (frame) {
       print("Processing");
       print(frame.body);
-      Navigator.pushNamed(parentContext, Shop.pageName);
+      //Navigator.pushNamed(parentContext, Shop.pageName);
       showSnackBar(parentContext, "Aucun TPE disponible pour le moment", "error", 3);
     });
 
