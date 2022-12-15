@@ -31,6 +31,8 @@ dependencies:
   qr_code_scanner: ^1.0.1
   http: ^0.13.5
   flutter_dotenv: ^5.0.2
+  stomp_dart_client: ^0.4.4
+  provider: ^6.0.4
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +51,7 @@ flutter:
     - assets/gif/animation_nfc.gif
     - assets/gif/home_loader.gif
     - assets/gif/payment_loader.gif
+    - .env
   fonts:
     - family: Montserrat
       fonts:
