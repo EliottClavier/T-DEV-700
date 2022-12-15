@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:tpe/screens/payment.dart';
+import 'package:provider/provider.dart';
+import 'package:tpe/services/bank_service.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -30,21 +32,13 @@ class HomeScreenStatefulWidget extends StatefulWidget {
 }
 
 class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
-  String getPrice() {
-    Random rng = Random();
-    var price = rng.nextInt(100);
-    return "${price.toString()}.00 €";
-  }
+  BankService bankService = BankService();
+  late bool isConnectedToApi;
 
-  void _onClick(PointerEvent details) {
-    String price = getPrice();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PaymentScreen(
-          price: price,
-        ),
-      ),
-    );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _initBank();
   }
 
   @override
@@ -55,6 +49,43 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _initBank() async {
+    isConnectedToApi = _isConnectedToApi();
+  }
+
+  bool _isConnectedToApi() {
+    bool response =
+        Provider.of<BankService>(context, listen: true).isConnectedToApi;
+    if (response) {
+      onConnectedToApi();
+    }
+    return response;
+  }
+
+  void onConnectedToApi() {
+    print("Connected to API");
+  }
+
+  String getPrice() {
+    Random rng = Random();
+    var price = rng.nextInt(100);
+    return "${price.toString()}.00 €";
+  }
+
+  void _onClick(PointerEvent details) {
+    String price = getPrice();
+    print("Price: $price");
+    bankService.printStatus();
+    context.go("/payment");
+    /* Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PaymentScreen(
+          price: price,
+        ),
+      ),
+    ); */
   }
 
   @override
@@ -73,7 +104,8 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
                   Image.asset("assets/gif/home_loader.gif",
                       width: 300, height: 300),
                 ],
-              )
+              ),
+              Text("$isConnectedToApi"),
             ],
           ),
         ),

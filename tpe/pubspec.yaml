@@ -33,6 +33,9 @@ dependencies:
   flutter_dotenv: ^5.0.2
   stomp_dart_client: ^0.4.4
   provider: ^6.0.4
+  go_router: ^5.2.4
+  flutter_redux: ^0.10.0
+  compute: ^1.0.2
 
 dev_dependencies:
   flutter_test:

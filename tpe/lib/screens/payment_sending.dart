@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
+import 'package:tpe/services/bank_service.dart';
 import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
-import 'package:tpe/connectors/bank.dart';
 
 class PaymentSendingScreen extends StatelessWidget {
   final String price;
@@ -55,10 +55,7 @@ class _PaymentSendingScreenStatefulWidgetState
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(const Duration(milliseconds: 3000), () {
-      sendData();
-    });
+    sendData();
   }
 
   @override
@@ -67,21 +64,7 @@ class _PaymentSendingScreenStatefulWidgetState
   }
 
   void sendData() async {
-    var response = widget.paymentMethod == "qr_code"
-        ? await sendQrCodeData(widget.paymentData)
-        : await sendNfcData(widget.paymentData);
-    Widget screen = const PaymentErrorScreen();
-    if (response) {
-      screen = PaymentSuccessScreen(
-        price: widget.price,
-      );
-    }
-    dispose();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => screen,
-      ),
-    );
+    context.go("/payment_success");
   }
 
   @override

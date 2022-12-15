@@ -16,7 +16,9 @@ class QrCodeReaderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'QR Code Reader',
-      home: QrCodeReaderScreenWidget(price: price),
+      home: QrCodeReaderScreenWidget(
+        price: price,
+      ),
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF03045F),
         primarySwatch: Colors.blue,
