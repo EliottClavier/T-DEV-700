@@ -5,15 +5,11 @@ import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
 
 class PaymentSendingScreen extends StatelessWidget {
-  final String price;
   final String paymentMethod;
   final String paymentData;
 
   const PaymentSendingScreen(
-      {super.key,
-      required this.price,
-      required this.paymentMethod,
-      required this.paymentData});
+      {super.key, required this.paymentMethod, required this.paymentData});
 
   static const String _title = 'Sending Payment';
 
@@ -22,7 +18,6 @@ class PaymentSendingScreen extends StatelessWidget {
     return MaterialApp(
       title: _title,
       home: PaymentSendingScreenStatefulWidget(
-        price: price,
         paymentMethod: paymentMethod,
         paymentData: paymentData,
       ),
@@ -36,12 +31,8 @@ class PaymentSendingScreen extends StatelessWidget {
 
 class PaymentSendingScreenStatefulWidget extends StatefulWidget {
   const PaymentSendingScreenStatefulWidget(
-      {super.key,
-      required this.price,
-      required this.paymentMethod,
-      required this.paymentData});
+      {super.key, required this.paymentMethod, required this.paymentData});
 
-  final String price;
   final String paymentMethod;
   final String paymentData;
 

@@ -1,9 +1,14 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:provider/provider.dart';
 import 'package:tpe/services/bank_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tpe/utils/price.dart';
+
+import 'package:tpe/store/transaction_store.dart';
+import 'package:redux/redux.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -68,15 +73,10 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
     print("Connected to API");
   }
 
-  String getPrice() {
-    Random rng = Random();
-    var price = rng.nextInt(100);
-    return "${price.toString()}.00 €";
-  }
-
   void _onClick(PointerEvent details) {
-    String price = getPrice();
-    print("Price: $price");
+    amount = Random().nextDouble() * 100;
+    amount = double.parse(amount.toStringAsFixed(2));
+    print("Price store: ${getAmount()}");
     bankService.printStatus();
     context.go("/payment");
     /* Navigator.of(context).push(

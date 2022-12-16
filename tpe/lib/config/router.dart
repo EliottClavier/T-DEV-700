@@ -17,35 +17,26 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/scan/qr-code',
-      builder: (context, state) => const QrCodeReaderScreen(
-        price: "Test",
-      ),
+      builder: (context, state) => const QrCodeReaderScreen(),
     ),
     GoRoute(
       path: '/scan/nfc',
-      builder: (context, state) => const NfcReaderScreen(
-        price: "Test",
-      ),
+      builder: (context, state) => const NfcReaderScreen(),
     ),
     GoRoute(
       path: '/payment',
-      builder: (context, state) => const PaymentScreen(
-        price: "Test",
-      ),
+      builder: (context, state) => const PaymentScreen(),
       routes: [
         GoRoute(
           path: 'sending/:method',
           builder: (context, state) => PaymentSendingScreen(
-            price: "Test",
             paymentMethod: state.params['method']!,
             paymentData: "Test",
           ),
         ),
         GoRoute(
           path: 'success',
-          builder: (context, state) => const PaymentSuccessScreen(
-            price: "Test",
-          ),
+          builder: (context, state) => const PaymentSuccessScreen(),
         ),
         GoRoute(
           path: 'error',

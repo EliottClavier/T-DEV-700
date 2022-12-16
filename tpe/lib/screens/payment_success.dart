@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:tpe/screens/home.dart';
+import 'package:tpe/utils/price.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
-  const PaymentSuccessScreen({super.key, required this.price});
+  const PaymentSuccessScreen({super.key});
 
   static const String _title = 'Payment method';
-  final String price;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: PaymentSuccessScreenStatefulWidget(
-        price: price,
-      ),
+      home: const PaymentSuccessScreenStatefulWidget(),
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF1EBE4B),
           fontFamily: "Montserrat"),
@@ -22,9 +20,7 @@ class PaymentSuccessScreen extends StatelessWidget {
 }
 
 class PaymentSuccessScreenStatefulWidget extends StatefulWidget {
-  const PaymentSuccessScreenStatefulWidget({super.key, this.price});
-
-  final String? price;
+  const PaymentSuccessScreenStatefulWidget({super.key});
 
   @override
   State<PaymentSuccessScreenStatefulWidget> createState() =>
@@ -84,7 +80,7 @@ class _PaymentSuccessScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "Votre paiement de ${widget.price} a bien été réalisé",
+                      "Votre paiement de ${getAmount()} a bien été réalisé",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.w300,

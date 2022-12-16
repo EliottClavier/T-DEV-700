@@ -1,3 +1,4 @@
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,30 +7,31 @@ import 'package:tpe/screens/payment.dart';
 import 'package:tpe/screens/payment_sending.dart';
 import 'package:tpe/utils/snackbar.dart';
 
-class NfcReaderScreen extends StatelessWidget {
-  const NfcReaderScreen({super.key, required this.price});
+import '../store/transaction_store.dart';
 
-  final String price;
+import 'package:tpe/store/transaction_store.dart';
+import 'package:redux/redux.dart';
+
+class NfcReaderScreen extends StatelessWidget {
+  const NfcReaderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NFC Reader',
-      home: NfcReaderScreenWidget(price: price),
+      title: "NFC Reader",
+      home: NfcReaderScreenWidget(),
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFF03045F),
-        primarySwatch: Colors.blue,
-        fontFamily: "Montserrat",
-      ),
+          scaffoldBackgroundColor: const Color(0xFF03045F),
+          primarySwatch: Colors.blue,
+          fontFamily: "Montserrat"),
     );
   }
 }
 
 class NfcReaderScreenWidget extends StatefulWidget {
-  NfcReaderScreenWidget({super.key, required this.price});
+  NfcReaderScreenWidget({super.key});
 
   final NfcManager nfcManager = NfcManager.instance;
-  final String price;
 
   @override
   State<NfcReaderScreenWidget> createState() => NfcReaderScreenWidgetState();
@@ -89,7 +91,6 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => PaymentSendingScreen(
-          price: widget.price,
           paymentData: nfcDataString,
           paymentMethod: "nfc",
         ),
@@ -116,9 +117,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     dispose();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => PaymentScreen(
-          price: widget.price,
-        ),
+        builder: (context) => const PaymentScreen(),
       ),
     );
   }
