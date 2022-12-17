@@ -17,7 +17,7 @@ public class QrCheck extends Base {
     @Column(nullable = false, unique = true)
     private String checkToken;
 
-    private int soldAmount;
+    private float soldAmount;
 
     @Column(nullable = false)
     private int nbDayOfValidity;

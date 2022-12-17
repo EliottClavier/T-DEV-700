@@ -2,22 +2,26 @@ package com.api.bank.service;
 
 import com.api.bank.model.entity.Card;
 import com.api.bank.model.entity.Client;
+import com.api.bank.repository.AccountRepository;
 import com.api.bank.repository.CardRepository;
 import com.api.bank.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Service;
 
-public class CardService extends GenericService<Card, CardRepository> {
+@Service
+public class CardService extends GenericService<Card> {
 
-    public CardRepository cardRepository;
+//    public CardRepository cardRepository;
 
+    @Autowired
     public CardService(CardRepository cardRepository) {
         super(cardRepository);
-        this.cardRepository = cardRepository;
+//        this.cardRepository = cardRepository;
     }
 
     public Card getCardByCardId(String cardId) {
-        return this.cardRepository.findCardByCardId(cardId);
+        return ((CardRepository)repository).findCardByCardId(cardId);
     }
 }
 

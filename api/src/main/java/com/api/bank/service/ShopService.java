@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @Service
-public class ShopService extends GenericService<Shop, ShopRepository> {
+public class ShopService extends GenericService<Shop> {
 
     @Autowired
     public ShopRepository shopRepository;

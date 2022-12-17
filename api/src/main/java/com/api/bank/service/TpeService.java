@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @Service
-public class TpeService extends GenericService<Tpe, TpeRepository> {
-
+public class TpeService extends GenericService<Tpe> {
     @Autowired
     public TpeRepository tpeRepository;
 

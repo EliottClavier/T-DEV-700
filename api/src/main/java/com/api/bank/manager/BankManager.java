@@ -18,6 +18,9 @@ import com.api.bank.service.CheckService;
 import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
 import com.sun.istack.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,24 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.Queue;
 
-@Component
-//@ComponentScan("com.api.bank.service")
-public class BankManager {
-
-//    @Autowired
-    private  AccountService accountService;
-//    @Autowired
-    private  OperationService operationService;
-//    @Autowired
-    private  ClientService clientService;
-
-    private CheckService checkService;
-
+@Component()
+@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+public class BankManager implements IBankManager {
+    private final AccountService accountService;
+    private final OperationService operationService;
+    private final ClientService clientService;
+    private final CheckService checkService;
 
     private Queue<BankTransaction> transactionQueue;
 
-    private BankManager bankManager;
-
+    @Autowired
     public BankManager(OperationRepository operationRepository, AccountRepository accountRepository, ClientRepository clientRepository, CheckRepository checkRepository) {
 
         this.accountService = new AccountService(accountRepository);
@@ -50,30 +46,26 @@ public class BankManager {
         this.clientService = new ClientService(clientRepository);
         this.checkService = new CheckService(checkRepository);
     }
-    public BankManager() {
-        super();
-    }
 
-    public BankManager(AccountService accountService, OperationService operationService, ClientService clientService, CheckService checkService) {
-
-        this.accountService = accountService;
-        this.operationService = operationService;
-        this.clientService = clientService;
-        this.checkService = checkService;
-    }
-
-
+    @Override
     @Transactional(rollbackFor = {BankTransactionException.class, Exception.class}, propagation = Propagation.REQUIRES_NEW)
-    public TransactionResult HandleTransaction(BankTransaction transaction) throws BankTransactionException {
+    public TransactionResult HandleTransaction(BankTransaction transaction) {
 
-        Account withdrawAccount;
-        PaymentMethod paymentMethod = transaction.getPaymentMethod();
+        Account withdrawAccount = null;
         QrCheck qrcheck = null;
+        PaymentMethod paymentMethod = transaction.getPaymentMethod();
 
         try {
+  //          withdrawAccount = getAccountBy(transaction);
+ //           checkAccount(withdrawAccount, transaction);
+//            checkCardOrQrCheck();
+//            checkExpirationDate();
+//            checkQrCheck();
+//            checkBalance();
 
-            if (transaction.getPaymentMethod() == PaymentMethod.CARD) {
-                withdrawAccount = accountService.getAccountByCardId(transaction.getCardId());
+            if (isCardPayment(transaction)) {
+
+                withdrawAccount = accountService.getAccountByCardId(transaction.getMeansOfPaymentId());
 
                 // Is the card valid ?
                 if (withdrawAccount == null || withdrawAccount.getCard() == null)
@@ -83,9 +75,13 @@ public class BankManager {
                 if (withdrawAccount.getCard().getExpirationDate().before(new Date()))
                     throw new BankTransactionException(TransactionStatus.CARD_ERROR, transaction.getOperationId(), "Card expired");
 
-            } else {
+            } else if (transaction.getPaymentMethod() == PaymentMethod.CHECK) {
                 withdrawAccount = clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
-                qrcheck = checkService.getCheckByCheckToken(transaction.getCheckToken());
+                qrcheck = checkService.getCheckByCheckToken(transaction.getMeansOfPaymentId());
+
+                // Is the Bank account valid ?
+                if (withdrawAccount == null || !withdrawAccount.getClient().getOrganisationName().equals(BankConstants.BANK_NAME))
+                    throw new BankTransactionException(TransactionStatus.BANK_ERROR, transaction.getOperationId(), "Bank not found");
 
                 // Is the check valid ?
                 if (qrcheck == null)
@@ -101,7 +97,7 @@ public class BankManager {
             }
 
             // Is an operation is already in progress ?
-            if(operationService.isOperationPendingFor(withdrawAccount.getId()))
+            if (operationService.isOperationPendingFor(withdrawAccount.getId()))
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
 
             // Add the operation to the list of pending operations
@@ -116,6 +112,10 @@ public class BankManager {
             // Debit the account and update the operation status
             if (setSoldAccount(withdrawAccount, transaction).isValid()) {
                 this.persistOperationStatus(OperationStatus.CLOSED, clientOperation);
+                if (qrcheck != null && transaction.getPaymentMethod() == PaymentMethod.CHECK) {
+                    qrcheck.setSoldAmount(qrcheck.getSoldAmount() - transaction.getAmount());
+                    checkService.update(qrcheck);
+                }
             } else {
                 this.persistOperationStatus(OperationStatus.CANCELED, clientOperation);
                 throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
@@ -153,6 +153,41 @@ public class BankManager {
         }
     }
 
+    private void checkAccount(Account withdrawAccount, BankTransaction transaction) throws BankTransactionException {
+
+        // Is the Bank account valid ?
+        if (withdrawAccount == null || !withdrawAccount.getClient().getOrganisationName().equals(BankConstants.BANK_NAME))
+            throw new BankTransactionException(TransactionStatus.BANK_ERROR, transaction.getOperationId(), "Bank not found");
+
+    }
+
+    /**
+     *  Fourni le compte à débiter en fonction du moyen de paiement
+     * @param transaction
+     * @return
+     * @throws BankTransactionException
+     */
+    private Account getAccountBy(BankTransaction transaction) throws BankTransactionException {
+
+        if (isCardPayment(transaction)) {
+            return accountService.getAccountByCardId(transaction.getMeansOfPaymentId());
+
+        }
+        else if (isCheckPayment(transaction)) {
+            return clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
+        }
+        else {
+            throw new BankTransactionException(TransactionStatus.MEANS_OF_PAYMENT_ERROR, transaction.getOperationId(), "Means of Payment error was occurred");
+        }
+    }
+
+    private boolean isCardPayment(BankTransaction transaction) throws BankTransactionException {
+        return transaction.getPaymentMethod() == PaymentMethod.CARD;
+    }
+    private boolean isCheckPayment(BankTransaction transaction) throws BankTransactionException {
+        return transaction.getPaymentMethod() == PaymentMethod.CHECK;
+    }
+
     private @NotNull Operation createOperation(BankTransaction transaction, Account account, QrCheck qrCheck, OperationStatus opeStatus, OperationType opeType, PaymentMethod payMethod) {
         return new Operation(transaction.getOperationId(), transaction.getLabel(), transaction.getAmount(),
                 transaction.getDate(), account, qrCheck, opeStatus, opeType, payMethod);
@@ -167,4 +202,7 @@ public class BankManager {
         operation.setOperationStatus(status);
         return operationService.update(operation).isValid();
     }
+
+
+
 }
