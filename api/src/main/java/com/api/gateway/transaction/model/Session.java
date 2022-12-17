@@ -31,6 +31,6 @@ public class Session implements Serializable {
     }
 
     public Boolean isComplete() {
-        return !username.isEmpty() && !sessionId.isEmpty();
+        return username != null && !username.isEmpty() && sessionId != null && !sessionId.isEmpty();
     }
 }

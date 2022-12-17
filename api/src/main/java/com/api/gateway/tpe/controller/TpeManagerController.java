@@ -49,7 +49,7 @@ public class TpeManagerController {
             Principal user,
             @Header("simpSessionId") String sessionId
     ) {
-        if (tpeManagerService.isTpeRedisAvailable(user.getName())) {
+        if (!tpeManagerService.isTpeRedisAvailable(user.getName())) {
             Gson gson = new Gson();
             TransactionRequestTpe transactionRequestTpe = gson.fromJson(transactionData, TransactionRequestTpe.class);
             TransactionRequest transactionRequest = tpeManagerService.retrieveTransactionRequestByTpeSessionId(sessionId);
@@ -117,7 +117,7 @@ public class TpeManagerController {
             Principal user,
             @Header("simpSessionId") String sessionId
     ) {
-        if (tpeManagerService.isTpeRedisAvailable(user.getName())) {
+        if (!tpeManagerService.isTpeRedisAvailable(user.getName())) {
             TransactionRequest transactionRequest = tpeManagerService.retrieveTransactionRequestByTpeSessionId(sessionId);
             if (transactionRequest != null) {
                 // Send message to TPE
@@ -136,14 +136,14 @@ public class TpeManagerController {
             } else {
                 smt.convertAndSendToUser(
                         user.getName(),
-                        destinationGenerator.getShopTransactionStatusDest(sessionId),
+                        destinationGenerator.getTpeTransactionStatusDest(sessionId),
                         new Message("TPE not involved in any transaction.", MessageType.NOT_INVOLVED)
                 );
             }
         } else {
             smt.convertAndSendToUser(
                     user.getName(),
-                    destinationGenerator.getShopTransactionStatusDest(sessionId),
+                    destinationGenerator.getTpeTransactionStatusDest(sessionId),
                     new Message("TPE still marked available while trying to cancel a transaction.", MessageType.STILL_AVAILABLE)
             );
         }

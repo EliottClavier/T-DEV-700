@@ -1,20 +1,16 @@
 package com.api.gateway.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
+import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfiguration extends AbstractSecurityWebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -27,27 +23,24 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     }
 
     @Override
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+        messages.simpDestMatchers("/websocket-manager/tpe/**").hasRole("TPE")
+                .simpSubscribeDestMatchers("/user/queue/tpe/**").hasRole("TPE")
+                .simpDestMatchers("/websocket-manager/shop/**").hasRole("SHOP")
+                .simpSubscribeDestMatchers("/user/queue/shop/**").hasRole("SHOP")
+                .simpTypeMatchers(SimpMessageType.CONNECT, SimpMessageType.DISCONNECT, SimpMessageType.OTHER).permitAll()
+                .anyMessage().authenticated();
+    }
+
+    @Override
+    protected boolean sameOriginDisabled() {
+        return true;
+    }
+
+    @Override
     public void configureMessageBroker(MessageBrokerRegistry config){
         config.enableSimpleBroker("/topic", "/queue");
         config.setApplicationDestinationPrefixes("/websocket-manager");
         config.setUserDestinationPrefix("/user");
-    }
-
-    @EventListener
-    public void onSocketSubscribe(SessionSubscribeEvent event) {
-        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
-        System.out.println("[Listener Subscribe] " + sha.getSessionId());
-    }
-
-    @EventListener
-    public void onSocketUnsubscribe(SessionUnsubscribeEvent event) {
-        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
-        System.out.println("[Listener Unsubscribe] " + sha.getSessionId());
-    }
-
-    @EventListener
-    public void onSocketConnected(SessionConnectedEvent event) {
-        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
-        System.out.println("[Connected] " + sha.getSessionId());
     }
 }
