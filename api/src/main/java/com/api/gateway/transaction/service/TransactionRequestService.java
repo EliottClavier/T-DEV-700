@@ -16,7 +16,7 @@ public class TransactionRequestService {
     @Autowired
     private RedisTemplate<String, String> customRedisTemplate;
 
-    public Session deleteTransactionBySessionId(Session session) {
+    public Session deleteTransactionRequestBySessionId(Session session) {
         Gson gson = new Gson();
         Session sessionResponse = new Session();
         // Find transaction either by tpeSessionId or by shopSessionId in Redis
@@ -35,6 +35,10 @@ public class TransactionRequestService {
             }
         });
         return sessionResponse;
+    }
+
+    public void updateTransactionRequestRedis(TransactionRequest transactionRequest) {
+        customRedisTemplate.opsForHash().put(HASH_KEY_NAME_TRANSACTION, transactionRequest.getId(), transactionRequest.toString());
     }
 
 }

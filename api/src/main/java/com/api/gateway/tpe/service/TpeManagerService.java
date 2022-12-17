@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TpeManagerService {
 
@@ -82,6 +84,18 @@ public class TpeManagerService {
 
     public void deleteTransactionByTransactionId(String transactionId) {
         this.customRedisTemplate.opsForHash().delete(HASH_KEY_NAME_TRANSACTION, transactionId);
+    }
+
+    public List<Object> getAllTpeRedis() {
+        return customRedisTemplate.opsForHash().values(HASH_KEY_NAME_TPE);
+    }
+
+    public Object getRandomTpeRedisUsername() {
+        return customRedisTemplate.opsForHash().randomKey(HASH_KEY_NAME_TPE);
+    }
+
+    public Object getTpeRedisSessionIdByUsername(String tpeUsername) {
+        return customRedisTemplate.opsForHash().get(HASH_KEY_NAME_TPE, tpeUsername);
     }
 
 }

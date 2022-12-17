@@ -59,9 +59,10 @@ public class TpeManagerController {
                     transactionRequest.setPaymentMethod(PaymentMethod.valueOf(transactionRequestTpe.getType()));
                     transactionRequest.setPaymentId(transactionRequestTpe.getPaymentId());
 
-                    // Execute transaction and remove it from Redis
+                    // Execute transaction
                     realizeTransaction(transactionRequest);
 
+                    // Remove transaction from Redis
                     tpeManagerService.deleteTransactionByTransactionId(transactionRequest.getId());
 
                     // Make the Tpe available for a new transaction

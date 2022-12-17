@@ -38,7 +38,7 @@ public class WebSocketListeners {
             tpeManagerService.deleteTpeRedisByTpeUsername(sha.getUser().getName());
         }
 
-        Session session = transactionRequestService.deleteTransactionBySessionId(
+        Session session = transactionRequestService.deleteTransactionRequestBySessionId(
                 new Session(Objects.requireNonNull(sha.getUser()).getName(), Objects.requireNonNull(sha.getSessionId()))
         );
 
@@ -61,8 +61,6 @@ public class WebSocketListeners {
                 );
             }
         }
-
-        System.out.println("[Disonnected] " + sha.getSessionId());
     }
 
 }
