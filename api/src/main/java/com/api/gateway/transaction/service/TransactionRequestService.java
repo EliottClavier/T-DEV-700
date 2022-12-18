@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 @Service
 public class TransactionRequestService {
 
@@ -15,6 +17,18 @@ public class TransactionRequestService {
 
     @Autowired
     private RedisTemplate<String, String> customRedisTemplate;
+
+    public Boolean isShopAlreadyInTransaction(Session session) {
+        Gson gson = new Gson();
+        AtomicReference<Boolean> present = new AtomicReference<>(false);
+        customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).forEach((key, value) -> {
+            TransactionRequest transactionRequest = gson.fromJson((String) value, TransactionRequest.class);
+            if (transactionRequest.getShopSessionId().equals(session.getSessionId())) {
+                present.set(true);
+            }
+        });
+        return present.get();
+    }
 
     public Session deleteTransactionRequestBySessionId(Session session) {
         Gson gson = new Gson();

@@ -3,10 +3,8 @@ package com.api.gateway.shop.controller;
 import com.api.gateway.shop.service.ShopManagerService;
 import com.api.gateway.data.DestinationGenerator;
 import com.api.gateway.tpe.service.TpeManagerService;
-import com.api.gateway.transaction.model.Message;
-import com.api.gateway.transaction.model.MessageType;
-import com.api.gateway.transaction.model.TransactionRequest;
-import com.api.gateway.transaction.model.TransactionRequestShop;
+import com.api.gateway.transaction.model.*;
+import com.api.gateway.transaction.service.TransactionRequestService;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
@@ -30,6 +28,9 @@ public class ShopManagerController {
     @Autowired
     private TpeManagerService tpeManagerService;
 
+    @Autowired
+    private TransactionRequestService transactionRequestService;
+
     private final DestinationGenerator destinationGenerator = new DestinationGenerator();
 
     /* Shop */
@@ -46,40 +47,48 @@ public class ShopManagerController {
             if (shopManagerService.isShopValid(user.getName())) {
                 // Create transaction request object from transaction request shop
                 TransactionRequest transactionRequest = new TransactionRequest(user.getName(), sessionId, transactionRequestShop.getAmount());
-
+                Session session = new Session(user.getName(), sessionId);
                 List<Object> tpeManagers = tpeManagerService.getAllTpeRedis();
-                if (tpeManagers.size() > 0) {
-                    // Get a random TPE to process the transaction
-                    Object randomUsername = tpeManagerService.getRandomTpeRedisUsername();
-                    if (randomUsername != null) {
-                        // Prepare transaction request (choose TPE and register transaction)
-                        transactionRequest = shopManagerService.prepareTransactionRequestFromShop(transactionRequest, randomUsername.toString());
+                if (!transactionRequestService.isShopAlreadyInTransaction(session)) {
+                    if (tpeManagers.size() > 0) {
+                        // Get a random TPE to process the transaction
+                        Object randomUsername = tpeManagerService.getRandomTpeRedisUsername();
+                        if (randomUsername != null) {
+                            // Prepare transaction request (choose TPE and register transaction)
+                            transactionRequest = shopManagerService.prepareTransactionRequestFromShop(transactionRequest, randomUsername.toString());
 
-                        // Send transaction opened message to TPE
-                        smt.convertAndSendToUser(
-                                transactionRequest.getTpeUsername(),
-                                destinationGenerator.getTpeTransactionStatusDest(transactionRequest.getTpeSessionId()),
-                                new Message("Open Transaction.", MessageType.TRANSACTION_OPENED)
-                        );
+                            // Send transaction opened message to TPE
+                            smt.convertAndSendToUser(
+                                    transactionRequest.getTpeUsername(),
+                                    destinationGenerator.getTpeTransactionStatusDest(transactionRequest.getTpeSessionId()),
+                                    new Message("Open Transaction.", MessageType.TRANSACTION_OPENED)
+                            );
 
-                        // Send processing message to Shop
-                        smt.convertAndSendToUser(
-                                user.getName(),
-                                destinationGenerator.getShopTransactionStatusDest(sessionId),
-                                new Message(gson.toJson(transactionRequest), MessageType.TRANSACTION_OPENED)
-                        );
+                            // Send processing message to Shop
+                            smt.convertAndSendToUser(
+                                    user.getName(),
+                                    destinationGenerator.getShopTransactionStatusDest(sessionId),
+                                    new Message(gson.toJson(transactionRequest), MessageType.TRANSACTION_OPENED)
+                            );
+                        } else {
+                            smt.convertAndSendToUser(
+                                    user.getName(),
+                                    destinationGenerator.getShopTransactionStatusDest(sessionId),
+                                    new Message("Error while selecting TPE.", MessageType.NO_TPE_SELECTED)
+                            );
+                        }
                     } else {
                         smt.convertAndSendToUser(
                                 user.getName(),
                                 destinationGenerator.getShopTransactionStatusDest(sessionId),
-                                new Message("Error while selecting TPE.", MessageType.NO_TPE_SELECTED)
+                                new Message("No TPE available.", MessageType.NO_TPE_FOUND)
                         );
                     }
                 } else {
                     smt.convertAndSendToUser(
                             user.getName(),
                             destinationGenerator.getShopTransactionStatusDest(sessionId),
-                            new Message("No TPE available.", MessageType.NO_TPE_FOUND)
+                            new Message("Shop already in a transaction.", MessageType.ALREADY_IN_TRANSACTION)
                     );
                 }
             } else {
