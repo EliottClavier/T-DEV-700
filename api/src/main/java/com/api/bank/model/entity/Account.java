@@ -30,4 +30,8 @@ public class Account extends Base {
     public Account() {
         super();
     }
+
+    public boolean isEnoughMoney(float amount) {
+        return sold >= amount;
+    }
 }

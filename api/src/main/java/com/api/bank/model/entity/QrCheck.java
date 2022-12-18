@@ -40,4 +40,11 @@ public class QrCheck extends Base {
         expirationDate.setTime(expirationDate.getTime() + (long) nbDayOfValidity * 24 * 60 * 60 * 1000);
         return expirationDate;
     }
+
+    public boolean isExpired() {
+        return getExpirationDate().before(new Date());
+    }
+    public boolean isEnoughMoney(float amount) {
+        return soldAmount >= amount;
+    }
 }
