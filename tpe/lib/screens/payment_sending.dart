@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tpe/services/bank_service.dart';
-import 'package:tpe/screens/payment_success.dart';
-import 'package:tpe/screens/payment_error.dart';
 
 class PaymentSendingScreen extends StatelessWidget {
   final String price;

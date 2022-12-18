@@ -4,7 +4,11 @@ class Token {
   Token({required this.token});
 
   Token.fromJson(Map<String, dynamic> json) {
-    token = json['token'];
+    if (json['token'].toString().isEmpty) {
+      throw Exception(json["message"]);
+    } else {
+      token = json['token'];
+    }
   }
 
   Map<String, dynamic> toJson() {

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tpe/services/bank_service.dart';
@@ -34,6 +32,7 @@ class HomeScreenStatefulWidget extends StatefulWidget {
 class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   BankService bankService = BankService();
   late bool isConnectedToApi;
+  late String status;
 
   @override
   void didChangeDependencies() {
@@ -53,6 +52,7 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
 
   void _initBank() async {
     isConnectedToApi = _isConnectedToApi();
+    status = Provider.of<BankService>(context, listen: true).getStatus();
   }
 
   bool _isConnectedToApi() {
@@ -68,24 +68,9 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
     print("Connected to API");
   }
 
-  String getPrice() {
-    Random rng = Random();
-    var price = rng.nextInt(100);
-    return "${price.toString()}.00 €";
-  }
-
   void _onClick(PointerEvent details) {
-    String price = getPrice();
-    print("Price: $price");
     bankService.printStatus();
     context.go("/payment");
-    /* Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PaymentScreen(
-          price: price,
-        ),
-      ),
-    ); */
   }
 
   @override
@@ -105,7 +90,13 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
                       width: 300, height: 300),
                 ],
               ),
-              Text("$isConnectedToApi"),
+              Text(
+                "$status",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+              ),
             ],
           ),
         ),

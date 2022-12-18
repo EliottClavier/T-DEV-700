@@ -22,7 +22,9 @@ class BankService with ChangeNotifier {
   PlatformRepository platformRepository = PlatformRepository();
 
   late String _token;
+  late String _sessionId;
   late String _ip;
+  String _status = "Disconnected";
   late StompClient _client;
 
   bool isConnectedToApi = false;
@@ -39,33 +41,39 @@ class BankService with ChangeNotifier {
     print("isSynchronized : ${isSynchronized}");
   }
 
+  void setStatus(status) {
+    _status = status;
+  }
+
+  String getStatus() {
+    return _status;
+  }
+
   Future<void> init() async {
     /* dotenv = await dotenv.load(fileName: ".env");
     _ip = dotenv.env['IP']; */
-    _ip = "192.168.1.20:8080/api";
+    _ip = "192.168.1.11:8080/api";
     await _connect();
-    await _connectWebSocket();
-    _activateWebSocket();
-    /* _synchronizeTpe(); */
     print("IP : ${_ip}");
   }
 
   Future<void> _connect() async {
     String macAddress = await platformRepository.getMacAddr();
-    print("Mac Address : ${macAddress}");
     final response = await http.post(Uri.parse("http://$_ip/auth/tpe/login"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"mac": "MAC", "serial": "SERIAL"}));
-
+        body: jsonEncode({"mac": macAddress, "serial": "SERIAL"}));
     if (response.statusCode == 200) {
       _token = Token.fromJson(jsonDecode(response.body)).token;
+      await _connectWebSocket();
+      setStatus("Connected to server");
       isConnectedToApi = true;
       isRegistered = true;
     } else {
-      // Send HTTP register
       _fullRegister();
+      setStatus("Connexion to server failed.");
       throw Exception('Failed to load post');
     }
+    notifyListeners();
   }
 
   Future<void> _fullRegister() async {
@@ -75,17 +83,26 @@ class BankService with ChangeNotifier {
         body: jsonEncode({"mac": macAddress, "serial": "SERIAL"}));
 
     if (response.statusCode == 200) {
-      print('Register successfull. Please wait TPE activation');
+      setStatus('Register successfull. Please wait for Device whitelist');
       isRegistered = true;
     } else {
-      // Send HTTP register
+      onFullRegisterError();
+      setStatus("Register to server failed. New attempt in 5 seconds");
       throw Exception('Failed to full register tpe');
     }
+    notifyListeners();
+  }
+
+  Future<void> onFullRegisterError() async {
+    setStatus("Connexion attempt failed. Retry in 5 seconds");
+    await Future.delayed(const Duration(seconds: 5));
+    await _connect();
+    return Future.value();
   }
 
   Future<void> _connectWebSocket() async {
     final config = StompConfig.SockJS(
-      url: "http://$_ip/websocket-manager/tpe/socket",
+      url: "http://$_ip/websocket-manager/secured/tpe/socket",
       onConnect: _onConnectCallback,
       onWebSocketError: (dynamic error) => print(error.toString()),
       stompConnectHeaders: {'Authorization': "Bearer $_token"},
@@ -95,37 +112,56 @@ class BankService with ChangeNotifier {
         'Upgrade': 'WebSocket'
       },
     );
-    _client = StompClient(config: config);
-    isConnectedToWebSocket = true;
+    if (_token.isNotEmpty) {
+      _client = StompClient(config: config);
+      await _activateWebSocket();
+      isConnectedToWebSocket = true;
+      setStatus("Connected to websocket");
+    } else {
+      setStatus("Connexion to websocket failed.");
+      onFullRegisterError();
+      throw Exception('Failed to load post');
+    }
     notifyListeners();
   }
 
   Future<void> _activateWebSocket() async {
     _client.activate();
+    String url = _client.config.url;
+    url = url.replaceAll("ws://$_ip/websocket-manager/secured/tpe/socket", "");
+    url = url.replaceAll("/websocket", "");
+    _sessionId = url.replaceAll("r/^[0-9]+\//", "").split('/')[2];
     isActiveWebSocket = true;
+    await _synchronizeTpe();
     notifyListeners();
   }
 
-  Future<void> _killWebSocket() async {
+  Future<void> killWebSocket() async {
     _client.deactivate();
     isActiveWebSocket = false;
     notifyListeners();
   }
 
   Future<void> _synchronizeTpe() async {
-    _client.subscribe(
-        destination: "/user/queue/sync",
-        callback: (StompFrame frame) {
-          print("Synchronize TPE");
-          print(frame.body);
-          isSynchronized = true;
-          notifyListeners();
-        });
+    Future.delayed(const Duration(seconds: 1), () {
+      _client.send(destination: '/websocket-manager/tpe/synchronize');
+    });
   }
 
   Future<void> _onConnectCallback(StompFrame frame) {
-    print("Connected to websocket");
-    print(frame.body);
+    dynamic synchronizationStatus = _client.subscribe(
+        destination: '/user/queue/tpe/synchronization-status/$_sessionId',
+        callback: (frame) {
+          print("Synchronise status");
+          print(frame.body);
+        });
+
+    dynamic transactionStatus = _client.subscribe(
+        destination: '/user/queue/tpe/transaction-status/$_sessionId',
+        callback: (frame) {
+          print("Transaction status");
+          print(frame.body);
+        });
     notifyListeners();
     return Future.value();
   }

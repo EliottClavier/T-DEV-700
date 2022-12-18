@@ -1,10 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
-import 'package:tpe/screens/nfc_reader.dart';
-import 'package:tpe/screens/qr_code_reader.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key, required this.price});
@@ -49,35 +48,12 @@ class _PaymentScreenStatefulWidgetState
     super.dispose();
   }
 
-  void _onPaymentSent() {
-    dispose();
-    Random random = Random();
-    StatelessWidget screen = random.nextBool()
-        ? PaymentSuccessScreen(
-            price: widget.price,
-          )
-        : const PaymentErrorScreen();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => screen,
-      ),
-    );
-  }
-
   void _onNfcSelected() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => NfcReaderScreen(price: widget.price),
-      ),
-    );
+    context.go("/scan/nfc");
   }
 
   void _onQrCodeSelected() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => QrCodeReaderScreen(price: widget.price),
-      ),
-    );
+    context.go("/scan/qr-code");
   }
 
   @override
