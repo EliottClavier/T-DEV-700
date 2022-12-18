@@ -36,10 +36,6 @@ public class QrCheckManager {
             //SAVE THE CHECK IN THE DATABASE
             this.checkService.add(check);
 
-
-
-
-
             return new QrCheck();
 
         } catch (Exception e) {

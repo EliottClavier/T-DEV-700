@@ -24,7 +24,7 @@ public class TransactionController {
     private final IBankManager bankManager;
 
     @Autowired
-    public TransactionController(BankManager bankManager) {
+    public TransactionController(IBankManager bankManager) {
         super();
         this.bankManager = bankManager;
     }
