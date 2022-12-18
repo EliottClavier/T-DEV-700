@@ -47,10 +47,10 @@ public class AuthTpeController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        if (!tpeRepository.existsByMac(tpeRegisterCredentials.getId())) {
+        if (!tpeRepository.existsByAndroidId(tpeRegisterCredentials.getAndroidId())) {
             String randomPassword = authService.alphaNumericString(12);
             String encodedPass = passwordEncoder.encode(randomPassword);
-            Tpe tpe = new Tpe(tpeRegisterCredentials.getId(), encodedPass);
+            Tpe tpe = new Tpe(tpeRegisterCredentials.getAndroidId(), encodedPass);
             tpe.setWhitelisted(false);
             tpeRepository.save(tpe);
             // Return list with two attributes: message and password
@@ -58,7 +58,6 @@ public class AuthTpeController {
                     "message", "TPE registered successfully. It needs to be whitelisted.",
                     "password", randomPassword
             );
-            //return Collections.singletonMap("message", "TPE registered successfully. It needs to be whitelisted.");
         } else {
             return Collections.singletonMap("message", "TPE already registered.");
         }
@@ -68,9 +67,9 @@ public class AuthTpeController {
     public Map<String, Object> loginHandler(@RequestBody TpeLoginCredentials body){
         try {
             UsernamePasswordAuthenticationToken authInputToken =
-                    new UsernamePasswordAuthenticationToken(body.getMac(), body.getSerial());
+                    new UsernamePasswordAuthenticationToken(body.getAndroidId(), body.getPassword());
             tpeAuthenticationProvider.authenticate(authInputToken);
-            String token = jwtUtil.generateToken(body.getMac(), "TPE Connection");
+            String token = jwtUtil.generateToken(body.getAndroidId(), "TPE Connection");
             return Collections.singletonMap("token", token);
         } catch (AuthenticationException authExc) {
             return Collections.singletonMap("message", authExc.getMessage());

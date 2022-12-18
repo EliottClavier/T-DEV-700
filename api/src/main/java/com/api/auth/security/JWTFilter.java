@@ -57,9 +57,9 @@ public class JWTFilter extends OncePerRequestFilter {
                         }
 
                     } else if (Objects.equals(subject, "TPE Connection")) {
-                        String mac = jwtUtil.validateTokenAndRetrieveSubject(jwt, subject);
-                        UserDetails tpeDetails = tpeDetailsService.loadUserByUsername(mac);
-                        authToken = new UsernamePasswordAuthenticationToken(mac, tpeDetails.getPassword(), tpeDetails.getAuthorities());
+                        String androidId = jwtUtil.validateTokenAndRetrieveSubject(jwt, subject);
+                        UserDetails tpeDetails = tpeDetailsService.loadUserByUsername(androidId);
+                        authToken = new UsernamePasswordAuthenticationToken(androidId, tpeDetails.getPassword(), tpeDetails.getAuthorities());
                         if (SecurityContextHolder.getContext().getAuthentication() == null) {
                             SecurityContextHolder.getContext().setAuthentication(authToken);
                         }

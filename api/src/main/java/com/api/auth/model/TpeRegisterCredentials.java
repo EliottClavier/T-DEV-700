@@ -8,5 +8,5 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class TpeRegisterCredentials {
-    private String id;
+    private String androidId;
 }

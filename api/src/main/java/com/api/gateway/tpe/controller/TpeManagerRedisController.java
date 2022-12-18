@@ -22,9 +22,9 @@ public class TpeManagerRedisController {
         return new ResponseEntity<>(customRedisTemplate.opsForHash().values(HASH_KEY_NAME), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/{mac}", method = RequestMethod.GET)
-    public ResponseEntity<?> getTpe(@PathVariable("mac") String mac) {
-        return new ResponseEntity<>(customRedisTemplate.opsForHash().get(HASH_KEY_NAME, mac), HttpStatus.OK);
+    @RequestMapping(path = "/{androidId}", method = RequestMethod.GET)
+    public ResponseEntity<?> getTpe(@PathVariable("androidId") String androidId) {
+        return new ResponseEntity<>(customRedisTemplate.opsForHash().get(HASH_KEY_NAME, androidId), HttpStatus.OK);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
@@ -39,10 +39,10 @@ public class TpeManagerRedisController {
         }
     }
 
-    @RequestMapping(path = "/{mac}", method = RequestMethod.PUT)
-    public ResponseEntity<String> updateTpe(@PathVariable("mac") String mac, @RequestBody TpeManager tpeManager) {
-        if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, mac) && tpeManager.isValid()) {
-            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, mac, tpeManager.getUsername());
+    @RequestMapping(path = "/{androidId}", method = RequestMethod.PUT)
+    public ResponseEntity<String> updateTpe(@PathVariable("androidId") String androidId, @RequestBody TpeManager tpeManager) {
+        if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, androidId) && tpeManager.isValid()) {
+            customRedisTemplate.opsForHash().put(HASH_KEY_NAME, androidId, tpeManager.getUsername());
             return new ResponseEntity<>("TPE updated.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("TPE not found.", HttpStatus.NOT_FOUND);
@@ -55,10 +55,10 @@ public class TpeManagerRedisController {
         return new ResponseEntity<>("All TPE removed.", HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/{mac}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> removeTpe(@PathVariable("mac") String mac) {
-        if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, mac)) {
-            customRedisTemplate.opsForHash().delete(HASH_KEY_NAME, mac);
+    @RequestMapping(path = "/{androidId}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> removeTpe(@PathVariable("androidId") String androidId) {
+        if (customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME, androidId)) {
+            customRedisTemplate.opsForHash().delete(HASH_KEY_NAME, androidId);
             return new ResponseEntity<>("TPE removed.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("TPE not found.", HttpStatus.NOT_FOUND);
