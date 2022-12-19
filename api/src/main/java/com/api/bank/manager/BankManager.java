@@ -240,7 +240,7 @@ public class BankManager implements IBankManager {
      * @return The account to deposit
      */
     private Account getDepositAccountBy(BankTransaction transaction) {
-        return accountService.getAccountByClientId(transaction.getShopId());
+        return accountService.getAccountByOwnerName(transaction.getDepositUsername());
     }
 
     /**
