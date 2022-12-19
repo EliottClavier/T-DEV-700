@@ -12,13 +12,9 @@ import java.util.UUID;
 @Service
 public class OperationService extends GenericService<Operation> {
 
-
-    private OperationRepository operationRepository;
-
     @Autowired
     public OperationService(OperationRepository repository) {
         super(repository);
-        this.operationRepository = repository;
     }
 
     public boolean isOperationPendingFor(UUID accountId) {

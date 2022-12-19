@@ -12,11 +12,13 @@ import java.util.UUID;
 
 @Service
 public class TpeService extends GenericService<Tpe> {
-    @Autowired
+
     public TpeRepository tpeRepository;
 
+    @Autowired
     public TpeService(TpeRepository tpeRepository) {
         super(tpeRepository);
+        this.tpeRepository = tpeRepository;
     }
 
     public ObjectResponse getTpeById(String id) {

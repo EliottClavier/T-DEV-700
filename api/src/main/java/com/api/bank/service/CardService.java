@@ -12,12 +12,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CardService extends GenericService<Card> {
 
-//    public CardRepository cardRepository;
-
     @Autowired
     public CardService(CardRepository cardRepository) {
         super(cardRepository);
-//        this.cardRepository = cardRepository;
     }
 
     public Card getCardByCardId(String cardId) {

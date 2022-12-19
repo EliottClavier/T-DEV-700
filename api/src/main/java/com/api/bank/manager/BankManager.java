@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.DataSource;
 import java.util.Queue;
 
 @Component()
@@ -58,6 +59,14 @@ public class BankManager implements IBankManager {
     @Override
     @Transactional(rollbackFor = {BankTransactionException.class, Exception.class}, propagation = Propagation.REQUIRES_NEW)
     public TransactionResult HandleTransaction(BankTransaction transaction) {
+
+//        var uow = DatabaseContext.CreateUnitOfWork();//
+//        uow.StartTransaction();//
+//        var productRepository = new ProductRepository(uow);
+//        var customerRepository = new CustomerRepository(uow);//
+//// ... do some operations on the repositories.//
+//        uow.Commit();
+
 
         try {
             var withdrawAccount = getWithdrawAccountBy(transaction);
@@ -154,7 +163,6 @@ public class BankManager implements IBankManager {
         // Is an operation is already in progress ?
         if (operationService.isOperationPendingFor(withdrawAccount.getId()))
             throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
-
     }
 
     /**

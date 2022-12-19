@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CheckService extends GenericService<QrCheck> {
-//    @Autowired
+
     public CheckRepository checkRepository;
 
     @Autowired
@@ -20,5 +20,8 @@ public class CheckService extends GenericService<QrCheck> {
     }
     public QrCheck getCheckByCheckToken(String checkToken) {
         return this.checkRepository.findQrCheckByCheckToken(checkToken);
+    }
+    public boolean existsCheckByCheckToken(String checkToken) {
+        return this.checkRepository.existsQrCheckByCheckToken(checkToken);
     }
 }

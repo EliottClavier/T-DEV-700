@@ -33,7 +33,7 @@ public class GenericService<T extends Base> {
     public ObjectResponse add(T entity) {
         try {
             var res = repository.save(entity);
-            repository.flush();
+//            repository.flush();
             return new ObjectResponse("Success", res, true, HttpStatus.CREATED);
 
         } catch (Exception e) {

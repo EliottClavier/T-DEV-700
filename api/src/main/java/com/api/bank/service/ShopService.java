@@ -13,11 +13,13 @@ import java.util.UUID;
 @Service
 public class ShopService extends GenericService<Shop> {
 
-    @Autowired
+
     public ShopRepository shopRepository;
 
+    @Autowired
     public ShopService(ShopRepository shopRepository) {
         super(shopRepository);
+        this.shopRepository = shopRepository;
     }
 
     public ObjectResponse getShopById(String id) {
