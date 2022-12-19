@@ -4,6 +4,8 @@
     <title>QrCode Generator</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
     <link rel="stylesheet" href="style.css" >
+    <script src="js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </head>
 <body>
 <div class="main-block">
@@ -13,13 +15,10 @@
         <div class="btn-block">
             <button type="button" onclick="sendJSON()">Générer un QrCode</button>
         </div>
-        <div>
-            <p class="hidden" id="result">Qr Code correctly generated !</p>
-        </div>
+        <div id="result"></div>
     </form>
 </div>
 
-<script src="main.js"></script>
 </body>
 </html>
 
