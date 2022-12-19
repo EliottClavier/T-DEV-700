@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 @Transactional
 public interface ShopRepository extends GenericRepository<Shop> {
-    Optional<Shop> findByName(String mac);
+    Optional<Shop> findByName(String name);
 
-    Boolean existsByName(String mac);
+    Boolean existsByName(String name);
 }

@@ -37,6 +37,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   animate_do: ^3.0.2
+  http: ^0.13.5
+  stomp_dart_client: ^0.4.4
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +68,8 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
   - images/logo_cash_manager.png
+  - images/waiting.gif
+  - images/validation.gif
   - images/aliments/abricot.png
   - images/aliments/banane.png
   - images/aliments/carotte.png

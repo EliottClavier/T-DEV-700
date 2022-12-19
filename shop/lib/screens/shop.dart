@@ -3,14 +3,20 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:shop/connectors/requests.dart';
+import 'package:shop/screens/payment.dart';
 import 'package:shop/widgets/navBar.dart';
 import 'package:shop/util/shop.dart';
 import 'package:shop/widgets/shop_card.dart';
 import 'package:shop/widgets/separation.dart';
 import 'package:shop/router/router.dart';
+import 'package:shop/widgets/snackBar.dart';
+
 
 class Shop extends StatefulWidget {
   static const String pageName = '/shop';
+  static late BuildContext contextShop;
+  String? totalOfArticles = totalArticles();
   String? total = totalPrice();
   Shop({super.key});
 
@@ -30,6 +36,7 @@ class ShopState extends State<Shop> {
   void updateTotal() {
     setState(() {
       widget.total = totalPrice();
+      widget.totalOfArticles = totalArticles();
     });
   }
 
@@ -41,12 +48,9 @@ class ShopState extends State<Shop> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Panier',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Container(
+    Shop.contextShop = context;
+    return Scaffold(
+      body: Container(
         color: Colors.white,
         child: Center(
           child: Column(
@@ -82,7 +86,8 @@ class ShopState extends State<Shop> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/checkout');
+                      RequestsClass.connect(double.parse(widget.total!), context);
+                      Navigator.pushNamed(context, Payment.pageName);
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
@@ -100,7 +105,7 @@ class ShopState extends State<Shop> {
                 ],
               ),
               const SizedBox(height: 20),
-              NavBar(parentContext: context, total: widget.total,),
+              NavBar(parentContext: context, total: widget.totalOfArticles,),
             ],
           ),
         ),

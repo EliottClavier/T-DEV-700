@@ -5,6 +5,8 @@ import 'package:animate_do/animate_do.dart';
 import 'package:shop/screens/listArticles.dart';
 import 'package:shop/router/router.dart';
 
+import 'package:shop/connectors/requests.dart';
+
 
 class Home extends StatelessWidget {
   static const String pageName = '/';

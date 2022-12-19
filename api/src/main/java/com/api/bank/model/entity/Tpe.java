@@ -15,17 +15,17 @@ import javax.persistence.InheritanceType;
 public class Tpe extends Base {
 
     @NonNull
-    private String mac;
+    private String androidId;
 
     @NonNull
-    private String serial;
+    private String password;
     @NonNull
     private Boolean whitelisted;
 
-    public Tpe(String mac, String serial) {
+    public Tpe(String androidId, String password) {
         super();
-        this.mac = mac;
-        this.serial = serial;
+        this.androidId = androidId;
+        this.password = password;
         this.whitelisted = false;
     }
 }
