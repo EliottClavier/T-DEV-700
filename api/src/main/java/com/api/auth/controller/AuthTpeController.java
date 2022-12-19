@@ -76,6 +76,9 @@ public class AuthTpeController {
             String token = jwtUtil.generateToken(body.getAndroidId(), "TPE Connection");
             return new ResponseEntity<>(Collections.singletonMap("token", token), HttpStatus.OK);
         } catch (AuthenticationException authExc) {
+            if (authExc.getMessage().equals("Not whitelisted.")) {
+                return new ResponseEntity<>(Collections.singletonMap("message", authExc.getMessage()), HttpStatus.FORBIDDEN);
+            }
             return new ResponseEntity<>(Collections.singletonMap("message", authExc.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }
