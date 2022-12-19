@@ -17,7 +17,7 @@ public class QrCheck extends Base {
     @Column(nullable = false, unique = true)
     private String checkToken;
 
-    private int soldAmount;
+    private float soldAmount;
 
     @Column(nullable = false)
     private int nbDayOfValidity;
@@ -29,6 +29,14 @@ public class QrCheck extends Base {
         super();
         init();
     }
+
+    public QrCheck(float amount, String token) {
+        super();
+        init();
+        this.soldAmount = amount;
+        this.checkToken = token;
+    }
+
     private void init() {
         if (nbDayOfValidity == 0) {
             nbDayOfValidity = 365;
@@ -39,5 +47,12 @@ public class QrCheck extends Base {
         Date expirationDate = new Date();
         expirationDate.setTime(expirationDate.getTime() + (long) nbDayOfValidity * 24 * 60 * 60 * 1000);
         return expirationDate;
+    }
+
+    public boolean isExpired() {
+        return getExpirationDate().before(new Date());
+    }
+    public boolean isEnoughMoney(float amount) {
+        return soldAmount >= amount;
     }
 }

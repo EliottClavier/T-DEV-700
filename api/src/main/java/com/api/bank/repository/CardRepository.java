@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 
 @Repository
-
 public interface CardRepository extends GenericRepository<Card>{
    Card findCardByCardId(String cardId);
 }

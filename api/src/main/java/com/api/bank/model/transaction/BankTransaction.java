@@ -12,18 +12,17 @@ public class BankTransaction {
     private String OperationId;
     private UUID shopId;
     private String label;
-    private String cardId;
-    private String checkToken;
+    private String meansOfPaymentId;
+
     private float amount;
     private Date date;
     private PaymentMethod paymentMethod;
 
-    public BankTransaction(String operationId, UUID shopId, String label, String cardId, String checkToken, float amount, Date date, PaymentMethod paymentMethod) {
+    public BankTransaction(String operationId, UUID shopId, String label, String meansOfPaymentId, float amount, Date date, PaymentMethod paymentMethod) {
         OperationId = operationId;
         this.shopId = shopId;
         this.label = label;
-        this.cardId = cardId;
-        this.checkToken = checkToken;
+        this.meansOfPaymentId = meansOfPaymentId;
         this.amount = amount;
         this.date = date;
         this.paymentMethod = paymentMethod;
