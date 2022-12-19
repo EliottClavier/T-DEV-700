@@ -9,36 +9,21 @@ import java.util.UUID;
 @Data
 public class BankTransaction {
 
-    private String OperationId;
-    private UUID shopId;
+    private String operationId;
     private String depositUsername;
     private String label;
     private String meansOfPaymentId;
-
     private float amount;
     private Date date;
     private PaymentMethod paymentMethod;
 
-    public BankTransaction(String operationId, UUID shopId, String label, String meansOfPaymentId, float amount, Date date, PaymentMethod paymentMethod) {
-        OperationId = operationId;
-        this.shopId = shopId;
-        this.label = label;
-        this.meansOfPaymentId = meansOfPaymentId;
-        this.amount = amount;
-        this.date = date;
-        this.paymentMethod = paymentMethod;
-
-        init();
-    }
-    public BankTransaction(String operationId, String depositUsername, String label, String meansOfPaymentId, float amount, Date date, PaymentMethod paymentMethod) {
-        OperationId = operationId;
+    public BankTransaction(String operationId, String depositUsername, String label, String meansOfPaymentId, float amount, PaymentMethod paymentMethod) {
+        this.operationId = operationId;
         this.depositUsername = depositUsername;
         this.label = label;
         this.meansOfPaymentId = meansOfPaymentId;
         this.amount = amount;
-        this.date = date;
         this.paymentMethod = paymentMethod;
-
         init();
     }
 
