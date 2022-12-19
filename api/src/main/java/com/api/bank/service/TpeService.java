@@ -11,13 +11,14 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @Service
-public class TpeService extends GenericService<Tpe, TpeRepository> {
+public class TpeService extends GenericService<Tpe> {
+
+    private final TpeRepository tpeRepository;
 
     @Autowired
-    public TpeRepository tpeRepository;
-
     public TpeService(TpeRepository tpeRepository) {
         super(tpeRepository);
+        this.tpeRepository = tpeRepository;
     }
 
     public ObjectResponse getTpeById(String id) {

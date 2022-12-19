@@ -30,4 +30,15 @@ public class Account extends Base {
     public Account() {
         super();
     }
+
+    public Account(float sold, Client client) {
+        super();
+        this.client = client;
+        this.sold = sold;
+
+    }
+
+    public boolean isEnoughMoney(float amount) {
+        return sold >= amount;
+    }
 }

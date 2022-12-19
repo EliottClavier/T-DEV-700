@@ -25,11 +25,20 @@ public class QrCheck extends Base {
     @OneToMany(mappedBy = "qrCheck", cascade= CascadeType.ALL)
     private List<Operation> operations;
 
+    public QrCheck() {}
+
     public QrCheck(float soldAmount, int nbDayOfValidity) {
         super();
         this.soldAmount = soldAmount;
         this.nbDayOfValidity = nbDayOfValidity;
         init();
+    }
+
+    public QrCheck(float amount, String token) {
+        super();
+        init();
+        this.soldAmount = amount;
+        this.checkToken = token;
     }
 
     private void init() {
@@ -42,5 +51,12 @@ public class QrCheck extends Base {
         Date expirationDate = new Date();
         expirationDate.setTime(expirationDate.getTime() + (long) nbDayOfValidity * 24 * 60 * 60 * 1000);
         return expirationDate;
+    }
+
+    public boolean isExpired() {
+        return getExpirationDate().before(new Date());
+    }
+    public boolean isEnoughMoney(float amount) {
+        return soldAmount >= amount;
     }
 }

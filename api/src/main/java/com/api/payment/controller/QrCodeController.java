@@ -1,6 +1,7 @@
 package com.api.payment.controller;
 
 import com.api.bank.manager.BankManager;
+import com.api.bank.manager.QrCheckManager;
 import com.api.bank.model.entity.QrCheck;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -21,6 +22,10 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -36,11 +41,11 @@ public class QrCodeController {
     @Value("${default.qrcode.secret}")
     private String key;
     private static SecretKeySpec secretKey;
-    private final BankManager qrCheck;
+    private final QrCheckManager qrCheckManager;
 
     @Autowired()
-    public QrCodeController(BankManager qrCheck) {
-        this.qrCheck = qrCheck;
+    public QrCodeController(QrCheckManager qrCheckManager) {
+        this.qrCheckManager = qrCheckManager;
     }
 
     @RequestMapping(value = {"/", ""}, method = RequestMethod.POST)
@@ -51,7 +56,7 @@ public class QrCodeController {
             String encryptedString = encrypt(token, key);
 
             model.setCheckToken(encryptedString);
-            //model = qrCheck.byQrCheck(model);
+            model = qrCheckManager.buyQrCheck(model);
             if(model != null) {
                 generateQrcode(encryptedString);
             }
@@ -138,13 +143,10 @@ public class QrCodeController {
         MediaType contentType = MediaType.IMAGE_JPEG;
         InputStream in;
 
-        String fileName = "";
-        FileWriter myWriter = new FileWriter("../../../../qr-code/test.txt");
-        myWriter.write(fileName);
-        myWriter.close();
+        long file = new File("../../../../qr-code/").lastModified();
 
         try {
-            in = new FileInputStream("../../../../qr-code/" + fileName);
+            in = new FileInputStream("../../../../qr-code/" + file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             new ResponseEntity<InputStreamResource>((InputStreamResource) null, HttpStatus.INTERNAL_SERVER_ERROR);
