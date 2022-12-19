@@ -18,9 +18,9 @@ public class CheckController {
     private final CheckService checkService;
 
     @Autowired
-    public CheckController(CheckRepository checkRepository) {
+    public CheckController(CheckService checkService) {
         super();
-        this.checkService = new CheckService(checkRepository);
+        this.checkService = checkService;
     }
 
     @PostMapping("/add")

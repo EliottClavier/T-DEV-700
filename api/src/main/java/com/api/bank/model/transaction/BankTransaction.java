@@ -11,6 +11,7 @@ public class BankTransaction {
 
     private String OperationId;
     private UUID shopId;
+    private String depositUsername;
     private String label;
     private String meansOfPaymentId;
 
@@ -27,15 +28,30 @@ public class BankTransaction {
         this.date = date;
         this.paymentMethod = paymentMethod;
 
-        if(date == null) {
-            date = new Date();
-        }
+        init();
+    }
+    public BankTransaction(String operationId, String depositUsername, String label, String meansOfPaymentId, float amount, Date date, PaymentMethod paymentMethod) {
+        OperationId = operationId;
+        this.depositUsername = depositUsername;
+        this.label = label;
+        this.meansOfPaymentId = meansOfPaymentId;
+        this.amount = amount;
+        this.date = date;
+        this.paymentMethod = paymentMethod;
+
+        init();
     }
 
+
     public BankTransaction() {
-        if(date == null) {
+        init();
+    }
+
+    private void init() {
+        if (date == null) {
             date = new Date();
         }
     }
 }
+
 
