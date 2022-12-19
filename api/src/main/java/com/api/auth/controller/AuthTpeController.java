@@ -9,6 +9,8 @@ import com.api.auth.service.AuthService;
 import com.api.bank.model.entity.Tpe;
 import com.api.bank.repository.TpeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,7 +44,7 @@ public class AuthTpeController {
 
     @TpeRegisterSecuredRoute
     @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public Map<String, Object> registerHandler(
+    public ResponseEntity registerHandler(
             @RequestBody TpeRegisterCredentials tpeRegisterCredentials,
             HttpServletRequest request,
             HttpServletResponse response
@@ -54,25 +56,27 @@ public class AuthTpeController {
             tpe.setWhitelisted(false);
             tpeRepository.save(tpe);
             // Return list with two attributes: message and password
-            return Map.of(
-                    "message", "TPE registered successfully. It needs to be whitelisted.",
-                    "password", randomPassword
+            return new ResponseEntity<>(
+                Map.of(
+                "message", "TPE registered successfully. It needs to be whitelisted.",
+                "password", randomPassword
+                ), HttpStatus.OK
             );
         } else {
-            return Collections.singletonMap("message", "TPE already registered.");
+            return new ResponseEntity<>(Collections.singletonMap("message", "TPE already registered."), HttpStatus.CONFLICT);
         }
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public Map<String, Object> loginHandler(@RequestBody TpeLoginCredentials body){
+    public ResponseEntity loginHandler(@RequestBody TpeLoginCredentials body){
         try {
             UsernamePasswordAuthenticationToken authInputToken =
                     new UsernamePasswordAuthenticationToken(body.getAndroidId(), body.getPassword());
             tpeAuthenticationProvider.authenticate(authInputToken);
             String token = jwtUtil.generateToken(body.getAndroidId(), "TPE Connection");
-            return Collections.singletonMap("token", token);
+            return new ResponseEntity<>(Collections.singletonMap("token", token), HttpStatus.OK);
         } catch (AuthenticationException authExc) {
-            return Collections.singletonMap("message", authExc.getMessage());
+            return new ResponseEntity<>(Collections.singletonMap("message", authExc.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }
 }
