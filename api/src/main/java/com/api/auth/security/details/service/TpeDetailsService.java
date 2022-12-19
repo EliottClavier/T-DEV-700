@@ -18,15 +18,15 @@ public class TpeDetailsService implements UserDetailsService {
     private TpeRepository tpeRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String mac) throws UsernameNotFoundException, RuntimeException {
-        Optional<Tpe> tpeRes = tpeRepository.findByMac(mac);
+    public UserDetails loadUserByUsername(String androidId) throws UsernameNotFoundException, RuntimeException {
+        Optional<Tpe> tpeRes = tpeRepository.findByAndroidId(androidId);
         if(tpeRes.isEmpty())
-            throw new UsernameNotFoundException("Could not find TPE with mac = " + mac + ".");
+            throw new UsernameNotFoundException("Could not find TPE with Android ID = " + androidId + ".");
         Tpe tpe = tpeRes.get();
         if (!tpe.getWhitelisted()) {
             throw new RuntimeException("TPE not whitelisted.");
         }
-        return new org.springframework.security.core.userdetails.User(tpe.getMac(), tpe.getSerial(),
+        return new org.springframework.security.core.userdetails.User(tpe.getAndroidId(), tpe.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_TPE")));
     }
 }
