@@ -14,9 +14,9 @@ public class AccountController {
     private final AccountService accountService;
 
     @Autowired
-    public AccountController( AccountRepository accountRepository) {
+    public AccountController( AccountService accountService) {
         super();
-        this.accountService = new AccountService(accountRepository);
+        this.accountService = accountService;
     }
 
     @GetMapping("/{id}")

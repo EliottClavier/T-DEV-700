@@ -2,19 +2,21 @@ package com.api.bank.service;
 
 import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.Client;
+import com.api.bank.model.entity.Shop;
+import com.api.bank.model.enums.SocialReasonStatus;
 import com.api.bank.repository.AccountRepository;
-import com.api.bank.repository.GenericRepository;
-import lombok.RequiredArgsConstructor;
+import com.api.bank.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.UUID;
 
 @Service
 public class AccountService extends GenericService<Account> {
+
     private final AccountRepository accountRepository;
+
 
     @Autowired
     public AccountService(AccountRepository accountRepository) {
@@ -39,7 +41,6 @@ public class AccountService extends GenericService<Account> {
     public Account getAccountByClient(Client client){
         return ((AccountRepository)repository).findAccountByClient(client);
     }
-
 
 }
 

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/bank/transaction")
-//@RequiredArgsConstructor
 public class TransactionController {
     private final IBankManager bankManager;
 

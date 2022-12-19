@@ -7,6 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class TpeLoginCredentials {
-    private String mac;
-    private String serial;
+    private String androidId;
+    private String password;
 }

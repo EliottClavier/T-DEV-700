@@ -1,13 +1,19 @@
 package com.api.auth.controller;
 
 import com.api.auth.model.ShopLoginCredentials;
-import com.api.auth.model.TpeLoginCredentials;
 import com.api.auth.security.JWTUtil;
 import com.api.auth.security.providers.ShopAuthenticationProvider;
+import com.api.bank.model.entity.Account;
+import com.api.bank.model.entity.Client;
 import com.api.bank.model.entity.Shop;
-import com.api.bank.model.entity.Tpe;
+import com.api.bank.model.enums.SocialReasonStatus;
 import com.api.bank.repository.ShopRepository;
+import com.api.bank.service.AccountService;
+import com.api.bank.service.ClientService;
+import com.api.bank.service.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,34 +35,39 @@ public class AuthShopController {
     private ShopAuthenticationProvider shopAuthenticationProvider;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AccountService accountService;
 
     @Autowired
-    private ShopRepository shopRepository;
+    private ClientService clientService;
+
+    @Autowired
+    private ShopService shopService;
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public Map<String, Object> registerHandler(@RequestBody Shop shop){
-        if (!shopRepository.existsByName(shop.getName())) {
-            String encodedPass = passwordEncoder.encode(shop.getPassword());
-            shop.setPassword(encodedPass);
-            shop.setWhitelisted(false);
-            shopRepository.save(shop);
-            return Collections.singletonMap("message", "Shop registered successfully. It needs to be whitelisted.");
+    public ResponseEntity registerHandler(@RequestBody Shop shop){
+        Shop shopRegisterResponse = shopService.registerShop(shop);
+
+        if (shopRegisterResponse != null) {
+            var client = new Client(shop.getId(), shop.getName(), SocialReasonStatus.COMPANY);
+            var account = new Account(0, client);
+            accountService.add(account);
+
+            return new ResponseEntity<>(Collections.singletonMap("message", "Shop registered successfully. It needs to be whitelisted."), HttpStatus.OK);
         } else {
-            return Collections.singletonMap("message", "Shop already registered.");
+            return new ResponseEntity<>(Collections.singletonMap("message", "Shop already registered."), HttpStatus.CONFLICT);
         }
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public Map<String, Object> loginHandler(@RequestBody ShopLoginCredentials body){
+    public ResponseEntity loginHandler(@RequestBody ShopLoginCredentials body){
         try {
             UsernamePasswordAuthenticationToken authInputToken =
                     new UsernamePasswordAuthenticationToken(body.getName(), body.getPassword());
             shopAuthenticationProvider.authenticate(authInputToken);
             String token = jwtUtil.generateToken(body.getName(), "Shop Connection");
-            return Collections.singletonMap("token", token);
+            return new ResponseEntity<>(Collections.singletonMap("token", token), HttpStatus.OK);
         } catch (AuthenticationException authExc) {
-            return Collections.singletonMap("message", authExc.getMessage());
+            return new ResponseEntity<>(Collections.singletonMap("message", authExc.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }
 }

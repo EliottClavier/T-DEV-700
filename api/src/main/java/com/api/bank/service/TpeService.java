@@ -13,7 +13,7 @@ import java.util.UUID;
 @Service
 public class TpeService extends GenericService<Tpe> {
 
-    public TpeRepository tpeRepository;
+    private final TpeRepository tpeRepository;
 
     @Autowired
     public TpeService(TpeRepository tpeRepository) {
