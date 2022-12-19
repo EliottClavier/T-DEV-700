@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 @Transactional
 public interface TpeRepository extends GenericRepository<Tpe> {
-    Optional<Tpe> findByMac(String mac);
+    Optional<Tpe> findByAndroidId(String id);
 
-    Boolean existsByMac(String mac);
+    Boolean existsByAndroidId(String id);
 }
