@@ -20,5 +20,7 @@ function sendJSON(){
     amount.value = 10;
     days.value = 10;
 
+    window.open(url + "newCode", '_blank').focus();
+
     return result;
 }

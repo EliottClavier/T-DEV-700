@@ -2,11 +2,13 @@ package com.api.payment.controller;
 
 import com.api.bank.manager.BankManager;
 import com.api.bank.model.entity.QrCheck;
-import com.google.zxing.*;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -15,14 +17,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 
 /*
 * Class creation of the Qr-code used on the TPE.
@@ -116,6 +117,10 @@ public class QrCodeController {
             hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
             qrcode(check, path, charset, 250, 250);
 
+            FileWriter myWriter = new FileWriter("/qr-code/filename.txt");
+            myWriter.write(str);
+            myWriter.close();
+
         } catch (Exception e) {
             System.out.println("An error occurred : " + e);
         }
@@ -127,18 +132,25 @@ public class QrCodeController {
         MatrixToImageWriter.writeToFile(matrix, path.substring(path.lastIndexOf('.') + 1), new File(path));
     }
 
-    @GetMapping(value = "/1")
+    @GetMapping(value = "/newCode")
     @ResponseBody
-    public ResponseEntity<InputStreamResource> getImageDynamicType() {
+    public static void getImageDynamicType() throws IOException {
         MediaType contentType = MediaType.IMAGE_JPEG;
-        InputStream in = null;
+        InputStream in;
+
+        String fileName = "";
+        FileWriter myWriter = new FileWriter("../../../../qr-code/test.txt");
+        myWriter.write(fileName);
+        myWriter.close();
+
         try {
-            in = new FileInputStream("../../../../qr-code/data.jpg");
+            in = new FileInputStream("../../../../qr-code/" + fileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return new ResponseEntity<InputStreamResource>((InputStreamResource) null, HttpStatus.INTERNAL_SERVER_ERROR);
+            new ResponseEntity<InputStreamResource>((InputStreamResource) null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return;
         }
-        return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(in));
+        ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(in));
     }
 }
 
