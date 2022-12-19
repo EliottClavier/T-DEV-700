@@ -20,4 +20,8 @@ public class Card extends Base {
     public Card() {
         super();
     }
+
+    public boolean isExpired() {
+        return expirationDate.before(new Date());
+    }
 }

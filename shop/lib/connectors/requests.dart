@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:stomp_dart_client/parser.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
@@ -19,6 +20,7 @@ class RequestsClass {
   static bool paymentValidate = false;
   static late StompClient _client;
   static late BuildContext parentContext;
+  static String _sessionId = "";
 
   static connect(double amount, BuildContext context) async {
     try {
@@ -49,7 +51,7 @@ class RequestsClass {
       if (token.isNotEmpty) {
         _client = StompClient(
           config: StompConfig.SockJS(
-            url: "http://$_ip/websocket-manager/shop/socket",
+            url: "http://$_ip/websocket-manager/secured/shop/socket",
             onConnect: onConnectCallback,
             onWebSocketError: (dynamic error) => print(error.toString()),
             stompConnectHeaders: {'Authorization': "Bearer $token"},
@@ -65,39 +67,59 @@ class RequestsClass {
 
   static void activateWebSocket() {
     _client.activate();
+    String url = _client.config.url;
+    url = url.replaceAll(
+        "ws://$_ip/websocket-manager/secured/shop/socket",  "");
+    url = url.replaceAll("/websocket", "");
+    _sessionId = url.replaceAll("r/^[0-9]+\//", "").split('/')[2];
   }
 
   static void pay() {
     print("Pay : "+totalAmount.toString()+"€");
     var json = {
-      "shopName": "SHOP",
-      "amount": totalAmount
+      "token": token,
+      "sessionId": _sessionId,
+      "amount": 30
     };
     _client.send(destination: '/websocket-manager/shop/pay', body: jsonEncode(json));
   }
 
   static void onConnectCallback(StompFrame connectFrame) {
     print("Connected");
-    dynamic processing = _client.subscribe(destination: '/user/private/shop/processing', callback: (frame) {
-      print("Processing");
-      print(frame.body);
-      Navigator.pushNamed(parentContext, Shop.pageName);
-      showSnackBar(parentContext, "Aucun TPE disponible pour le moment", "error", 3);
+    dynamic transactionStatus = _client.subscribe(destination: '/user/queue/shop/transaction-status/$_sessionId', callback: (frame) {
+      var response = Response.fromJson(jsonDecode(frame.body!));
+      switch (response.type) {
+        case "TRANSACTION_DONE":
+          paymentValidate = true;
+          Navigator.pushNamed(parentContext, Validation.pageName);
+          break;
+        case "TRANSACTION_ERROR":
+          paymentValidate = true;
+          Navigator.pushNamed(parentContext, Shop.pageName);
+          showSnackBar(parentContext, "Erreur lors de la transaction", "error", 3);
+          break;
+        case "NO_TPE_FOUND":
+          paymentValidate = true;
+          Navigator.pushNamed(parentContext, Shop.pageName);
+          showSnackBar(parentContext, "Aucun TPE disponible pour le moment", "error", 3);
+          break;
+        case "NO_TPE_SELECTED":
+          paymentValidate = true;
+          Navigator.pushNamed(parentContext, Shop.pageName);
+          showSnackBar(parentContext, "Une erreur est survenue lors de la sélection d'un TPE", "error", 3);
+          break;
+        case "TRANSACTION_OPENED":
+          paymentValidate = true;
+          Navigator.pushNamed(parentContext, Shop.pageName);
+          showSnackBar(parentContext, "Le paiement est disponible sur un TPE", "success", 3);
+          break;
+        case "NOT_FOUND":
+          paymentValidate = true;
+          Navigator.pushNamed(parentContext, Shop.pageName);
+          showSnackBar(parentContext, "Erreur lors de la connexion avec la banque", "error", 3);
+          break;
+      }
     });
-
-    dynamic transactionDone = _client.subscribe(destination: '/user/private/shop/transaction-done', callback: (frame) {
-      print("Transaction done");
-      print(frame.body);
-      Navigator.pushNamed(parentContext, Validation.pageName);
-    });
-
-    dynamic transactionCancelled = _client.subscribe(destination: '/user/private/shop/transaction-cancelled', callback: (frame) {
-      print("Transaction cancelled");
-      print(frame.body);
-      Navigator.pushNamed(parentContext, Shop.pageName);
-      showSnackBar(parentContext, "La transaction a été annulée", "error", 3);
-    });
-
     if (!paymentValidate) {
       pay();
     }

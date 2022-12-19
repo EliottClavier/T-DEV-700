@@ -20,7 +20,7 @@ class Payment extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Image(
-                image: AssetImage('images/waiting.gif'),
+                image: AssetImage('images/man_wait.gif'),
                 width: 200,
                 height: 200,
               ),

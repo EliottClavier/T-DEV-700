@@ -3,6 +3,11 @@ package com.api.bank.service;
 import com.api.bank.model.entity.Base;
 import com.api.bank.model.ObjectResponse;
 import com.api.bank.model.exception.BankTransactionException;
+import com.api.bank.repository.GenericRepository;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,22 +19,21 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class GenericService<T extends Base, T1 extends JpaRepository<T, UUID>> {
+@RequiredArgsConstructor
+public class GenericService<T extends Base> {
 
-    private T1 repository;
+    protected  GenericRepository<T> repository;
 
-    public GenericService(T1 repository) {
+    public GenericService( GenericRepository<T> repository) {
+        super();
         this.repository = repository;
-    }
-    public GenericService() {
-        this.repository = null;
     }
 
     @Transactional()
     public ObjectResponse add(T entity) {
         try {
             var res = repository.save(entity);
-            repository.flush();
+//            repository.flush();
             return new ObjectResponse("Success", res, true, HttpStatus.CREATED);
 
         } catch (Exception e) {

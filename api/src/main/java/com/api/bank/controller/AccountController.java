@@ -4,17 +4,19 @@ import com.api.bank.model.entity.Account;
 import com.api.bank.model.ObjectResponse;
 import com.api.bank.repository.AccountRepository;
 import com.api.bank.service.AccountService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/bank/account")
 public class AccountController {
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    public AccountController( AccountRepository accountRepository) {
+    @Autowired
+    public AccountController( AccountService accountService) {
         super();
-        this.accountService = new AccountService(accountRepository);
+        this.accountService = accountService;
     }
 
     @GetMapping("/{id}")
