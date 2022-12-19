@@ -35,7 +35,7 @@ import java.util.*;
 */
 
 @RestController
-@RequestMapping(path = "/payment/qr-code")
+@RequestMapping(path = "/admin/")
 public class QrCodeController {
 
     @Value("${default.qrcode.secret}")
@@ -126,6 +126,8 @@ public class QrCodeController {
             myWriter.write(str);
             myWriter.close();
 
+            //getImageDynamicType(str);
+
         } catch (Exception e) {
             System.out.println("An error occurred : " + e);
         }
@@ -139,14 +141,18 @@ public class QrCodeController {
 
     @GetMapping(value = "/newCode")
     @ResponseBody
-    public static void getImageDynamicType() throws IOException {
+    public static void getImageDynamicType(/*String fileName*/) throws IOException {
         MediaType contentType = MediaType.IMAGE_JPEG;
         InputStream in;
 
-        long file = new File("../../../../qr-code/").lastModified();
+        String fileName = "qr-code-ead09fef-17cc-4707-a076-40c6af4d0c68";
+
+        FileWriter myWriter = new FileWriter("../../../../qr-code/test.txt");
+        myWriter.write(fileName);
+        myWriter.close();
 
         try {
-            in = new FileInputStream("../../../../qr-code/" + file);
+            in = new FileInputStream("../../../../qr-code/data.jpg"); // + fileName + ".jpg");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             new ResponseEntity<InputStreamResource>((InputStreamResource) null, HttpStatus.INTERNAL_SERVER_ERROR);

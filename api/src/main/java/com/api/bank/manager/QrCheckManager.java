@@ -34,7 +34,6 @@ public class QrCheckManager {
         this.checkService = new CheckService(qrCheckRepository);
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
-
         this.bankManager = bankManager;
     }
 
