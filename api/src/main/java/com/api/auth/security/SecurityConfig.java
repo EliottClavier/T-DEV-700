@@ -59,12 +59,16 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             .cors()
             .and()
             .authorizeHttpRequests()
+            // Endpoints
             .antMatchers("/auth/**").permitAll()
             .antMatchers("/bank/**").hasRole("MANAGER")
             .antMatchers("/tpe-manager/**").hasRole("TPE")
             .antMatchers("/websocket-manager/tpe/**").hasRole("TPE")
             .antMatchers("/websocket-manager/shop/**").hasRole("SHOP")
-            .anyRequest().authenticated()
+            // Interfaces for Admin
+            .antMatchers("/admin/auth/login").permitAll()
+            .antMatchers("/admin/qr-code/**").hasRole("MANAGER")
+            .anyRequest().hasRole("MANAGER")
             .and()
             .authenticationManager(authenticationManager)
             .exceptionHandling()
