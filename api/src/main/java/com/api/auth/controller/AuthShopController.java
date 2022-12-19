@@ -1,12 +1,12 @@
 package com.api.auth.controller;
 
 import com.api.auth.model.ShopLoginCredentials;
-import com.api.auth.model.TpeLoginCredentials;
 import com.api.auth.security.JWTUtil;
 import com.api.auth.security.providers.ShopAuthenticationProvider;
 import com.api.bank.model.entity.Shop;
-import com.api.bank.model.entity.Tpe;
 import com.api.bank.repository.ShopRepository;
+import com.api.bank.service.AccountService;
+import com.api.bank.service.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -29,18 +29,16 @@ public class AuthShopController {
     private ShopAuthenticationProvider shopAuthenticationProvider;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AccountService accountService;
 
     @Autowired
-    private ShopRepository shopRepository;
+    private ShopService shopService;
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public Map<String, Object> registerHandler(@RequestBody Shop shop){
-        if (!shopRepository.existsByName(shop.getName())) {
-            String encodedPass = passwordEncoder.encode(shop.getPassword());
-            shop.setPassword(encodedPass);
-            shop.setWhitelisted(false);
-            shopRepository.save(shop);
+        Shop shopRegisterResponse = shopService.registerShop(shop);
+        if (shopRegisterResponse != null) {
+            accountService.createShopAccount(shop);
             return Collections.singletonMap("message", "Shop registered successfully. It needs to be whitelisted.");
         } else {
             return Collections.singletonMap("message", "Shop already registered.");

@@ -5,8 +5,8 @@ import lombok.*;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
-public class TpeLoginCredentials {
+public class TpeRegisterCredentials {
     private String androidId;
-    private String password;
 }
