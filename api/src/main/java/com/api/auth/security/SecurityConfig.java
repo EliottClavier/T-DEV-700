@@ -64,6 +64,7 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             .antMatchers("/tpe-manager/**").hasRole("TPE")
             .antMatchers("/websocket-manager/tpe/**").hasRole("TPE")
             .antMatchers("/websocket-manager/shop/**").hasRole("SHOP")
+            .anyRequest().authenticated()
             .and()
             .authenticationManager(authenticationManager)
             .exceptionHandling()
