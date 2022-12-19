@@ -18,8 +18,14 @@ public class OperationService extends GenericService<Operation> {
     }
 
     public boolean isOperationPendingFor(UUID accountId) {
-        var res = ((OperationRepository) repository).existsOperationByOperationStatusIsLikeAndAccountIdIs(OperationStatus.PENDING, accountId);
+        return ((OperationRepository) repository).existsOperationByOperationStatusIsLikeAndAccountIdIs(OperationStatus.PENDING, accountId);
+    }
+    public boolean isOperationPendingByOperationId( String operationId, UUID accountId) {
+        var res = ((OperationRepository) repository).existsOperationByOperationStatusIsLikeAndOperationIdIsAndAccountIdIs(OperationStatus.PENDING, operationId, accountId);
         return res;
+    }
+    public Operation getByOperationId(String operationId) {
+        return ((OperationRepository) repository).getByOperationId(operationId);
     }
 }
 

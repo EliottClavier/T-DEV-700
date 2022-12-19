@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface OperationRepository extends GenericRepository<Operation> {
 
     boolean existsOperationByOperationStatusIsLikeAndAccountIdIs(OperationStatus operationStatus, UUID accountId);
+    boolean existsOperationByOperationStatusIsLikeAndOperationIdIsAndAccountIdIs(OperationStatus operationStatus,String OperationId, UUID accountId);
+    Operation getByOperationId(String operationId);
 }

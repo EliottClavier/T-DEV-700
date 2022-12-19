@@ -32,9 +32,9 @@ public class QrCheck extends Base {
 
     public QrCheck(float amount, String token) {
         super();
-        init();
         this.soldAmount = amount;
         this.checkToken = token;
+        init();
     }
 
     private void init() {

@@ -3,8 +3,10 @@ package com.api.bank.model.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -15,7 +17,7 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Card extends Base {
 
-    @Column(nullable=false, unique=true, length=50)
+    @Column(nullable = false, unique = true, length = 50)
     private String cardId;
 
     private Date expirationDate;
@@ -30,12 +32,12 @@ public class Card extends Base {
         this.cardId = cardId;
         this.expirationDate = expirationDate;
     }
+
     private void init() {
-        if(cardId == null) {
-            cardId = UUID.randomUUID().toString();
+        if (this.cardId == null) {
+            this.cardId = UUID.randomUUID().toString();
         }
-        this.setCardId(UUID.randomUUID().toString());
-        if(this.expirationDate == null) {
+        if (this.expirationDate == null) {
             this.expirationDate = setDefaultExpirationDate();
         }
     }
