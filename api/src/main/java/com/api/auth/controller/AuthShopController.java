@@ -8,7 +8,6 @@ import com.api.bank.model.entity.Client;
 import com.api.bank.model.entity.Shop;
 import com.api.bank.model.enums.SocialReasonStatus;
 import com.api.bank.service.AccountService;
-import com.api.bank.service.ClientService;
 import com.api.bank.service.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,9 +32,6 @@ public class AuthShopController {
 
     @Autowired
     private AccountService accountService;
-
-    @Autowired
-    private ClientService clientService;
 
     @Autowired
     private ShopService shopService;
