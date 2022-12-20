@@ -8,6 +8,10 @@ services:
       context: ./tpe
     volumes:
       - ./apks:/tpe/apk
+    environment:
+      API_URL: ${API_URL}
+      TPE_REGISTER_SECRET_HEADER: ${TPE_REGISTER_SECRET_HEADER}
+      TPE_REGISTER_SECRET_KEY: ${TPE_REGISTER_SECRET_KEY}
 
   shop:
     container_name: shop
@@ -15,6 +19,10 @@ services:
       context: ./shop
     volumes:
       - ./apks:/shop/apk
+    environment:
+      API_URL: ${API_URL}
+      SHOP_USERNAME: ${DEFAULT_SHOP_USERNAME}
+      SHOP_PASSWORD: ${DEFAULT_SHOP_PASSWORD}
 
   api:
     container_name: api
@@ -34,11 +42,19 @@ services:
       DEVTOOLS_LIVERELOAD_ENABLED: ${DEVTOOLS_LIVERELOAD_ENABLED}
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       DEFAULT_MANAGER_USERNAME: ${DEFAULT_MANAGER_USERNAME}
       DEFAULT_MANAGER_PASSWORD: ${DEFAULT_MANAGER_PASSWORD}
+      DEFAULT_SHOP_USERNAME: ${DEFAULT_SHOP_USERNAME}
+      DEFAULT_SHOP_PASSWORD: ${DEFAULT_SHOP_PASSWORD}
       TPE_REGISTER_SECRET_HEADER: ${TPE_REGISTER_SECRET_HEADER}
       TPE_REGISTER_SECRET_KEY: ${TPE_REGISTER_SECRET_KEY}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER_USERNAME: ${MAIL_USER_USERNAME}
+      MAIL_USER_PASSWORD: ${MAIL_USER_PASSWORD}
+      MAIL_USER_MAIL: ${MAIL_USER_MAIL}
     volumes:
       - ./apks:/apks
     ports:
