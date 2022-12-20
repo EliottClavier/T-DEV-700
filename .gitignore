@@ -7,9 +7,12 @@ database-data
 ### Redis volume ###
 redis-data
 
-
 ### APKS volume ###
 apks
 
-### .env ###
+### .env (except examples) ###
 .env
+env/dev/*
+!env/dev/*.example.*
+env/prod/*
+!env/prod/*.example.*
