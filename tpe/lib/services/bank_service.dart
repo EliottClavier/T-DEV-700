@@ -146,9 +146,11 @@ class BankService with ChangeNotifier {
   }
 
   Future<void> _synchronizeTpe() async {
-    Future.delayed(const Duration(seconds: 1), () {
+    print("Synchronize TPE");
+    await Future.delayed(const Duration(seconds: 1), () {
       _client.send(destination: '/websocket-manager/tpe/synchronize');
     });
+    print("Synchronize TPE sent");
   }
 
   Future<void> completeTransaction() async {

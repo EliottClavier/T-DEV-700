@@ -21,12 +21,12 @@ void handleTransactionStatus(context, status) {
           context, "Synchronized successfully", "success", null);
       break;
     case "TPE_INVALID":
-      snackbarThenNavigate(context, "TPE invalid", "error", "/home");
+      snackbarThenNavigate(context, "TPE invalid", "error", "/");
       break;
     case "NOT_FOUND":
-      snackbarThenNavigate(context, "TPE was not found", "error", "/home");
+      snackbarThenNavigate(context, "TPE was not found", "error", "/");
       break;
     default:
-      context.go("/home");
+      context.go('/');
   }
 }
