@@ -16,7 +16,7 @@ class BankService with ChangeNotifier {
   dynamic dotenv;
 
   late String _token;
-  late String _sessionId;
+  String _sessionId = "";
   late String _ip;
   String _status = "Disconnected";
   late StompClient _client;
@@ -28,7 +28,7 @@ class BankService with ChangeNotifier {
   bool isRegistered = false;
   bool isSynchronized = false;
 
-  String password = "mpmmt|DS(;lt";
+  String password = "p0;jRE:Ae6.:";
   String androidId = "123456789";
 
   void printStatus() {
@@ -51,7 +51,7 @@ class BankService with ChangeNotifier {
     /* dotenv = await dotenv.load(fileName: ".env");
     _ip = dotenv.env['IP']; */
     _context = context;
-    _ip = "10.29.125.163:8080/api";
+    _ip = "10.29.125.164:8080/api";
     await _connect();
     print("IP : ${_ip}");
   }
@@ -98,7 +98,7 @@ class BankService with ChangeNotifier {
   }
 
   Future<void> onFullRegisterError() async {
-    await Future.delayed(const Duration(seconds: 120));
+    await Future.delayed(const Duration(seconds: 5));
     await _connect();
     return Future.value();
   }
