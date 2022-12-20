@@ -1,12 +1,6 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'package:tpe/screens/payment_success.dart';
-import 'package:tpe/screens/payment_error.dart';
-import 'package:tpe/screens/nfc_reader.dart';
-import 'package:tpe/screens/qr_code_reader.dart';
-import 'package:tpe/utils/price.dart';
+import 'package:tpe/utils/amount.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});

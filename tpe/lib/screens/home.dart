@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tpe/services/bank_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tpe/utils/price.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -62,17 +61,16 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
     bool response =
         Provider.of<BankService>(context, listen: true).isConnectedToApi;
     if (response) {
-      onConnectedToApi();
+      onTransactionReceived();
     }
     return response;
   }
 
-  void onConnectedToApi() {
+  void onTransactionReceived() {
     print("Connected to API");
   }
 
   void _onClick(PointerEvent details) {
-    print("Price store: ${getAmount()}");
     bankService.printStatus();
     context.go("/payment");
   }

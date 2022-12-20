@@ -1,4 +1,3 @@
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,11 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:tpe/screens/payment.dart';
 import 'package:tpe/screens/payment_sending.dart';
 import 'package:tpe/utils/snackbar.dart';
-
-import '../store/transaction_store.dart';
-
-import 'package:tpe/store/transaction_store.dart';
-import 'package:redux/redux.dart';
 
 class NfcReaderScreen extends StatelessWidget {
   const NfcReaderScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tpe/screens/home.dart';
-import 'package:tpe/utils/price.dart';
+import 'package:tpe/utils/amount.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
   const PaymentSuccessScreen({super.key});

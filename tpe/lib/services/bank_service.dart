@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -7,20 +6,14 @@ import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tpe/config/token.dart';
-import 'package:tpe/utils/platform_repository.dart';
 import 'package:tpe/utils/transaction_status.dart';
-import 'package:provider/provider.dart';
-
-enum Actions { SendQrCodeData, SendNfcData, Connect }
 
 class BankService with ChangeNotifier {
   static final BankService _bankService = BankService._internal();
   static const MethodChannel _channel = MethodChannel('bank_service');
 
   dynamic dotenv;
-  PlatformRepository platformRepository = PlatformRepository();
 
   late String _token;
   late String _sessionId;
