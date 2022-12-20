@@ -23,21 +23,19 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
-public class QrCheckManager {
+public class QrCheckManager implements IQrCheckManager {
     private final CheckService checkService;
-    private final BankManager bankManager;
     private final AccountService accountService;
     private final OperationService operationService;
 
     @Autowired
-    public QrCheckManager(CheckRepository qrCheckRepository, AccountRepository accountRepository, OperationRepository operationRepository, BankManager bankManager) {
+    public QrCheckManager(CheckRepository qrCheckRepository, AccountRepository accountRepository, OperationRepository operationRepository) {
         this.checkService = new CheckService(qrCheckRepository);
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
-
-        this.bankManager = bankManager;
     }
 
+    @Override
     @Transactional(rollbackOn = Exception.class)
     public QrCheck buyQrCheck(QrCheck qrCheck) {
         try {
@@ -62,6 +60,16 @@ public class QrCheckManager {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public boolean checkQrCheck(QrCheck qrCheck) {
+        return false;
+    }
+
+    @Override
+    public boolean deleteQrCheck(QrCheck qrCheck) {
+        return false;
     }
 
     /**
