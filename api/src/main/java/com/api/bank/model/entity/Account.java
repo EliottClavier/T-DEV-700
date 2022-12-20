@@ -13,7 +13,7 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Account extends Base {
 
-    private float sold;
+    private double sold;
 
     @OneToMany(mappedBy = "account", cascade=CascadeType.ALL)
     private List<Operation> operations;
@@ -31,13 +31,13 @@ public class Account extends Base {
         super();
     }
 
-    public Account(float sold, Client client) {
+    public Account(double sold, Client client) {
         super();
         this.client = client;
         this.sold = sold;
 
     }
-    public Account(float sold, Client client, Card card) {
+    public Account(double sold, Client client, Card card) {
         super();
         this.client = client;
         this.sold = sold;
@@ -45,7 +45,7 @@ public class Account extends Base {
 
     }
 
-    public boolean isEnoughMoney(float amount) {
+    public boolean isEnoughMoney(double amount) {
         return sold >= amount;
     }
 }
