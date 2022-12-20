@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tpe/config/token.dart';
 import 'package:tpe/utils/platform_repository.dart';
+import 'package:tpe/utils/transaction_status.dart';
 import 'package:provider/provider.dart';
 
 enum Actions { SendQrCodeData, SendNfcData, Connect }
@@ -26,12 +27,15 @@ class BankService with ChangeNotifier {
   late String _ip;
   String _status = "Disconnected";
   late StompClient _client;
+  late BuildContext _context;
 
   bool isConnectedToApi = false;
   bool isConnectedToWebSocket = false;
   bool isActiveWebSocket = false;
   bool isRegistered = false;
   bool isSynchronized = false;
+
+  String password = "zES;|7qB4O9r";
 
   void printStatus() {
     print("isConnectedToApi : ${isConnectedToApi}");
@@ -49,19 +53,23 @@ class BankService with ChangeNotifier {
     return _status;
   }
 
-  Future<void> init() async {
+  Future<void> init(context) async {
     /* dotenv = await dotenv.load(fileName: ".env");
     _ip = dotenv.env['IP']; */
-    _ip = "192.168.1.11:8080/api";
+    _context = context;
+    _ip = "10.29.125.163:8080/api";
     await _connect();
     print("IP : ${_ip}");
   }
 
   Future<void> _connect() async {
-    String macAddress = await platformRepository.getMacAddr();
+    print("connecting to server");
+    String androidId = await platformRepository.getMacAddr();
     final response = await http.post(Uri.parse("http://$_ip/auth/tpe/login"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"mac": macAddress, "serial": "SERIAL"}));
+        body: jsonEncode({"androidId": androidId, "password": password}));
+    print(response.body);
+    print(response.statusCode);
     if (response.statusCode == 200) {
       _token = Token.fromJson(jsonDecode(response.body)).token;
       await _connectWebSocket();
@@ -71,31 +79,34 @@ class BankService with ChangeNotifier {
     } else {
       _fullRegister();
       setStatus("Connexion to server failed.");
-      throw Exception('Failed to load post');
     }
     notifyListeners();
   }
 
   Future<void> _fullRegister() async {
-    String macAddress = await platformRepository.getMacAddr();
+    print("full register to server");
+    String androidId = await platformRepository.getMacAddr();
     final response = await http.post(Uri.parse("http://$_ip/auth/tpe/register"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"mac": macAddress, "serial": "SERIAL"}));
-
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization-TPE-Register": "LDQRLohg4K8eEqWZ1dWmG87dTUaOMJPr"
+        },
+        body: jsonEncode({"androidId": androidId}));
+    print("fullRegister response : ${response.body}");
+    print("fullRegister response status : ${response.statusCode}");
     if (response.statusCode == 200) {
+      password = jsonDecode(response.body)['password'];
       setStatus('Register successfull. Please wait for Device whitelist');
       isRegistered = true;
     } else {
       onFullRegisterError();
-      setStatus("Register to server failed. New attempt in 5 seconds");
-      throw Exception('Failed to full register tpe');
+      setStatus("Register to server failed. New attempt in 120 seconds");
     }
     notifyListeners();
   }
 
   Future<void> onFullRegisterError() async {
-    setStatus("Connexion attempt failed. Retry in 5 seconds");
-    await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 120));
     await _connect();
     return Future.value();
   }
@@ -154,6 +165,7 @@ class BankService with ChangeNotifier {
         callback: (frame) {
           print("Synchronise status");
           print(frame.body);
+          handleTransactionStatus(_context, frame.body);
         });
 
     dynamic transactionStatus = _client.subscribe(
@@ -161,6 +173,7 @@ class BankService with ChangeNotifier {
         callback: (frame) {
           print("Transaction status");
           print(frame.body);
+          handleTransactionStatus(_context, frame.body);
         });
     notifyListeners();
     return Future.value();

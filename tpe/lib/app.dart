@@ -7,16 +7,15 @@ class App extends StatelessWidget {
 
   static const String _title = 'Payment Terminal Home';
 
-  BankService bankService = BankService();
+  final BankService bankService = BankService();
 
-  @override
   void dispose() {
     bankService.killWebSocket();
   }
 
   @override
   Widget build(BuildContext context) {
-    bankService.init();
+    bankService.init(context);
     return MaterialApp.router(
       title: _title,
       routerConfig: router,
