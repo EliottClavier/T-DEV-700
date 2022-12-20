@@ -31,7 +31,6 @@ import java.util.Map;
 public class AuthTpeController {
 
     private final JWTUtil jwtUtil;
-
     private final TpeAuthenticationProvider tpeAuthenticationProvider;
     private final PasswordEncoder passwordEncoder;
     private final TpeService tpeService;
@@ -67,7 +66,6 @@ public class AuthTpeController {
             tpe.setWhitelisted(false);
             if (tpeService.add(tpe).isValid()) {
                 // Return list with two attributes: message and password
-
                 emailService.sendSimpleMail(
                         env.getProperty("email.to.bank.admin"),
                         "TPE Registration",
