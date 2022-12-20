@@ -28,7 +28,7 @@ class BankService with ChangeNotifier {
   bool isRegistered = false;
   bool isSynchronized = false;
 
-  String password = "zES;|7qB4O9r";
+  String password = "mpmmt|DS(;lt";
   String androidId = "123456789";
 
   void printStatus() {
@@ -123,9 +123,9 @@ class BankService with ChangeNotifier {
     } else {
       setStatus("Connexion to websocket failed.");
       onFullRegisterError();
-      throw Exception('Failed to load post');
     }
     notifyListeners();
+    return Future.value();
   }
 
   Future<void> _activateWebSocket() async {
@@ -149,6 +149,13 @@ class BankService with ChangeNotifier {
     Future.delayed(const Duration(seconds: 1), () {
       _client.send(destination: '/websocket-manager/tpe/synchronize');
     });
+  }
+
+  Future<void> completeTransaction() async {
+    print("Complete transaction");
+    _client.send(
+        destination: '/websocket-manager/tpe/complete-transaction',
+        body: "{'paymentId': 'PAYMENT_ID', 'type': 'NFC'}");
   }
 
   Future<void> _onConnectCallback(StompFrame frame) {

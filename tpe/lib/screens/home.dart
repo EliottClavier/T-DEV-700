@@ -33,7 +33,6 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   BankService bankService = BankService();
   late bool isConnectedToApi;
   late String status;
-  late String password;
 
   @override
   void didChangeDependencies() {
@@ -54,7 +53,6 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   void _initBank() async {
     isConnectedToApi = _isConnectedToApi();
     status = Provider.of<BankService>(context, listen: true).getStatus();
-    password = Provider.of<BankService>(context, listen: true).password;
   }
 
   bool _isConnectedToApi() {
@@ -67,7 +65,7 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   }
 
   void onTransactionReceived() {
-    print("Connected to API");
+    print("Transaction received");
   }
 
   void _onClick(PointerEvent details) {

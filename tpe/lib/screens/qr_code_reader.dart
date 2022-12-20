@@ -144,10 +144,10 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
 
   @override
   void dispose() {
+    super.dispose();
     Future.delayed(const Duration(milliseconds: 200), () {
       controller?.stopCamera();
       controller?.dispose();
     });
-    super.dispose();
   }
 }
