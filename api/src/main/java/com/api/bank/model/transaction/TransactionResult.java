@@ -11,7 +11,7 @@ public class TransactionResult {
     private String transactionId;
     private String message;
 
-    public TransactionResult(TransactionStatus transactionStatus,String transactionId,String message){
+    public TransactionResult(TransactionStatus transactionStatus, String transactionId, String message){
         super();
         this.transactionStatus = transactionStatus;
         this.transactionId = transactionId;

@@ -61,48 +61,50 @@ public class ShopManagerController {
                             smt.convertAndSendToUser(
                                     transactionRequest.getTpeUsername(),
                                     destinationGenerator.getTpeTransactionStatusDest(transactionRequest.getTpeSessionId()),
-                                    new Message("Open Transaction.", MessageType.TRANSACTION_OPENED)
+                                    new TransactionReponsePay(
+                                            "Transaction opened.", transactionRequest.getAmount(), WebSocketStatus.TRANSACTION_OPENED
+                                    )
                             );
 
                             // Send processing message to Shop
                             smt.convertAndSendToUser(
                                     user.getName(),
                                     destinationGenerator.getShopTransactionStatusDest(sessionId),
-                                    new Message(gson.toJson(transactionRequest), MessageType.TRANSACTION_OPENED)
+                                    new Message("Transaction opened.", WebSocketStatus.TRANSACTION_OPENED)
                             );
                         } else {
                             smt.convertAndSendToUser(
                                     user.getName(),
                                     destinationGenerator.getShopTransactionStatusDest(sessionId),
-                                    new Message("Error while selecting TPE.", MessageType.NO_TPE_SELECTED)
+                                    new Message("Error while selecting TPE.", WebSocketStatus.NO_TPE_SELECTED)
                             );
                         }
                     } else {
                         smt.convertAndSendToUser(
                                 user.getName(),
                                 destinationGenerator.getShopTransactionStatusDest(sessionId),
-                                new Message("No TPE available.", MessageType.NO_TPE_FOUND)
+                                new Message("No TPE available.", WebSocketStatus.NO_TPE_FOUND)
                         );
                     }
                 } else {
                     smt.convertAndSendToUser(
                             user.getName(),
                             destinationGenerator.getShopTransactionStatusDest(sessionId),
-                            new Message("Shop already in a transaction.", MessageType.ALREADY_IN_TRANSACTION)
+                            new Message("Shop already in a transaction.", WebSocketStatus.ALREADY_IN_TRANSACTION)
                     );
                 }
             } else {
                 smt.convertAndSendToUser(
                         user.getName(),
                         destinationGenerator.getShopTransactionStatusDest(sessionId),
-                        new Message("Shop not found.", MessageType.NOT_FOUND)
+                        new Message("Shop not found.", WebSocketStatus.NOT_FOUND)
                 );
             }
         } catch (Exception e) {
             smt.convertAndSendToUser(
                     user.getName(),
                     destinationGenerator.getShopTransactionStatusDest(sessionId),
-                    new Message("Error while processing transaction.", MessageType.TRANSACTION_ERROR)
+                    new Message("Error while processing transaction.", WebSocketStatus.TRANSACTION_ERROR)
             );
         }
     }
