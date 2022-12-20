@@ -36,6 +36,7 @@ class BankService with ChangeNotifier {
   bool isSynchronized = false;
 
   String password = "zES;|7qB4O9r";
+  String androidId = "123456789";
 
   void printStatus() {
     print("isConnectedToApi : ${isConnectedToApi}");
@@ -64,7 +65,6 @@ class BankService with ChangeNotifier {
 
   Future<void> _connect() async {
     print("connecting to server");
-    String androidId = await platformRepository.getMacAddr();
     final response = await http.post(Uri.parse("http://$_ip/auth/tpe/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"androidId": androidId, "password": password}));
@@ -85,7 +85,6 @@ class BankService with ChangeNotifier {
 
   Future<void> _fullRegister() async {
     print("full register to server");
-    String androidId = await platformRepository.getMacAddr();
     final response = await http.post(Uri.parse("http://$_ip/auth/tpe/register"),
         headers: {
           "Content-Type": "application/json",

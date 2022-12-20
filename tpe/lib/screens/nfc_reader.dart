@@ -1,6 +1,7 @@
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:tpe/screens/payment.dart';
 import 'package:tpe/screens/payment_sending.dart';
@@ -97,14 +98,22 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     );
   }
 
+  void onNfcDiscovered(NfcTag tag) {
+    setNfcData(tag.data);
+  }
+
   void _initNfc() async {
     try {
       await widget.nfcManager.startSession(onDiscovered: (NfcTag tag) {
         setNfcData(tag.data);
-        return Future<void>.value();
+        return Future.value();
       });
     } on PlatformException catch (e) {
-      print('Error: $e');
+      showSnackBar(context, "NFC not available for device", "error", 2);
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        _disposeNfc();
+        context.go("/payment");
+      });
     }
   }
 
