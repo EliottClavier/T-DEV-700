@@ -29,26 +29,27 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth/tpe")
 public class AuthTpeController {
-    @Autowired
-    private JWTUtil jwtUtil;
 
-    @Autowired
-    private TpeAuthenticationProvider tpeAuthenticationProvider;
+    private final JWTUtil jwtUtil;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TpeService tpeService;
-
+    private final TpeAuthenticationProvider tpeAuthenticationProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final TpeService tpeService;
     private final AuthService authService;
     private final EmailService emailService;
     private final Environment env;
 
     @Autowired
-    AuthTpeController(AuthService authService, EmailService emailService, Environment env) {
+    AuthTpeController(TpeService tpeService, AuthService authService,
+                      EmailService emailService, Environment env,
+                      PasswordEncoder passwordEncoder, JWTUtil jwtUtil,
+                      TpeAuthenticationProvider tpeAuthenticationProvider) {
         this.authService = authService;
         this.emailService = emailService;
+        this.tpeService = tpeService;
+        this.passwordEncoder = passwordEncoder;
+        this.tpeAuthenticationProvider = tpeAuthenticationProvider;
+        this.jwtUtil = jwtUtil;
         this.env = env;
     }
 
@@ -64,21 +65,21 @@ public class AuthTpeController {
             String encodedPass = passwordEncoder.encode(randomPassword);
             Tpe tpe = new Tpe(tpeRegisterCredentials.getAndroidId(), encodedPass);
             tpe.setWhitelisted(false);
-                if (tpeService.add(tpe).isValid()) {
-                    // Return list with two attributes: message and password
+            if (tpeService.add(tpe).isValid()) {
+                // Return list with two attributes: message and password
 
-                    emailService.sendSimpleMail(
-                            env.getProperty("email.to.bank.admin"),
-                            "TPE Registration",
-                            "Your TPE has been registered. Your password is: " + randomPassword
-                    );
-                    return ResponseEntity.ok(Map.of(
-                            "message", "TPE registered successfully. It needs to be whitelisted." ));
-                } else {
-                    return new ResponseEntity<>(Collections.singletonMap("message", "TPE registration failed"), HttpStatus.INTERNAL_SERVER_ERROR);
-                }
+                emailService.sendSimpleMail(
+                        env.getProperty("email.to.bank.admin"),
+                        "TPE Registration",
+                        "Your TPE has been registered. Your password is: " + randomPassword
+                );
+                return ResponseEntity.ok(Map.of(
+                        "message", "TPE registered successfully. It needs to be whitelisted."));
+            } else {
+                return new ResponseEntity<>(Collections.singletonMap("message", "TPE registration failed"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-       return new ResponseEntity<>(Collections.singletonMap("message", "TPE already registered."), HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(Collections.singletonMap("message", "TPE already registered."), HttpStatus.CONFLICT);
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
