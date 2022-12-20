@@ -6,8 +6,6 @@ import com.api.bank.model.enums.TransactionStatus;
 public class BankTransactionException extends Exception {
     private String message;
 
-
-
     private TransactionStatus transactionStatus;
 
     public BankTransactionException(String message, String operationId) {

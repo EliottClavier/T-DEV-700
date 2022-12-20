@@ -1,6 +1,11 @@
 package com.api.gateway.tpe.controller;
 
+import com.api.bank.manager.BankManager;
+import com.api.bank.manager.IBankManager;
 import com.api.bank.model.enums.PaymentMethod;
+import com.api.bank.model.enums.TransactionStatus;
+import com.api.bank.model.transaction.BankTransaction;
+import com.api.bank.model.transaction.TransactionResult;
 import com.api.gateway.tpe.model.TpeManager;
 import com.api.gateway.tpe.service.TpeManagerService;
 import com.api.gateway.data.DestinationGenerator;
@@ -26,6 +31,9 @@ public class TpeManagerController {
 
     @Autowired
     private TpeManagerService tpeManagerService;
+
+    @Autowired
+    private IBankManager bankManager;
 
     public static void realizeTransaction(TransactionRequest transactionRequest) {
         System.out.println("Transaction realized: " + transactionRequest);
@@ -60,55 +68,80 @@ public class TpeManagerController {
                     transactionRequest.setPaymentId(transactionRequestTpe.getPaymentId());
 
                     // Execute transaction
-                    realizeTransaction(transactionRequest);
-
-                    // Remove transaction from Redis
-                    tpeManagerService.deleteTransactionByTransactionId(transactionRequest.getId());
-
-                    // Make the Tpe available for a new transaction
-                    TpeManager tpeManager = new TpeManager(user.getName(), sessionId);
-                    tpeManagerService.addTpeRedis(tpeManager);
-
-                    // Send transaction done message to TPE
-                    smt.convertAndSendToUser(
-                            tpeManager.getUsername(),
-                            destinationGenerator.getTpeTransactionStatusDest(sessionId),
-                            new Message("Transaction done. TPE available for transaction.", MessageType.TRANSACTION_DONE)
+                    BankTransaction transaction = new BankTransaction(
+                        transactionRequest.getId(),
+                        transactionRequest.getShopUsername(),
+                        transactionRequest.getShopUsername(),
+                        transactionRequest.getPaymentId(),
+                        transactionRequest.getAmount(),
+                        transactionRequest.getPaymentMethod()
                     );
 
-                    // Send transaction done message to Shop
-                    smt.convertAndSendToUser(
-                            transactionRequest.getShopUsername(),
-                            destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
-                            new Message("Transaction done.", MessageType.TRANSACTION_DONE)
-                    );
+                    TransactionResult transactionResult = bankManager.HandleTransaction(transaction);
+
+                    if (transactionResult.getTransactionStatus() == TransactionStatus.SUCCESS) {
+                        // Remove transaction from Redis
+                        tpeManagerService.deleteTransactionByTransactionId(transactionRequest.getId());
+
+                        // Make the Tpe available for a new transaction
+                        TpeManager tpeManager = new TpeManager(user.getName(), sessionId);
+                        tpeManagerService.addTpeRedis(tpeManager);
+
+                        // Send transaction done message to TPE
+                        smt.convertAndSendToUser(
+                                tpeManager.getUsername(),
+                                destinationGenerator.getTpeTransactionStatusDest(sessionId),
+                                new Message(transactionResult.getMessage(), transactionResult.getTransactionStatus())
+                        );
+
+                        // Send transaction done message to Shop
+                        smt.convertAndSendToUser(
+                                transactionRequest.getShopUsername(),
+                                destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
+                                new Message(transactionResult.getMessage(), transactionResult.getTransactionStatus())
+                        );
+                    } else {
+                        tpeManagerService.deleteTransactionByTransactionId(transactionRequest.getId());
+                        // Send transaction error message to TPE
+                        smt.convertAndSendToUser(
+                                user.getName(),
+                                destinationGenerator.getTpeTransactionStatusDest(sessionId),
+                                new Message(transactionResult.getMessage(), transactionResult.getTransactionStatus())
+                        );
+                        // Send transaction error message to Shop
+                        smt.convertAndSendToUser(
+                                transactionRequest.getShopUsername(),
+                                destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
+                                new Message("Error while processing transaction.", TransactionStatus.FAILED)
+                        );
+                    }
                 } else {
                     tpeManagerService.deleteTransactionByTransactionId(transactionRequest.getId());
                     // Send transaction error message to TPE
                     smt.convertAndSendToUser(
                             user.getName(),
                             destinationGenerator.getTpeTransactionStatusDest(sessionId),
-                            new Message("Invalid payment method.", MessageType.INVALID_PAYMENT_METHOD)
+                            new Message("Invalid payment method.", WebSocketStatus.INVALID_PAYMENT_METHOD)
                     );
                     // Send transaction error message to Shop
                     smt.convertAndSendToUser(
                             transactionRequest.getShopUsername(),
                             destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
-                            new Message("Error while processing transaction.", MessageType.TRANSACTION_ERROR)
+                            new Message("Error while processing transaction.", WebSocketStatus.TRANSACTION_ERROR)
                     );
                 }
             } else {
                 smt.convertAndSendToUser(
                         user.getName(),
                         destinationGenerator.getTpeTransactionStatusDest(sessionId),
-                        new Message("TPE not involved in any transaction.", MessageType.NOT_INVOLVED)
+                        new Message("TPE not involved in any transaction.", WebSocketStatus.NOT_INVOLVED)
                 );
             }
         } else {
             smt.convertAndSendToUser(
                     user.getName(),
                     destinationGenerator.getTpeTransactionStatusDest(sessionId),
-                    new Message("TPE still marked available while trying to complete a transaction.", MessageType.STILL_AVAILABLE)
+                    new Message("TPE still marked available while trying to complete a transaction.", WebSocketStatus.STILL_AVAILABLE)
             );
         }
     }
@@ -132,20 +165,20 @@ public class TpeManagerController {
                 smt.convertAndSendToUser(
                         transactionRequest.getShopUsername(),
                         destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
-                        new Message("Transaction cancelled.", MessageType.TRANSACTION_CANCELLED)
+                        new Message("Transaction cancelled.", WebSocketStatus.TRANSACTION_CANCELLED)
                 );
             } else {
                 smt.convertAndSendToUser(
                         user.getName(),
                         destinationGenerator.getTpeTransactionStatusDest(sessionId),
-                        new Message("TPE not involved in any transaction.", MessageType.NOT_INVOLVED)
+                        new Message("TPE not involved in any transaction.", WebSocketStatus.NOT_INVOLVED)
                 );
             }
         } else {
             smt.convertAndSendToUser(
                     user.getName(),
                     destinationGenerator.getTpeTransactionStatusDest(sessionId),
-                    new Message("TPE still marked available while trying to cancel a transaction.", MessageType.STILL_AVAILABLE)
+                    new Message("TPE still marked available while trying to cancel a transaction.", WebSocketStatus.STILL_AVAILABLE)
             );
         }
     }

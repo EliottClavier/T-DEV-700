@@ -4,7 +4,7 @@ import com.api.gateway.data.DestinationGenerator;
 import com.api.gateway.tpe.model.TpeManager;
 import com.api.gateway.tpe.service.TpeManagerService;
 import com.api.gateway.transaction.model.Message;
-import com.api.gateway.transaction.model.MessageType;
+import com.api.gateway.transaction.model.WebSocketStatus;
 import com.api.gateway.transaction.model.Session;
 import com.api.gateway.transaction.model.SessionOrigin;
 import com.api.gateway.transaction.service.TransactionRequestService;
@@ -47,7 +47,7 @@ public class WebSocketListeners {
                 smt.convertAndSendToUser(
                         session.getUsername(),
                         destinationGenerator.getShopTransactionStatusDest(session.getSessionId()),
-                        new Message("Transaction cancelled after losing connection with TPE.", MessageType.LOST_CONNECTION)
+                        new Message("Transaction cancelled after losing connection with TPE.", WebSocketStatus.LOST_CONNECTION)
                 );
             } else if (session.getOrigin().equals(SessionOrigin.TPE)) {
                 Message message = tpeManagerService.addTpeRedis(new TpeManager(session.getUsername(), session.getSessionId()));
@@ -56,7 +56,7 @@ public class WebSocketListeners {
                         destinationGenerator.getTpeSynchronizationStatusDest(session.getSessionId()),
                         new Message(
                                 "Lost connection with Shop. TPE's status after synchronising again: " + message.toString(),
-                                MessageType.LOST_CONNECTION
+                                WebSocketStatus.LOST_CONNECTION
                         )
                 );
             }
