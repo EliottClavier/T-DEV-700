@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface CheckRepository extends GenericRepository<QrCheck>{
 
     QrCheck findQrCheckByCheckToken(String checkToken);
+    boolean existsQrCheckByCheckToken(String checkToken);
 }

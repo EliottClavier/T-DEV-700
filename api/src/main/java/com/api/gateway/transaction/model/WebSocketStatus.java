@@ -1,6 +1,6 @@
 package com.api.gateway.transaction.model;
 
-public enum MessageType {
+public enum WebSocketStatus {
     PENDING,
     TRANSACTION_OPENED,
     TRANSACTION_DONE,

@@ -13,17 +13,17 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @Service
-public class ShopService extends GenericService<Shop, ShopRepository> {
-
+public class ShopService extends GenericService<Shop> {
     @Autowired
     private PasswordEncoder passwordEncoder;
+    private final ShopRepository shopRepository;
 
     @Autowired
-    public ShopRepository shopRepository;
-
     public ShopService(ShopRepository shopRepository) {
         super(shopRepository);
+        this.shopRepository = shopRepository;
     }
+
 
     public ObjectResponse getShopById(String id) {
         try {
