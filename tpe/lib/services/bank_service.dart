@@ -8,6 +8,7 @@ import 'package:stomp_dart_client/stomp_frame.dart';
 import 'package:http/http.dart' as http;
 import 'package:tpe/config/token.dart';
 import 'package:tpe/utils/transaction_status.dart';
+import 'package:tpe/config/environment/index.dart';
 
 class BankService with ChangeNotifier {
   static final BankService _bankService = BankService._internal();
@@ -17,7 +18,7 @@ class BankService with ChangeNotifier {
 
   late String _token;
   String _sessionId = "";
-  late String _ip;
+  final String _baseUrl = API_URL;
   String _status = "Disconnected";
   late StompClient _client;
   late BuildContext _context;
@@ -49,16 +50,16 @@ class BankService with ChangeNotifier {
 
   Future<void> init(context) async {
     /* dotenv = await dotenv.load(fileName: ".env");
-    _ip = dotenv.env['IP']; */
+    _baseUrl = dotenv.env['IP']; */
     _context = context;
-    _ip = "10.29.125.164:8080/api";
     await _connect();
-    print("IP : ${_ip}");
+    print("IP : ${_baseUrl}");
   }
 
   Future<void> _connect() async {
     print("connecting to server");
-    final response = await http.post(Uri.parse("http://$_ip/auth/tpe/login"),
+    final response = await http.post(
+        Uri.parse("http://$_baseUrl/auth/tpe/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"androidId": androidId, "password": password}));
     print(response.body);
@@ -78,10 +79,11 @@ class BankService with ChangeNotifier {
 
   Future<void> _fullRegister() async {
     print("full register to server");
-    final response = await http.post(Uri.parse("http://$_ip/auth/tpe/register"),
+    final response = await http.post(
+        Uri.parse("http://$_baseUrl/auth/tpe/register"),
         headers: {
           "Content-Type": "application/json",
-          "Authorization-TPE-Register": "LDQRLohg4K8eEqWZ1dWmG87dTUaOMJPr"
+          REGISTER_HEADER: REGISTER_KEY
         },
         body: jsonEncode({"androidId": androidId}));
     print("fullRegister response : ${response.body}");
@@ -105,7 +107,7 @@ class BankService with ChangeNotifier {
 
   Future<void> _connectWebSocket() async {
     final config = StompConfig.SockJS(
-      url: "http://$_ip/websocket-manager/secured/tpe/socket",
+      url: "http://$_baseUrl/websocket-manager/secured/tpe/socket",
       onConnect: _onConnectCallback,
       onWebSocketError: (dynamic error) => print(error.toString()),
       stompConnectHeaders: {'Authorization': "Bearer $_token"},
@@ -131,7 +133,8 @@ class BankService with ChangeNotifier {
   Future<void> _activateWebSocket() async {
     _client.activate();
     String url = _client.config.url;
-    url = url.replaceAll("ws://$_ip/websocket-manager/secured/tpe/socket", "");
+    url = url.replaceAll(
+        "ws://$_baseUrl/websocket-manager/secured/tpe/socket", "");
     url = url.replaceAll("/websocket", "");
     _sessionId = url.replaceAll("r/^[0-9]+\//", "").split('/')[2];
     isActiveWebSocket = true;
