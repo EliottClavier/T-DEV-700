@@ -1,6 +1,7 @@
 package com.api.bank.model.transaction;
 
 import lombok.Data;
+import java.util.UUID;
 
 @Data
 public class QrCheckTransaction {
@@ -15,5 +16,12 @@ public class QrCheckTransaction {
         this.token = token;
         this.amount = amount;
         this.debitAccount = debitAccount;
+        init();
+    }
+
+    private void init() {
+        if (operationId == null) {
+            operationId = String.valueOf(UUID.randomUUID());
+        }
     }
 }
