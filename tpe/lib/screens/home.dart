@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tpe/services/bank_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tpe/utils/price.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -71,6 +72,7 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   }
 
   void _onClick(PointerEvent details) {
+    print("Price store: ${getAmount()}");
     bankService.printStatus();
     context.go("/payment");
   }
@@ -93,7 +95,7 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
                 ],
               ),
               Text(
-                "$status",
+                status,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,

@@ -4,20 +4,20 @@ import 'package:go_router/go_router.dart';
 
 import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
+import 'package:tpe/screens/nfc_reader.dart';
+import 'package:tpe/screens/qr_code_reader.dart';
+import 'package:tpe/utils/price.dart';
 
 class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key, required this.price});
+  const PaymentScreen({super.key});
 
-  final String price;
   static const String _title = 'Payment method';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: PaymentScreenStatefulWidget(
-        price: price,
-      ),
+      home: const PaymentScreenStatefulWidget(),
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF03045F),
           primarySwatch: Colors.blue,
@@ -27,9 +27,7 @@ class PaymentScreen extends StatelessWidget {
 }
 
 class PaymentScreenStatefulWidget extends StatefulWidget {
-  const PaymentScreenStatefulWidget({super.key, required this.price});
-
-  final String price;
+  const PaymentScreenStatefulWidget({super.key});
 
   @override
   State<PaymentScreenStatefulWidget> createState() =>
@@ -68,7 +66,7 @@ class _PaymentScreenStatefulWidgetState
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Text(
-                "Montant: ${widget.price}",
+                "Montant: ${getAmount()}",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,

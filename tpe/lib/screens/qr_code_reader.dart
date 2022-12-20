@@ -8,17 +8,13 @@ import 'package:tpe/screens/payment_sending.dart';
 import 'package:tpe/utils/snackbar.dart';
 
 class QrCodeReaderScreen extends StatelessWidget {
-  const QrCodeReaderScreen({super.key, required this.price});
-
-  final String price;
+  const QrCodeReaderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'QR Code Reader',
-      home: QrCodeReaderScreenWidget(
-        price: price,
-      ),
+      home: const QrCodeReaderScreenWidget(),
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF03045F),
         primarySwatch: Colors.blue,
@@ -29,9 +25,7 @@ class QrCodeReaderScreen extends StatelessWidget {
 }
 
 class QrCodeReaderScreenWidget extends StatefulWidget {
-  const QrCodeReaderScreenWidget({super.key, required this.price});
-
-  final String price;
+  const QrCodeReaderScreenWidget({super.key});
 
   @override
   State<QrCodeReaderScreenWidget> createState() =>
@@ -113,9 +107,7 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
     dispose();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => PaymentScreen(
-          price: widget.price,
-        ),
+        builder: (context) => const PaymentScreen(),
       ),
     );
   }
@@ -139,8 +131,8 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   void paymentSendingScreen(String data) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => PaymentSendingScreen(
-            paymentData: data, price: widget.price, paymentMethod: "qr_code"),
+        builder: (context) =>
+            PaymentSendingScreen(paymentData: data, paymentMethod: "qr_code"),
       ),
     );
   }
