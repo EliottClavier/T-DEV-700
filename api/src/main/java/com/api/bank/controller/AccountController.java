@@ -3,6 +3,7 @@ package com.api.bank.controller;
 import com.api.bank.model.ObjectResponse;
 import com.api.bank.model.entity.Account;
 import com.api.bank.service.AccountService;
+import com.api.tools.mail.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/bank/account")
 public class AccountController {
     private final AccountService accountService;
+
+    @Autowired
+    private EmailService emailManager;
 
     @Autowired
     public AccountController(AccountService accountService) {

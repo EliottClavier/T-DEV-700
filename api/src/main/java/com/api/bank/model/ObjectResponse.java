@@ -32,5 +32,9 @@ public class ObjectResponse {
         this.message = message;
         this.status = status;
     }
+
+    public ObjectResponse() {
+
+    }
 }
 

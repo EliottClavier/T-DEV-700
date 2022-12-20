@@ -5,7 +5,7 @@ import com.api.bank.repository.ShopRepository;
 import com.api.gateway.tpe.model.TpeManager;
 import com.api.gateway.tpe.service.TpeManagerService;
 import com.api.gateway.transaction.model.Message;
-import com.api.gateway.transaction.model.MessageType;
+import com.api.gateway.transaction.model.WebSocketStatus;
 import com.api.gateway.transaction.model.TransactionRequest;
 import com.api.gateway.transaction.service.TransactionRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
