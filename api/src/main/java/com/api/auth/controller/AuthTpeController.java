@@ -67,7 +67,7 @@ public class AuthTpeController {
             if (tpeService.add(tpe).isValid()) {
                 // Return list with two attributes: message and password
                 emailService.sendSimpleMail(
-                        env.getProperty("email.to.bank.admin"),
+                        env.getProperty("email.to"),
                         "TPE Registration",
                         "Your TPE has been registered. Your password is: " + randomPassword
                 );
