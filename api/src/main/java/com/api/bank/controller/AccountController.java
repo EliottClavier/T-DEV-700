@@ -14,9 +14,6 @@ public class AccountController {
     private final AccountService accountService;
 
     @Autowired
-    private EmailService emailManager;
-
-    @Autowired
     public AccountController(AccountService accountService) {
         super();
         this.accountService = accountService;

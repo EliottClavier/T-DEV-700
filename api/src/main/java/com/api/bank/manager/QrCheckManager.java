@@ -25,7 +25,6 @@ import java.util.UUID;
 @Component
 public class QrCheckManager implements IQrCheckManager {
     private final CheckService checkService;
-    private final BankManager bankManager;
     private final AccountService accountService;
     private final OperationService operationService;
 
@@ -34,7 +33,6 @@ public class QrCheckManager implements IQrCheckManager {
         this.checkService = new CheckService(qrCheckRepository);
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
-        this.bankManager = bankManager;
     }
 
     @Override
@@ -75,8 +73,8 @@ public class QrCheckManager implements IQrCheckManager {
     }
 
     /**
-     * Write a operation, add to an account and persist it in the database
-     * @throws Exception If the persist is not valid
+     * Write an operation, add to an account and persist it in the database
+     * @throws Exception If the persistence is not valid
      */
     private ObjectResponse writeOperation(Account account, QrCheck qrCheck, OperationStatus
             opStatus, OperationType opType, String label) throws Exception {

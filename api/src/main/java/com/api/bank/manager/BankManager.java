@@ -98,7 +98,7 @@ public class BankManager implements IBankManager {
     }
 
     /**
-     * Cancel a pending operation when trnasaction failed     *
+     * Cancel a pending operation when transaction failed
      *
      * @param transaction The transaction to be canceled
      */
@@ -119,7 +119,6 @@ public class BankManager implements IBankManager {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Proceed to balance operation and update new value of the account and operation
@@ -146,7 +145,6 @@ public class BankManager implements IBankManager {
             throw new BankTransactionException(TransactionStatus.PAYMENT_ERROR, transaction.getOperationId(), "Payment error was occurred");
         }
     }
-
 
     /**
      * Check if the account or/and the qrCheck has enough balance to proceed the transaction
