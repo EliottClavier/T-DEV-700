@@ -12,7 +12,7 @@ public class HomeController {
     /*public String home(){return "Hello World!";}*/
 
     @RestController
-    @RequestMapping("/")
+    @RequestMapping("/admin/auth/login")
     public static class IndexController {
 
         @GetMapping(value = "/")

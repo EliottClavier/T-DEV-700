@@ -1,6 +1,5 @@
 package com.api.payment.controller;
 
-import com.api.bank.manager.BankManager;
 import com.api.bank.manager.QrCheckManager;
 import com.api.bank.model.entity.QrCheck;
 import com.google.zxing.BarcodeFormat;
@@ -22,10 +21,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -60,7 +55,6 @@ public class QrCodeController {
             if(model != null) {
                 generateQrcode(encryptedString);
             }
-
         } catch (IOException | WriterException e) {
             System.out.println(e);
         }
@@ -84,8 +78,7 @@ public class QrCodeController {
             setKey(secret);
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return Base64.getEncoder()
-                    .encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
+            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             System.out.println("Error while encrypting: " + e);
         }
@@ -97,12 +90,9 @@ public class QrCodeController {
             setKey(secret);
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            String decrypt = new String(cipher.doFinal(Base64.getDecoder()
-                    .decode(strToDecrypt)));
-
+            String decrypt = new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
             String[] arrOfStr = decrypt.split(":");
             System.out.println(Arrays.toString(arrOfStr));
-
             return arrOfStr;
         } catch (Exception e) {
             System.out.println("Error while decrypting: " + e);
@@ -125,9 +115,6 @@ public class QrCodeController {
             FileWriter myWriter = new FileWriter("/qr-code/filename.txt");
             myWriter.write(str);
             myWriter.close();
-
-            //getImageDynamicType(str);
-
         } catch (Exception e) {
             System.out.println("An error occurred : " + e);
         }
@@ -145,10 +132,8 @@ public class QrCodeController {
         MediaType contentType = MediaType.IMAGE_JPEG;
         InputStream in;
 
-        String fileName = "qr-code-ead09fef-17cc-4707-a076-40c6af4d0c68";
-
         FileWriter myWriter = new FileWriter("../../../../qr-code/test.txt");
-        myWriter.write(fileName);
+        myWriter.write("data.jpg");
         myWriter.close();
 
         try {
