@@ -72,6 +72,10 @@ flutter:
   - images/waiting.gif
   - images/man_wait.gif
   - images/validation.gif
+  - images/category/Default.png
+  - images/category/Alimentaire.png
+  - images/category/Sport.png
+  - images/category/Menage.png
   - images/aliments/abricot.png
   - images/aliments/banane.png
   - images/aliments/carotte.png
@@ -84,6 +88,17 @@ flutter:
   - images/aliments/radis.png
   - images/aliments/salade.png
   - images/aliments/tomate.png
+  - images/sports/altere.png
+  - images/sports/balle_tennis.png
+  - images/sports/volley.png
+  - images/sports/foot.png
+  - images/sports/club_golf.png
+  - images/sports/short.png
+  - images/sports/tennis.png
+  - images/menage/aspirateur.png
+  - images/menage/eponge.png
+  - images/menage/vaisselle.png
+  - images/menage/torchon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

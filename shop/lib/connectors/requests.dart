@@ -79,7 +79,7 @@ class RequestsClass {
     var json = {
       "token": token,
       "sessionId": _sessionId,
-      "amount": 30
+      "amount": totalAmount
     };
     _client.send(destination: '/websocket-manager/shop/pay', body: jsonEncode(json));
   }
@@ -91,30 +91,34 @@ class RequestsClass {
       switch (response.type) {
         case "TRANSACTION_DONE":
           paymentValidate = true;
+          _client.deactivate();
           Navigator.pushNamed(parentContext, Validation.pageName);
           break;
         case "TRANSACTION_ERROR":
           paymentValidate = true;
+          _client.deactivate();
           Navigator.pushNamed(parentContext, Shop.pageName);
           showSnackBar(parentContext, "Erreur lors de la transaction", "error", 3);
           break;
         case "NO_TPE_FOUND":
           paymentValidate = true;
+          _client.deactivate();
           Navigator.pushNamed(parentContext, Shop.pageName);
           showSnackBar(parentContext, "Aucun TPE disponible pour le moment", "error", 3);
           break;
         case "NO_TPE_SELECTED":
           paymentValidate = true;
+          _client.deactivate();
           Navigator.pushNamed(parentContext, Shop.pageName);
           showSnackBar(parentContext, "Une erreur est survenue lors de la sélection d'un TPE", "error", 3);
           break;
         case "TRANSACTION_OPENED":
           paymentValidate = true;
-          Navigator.pushNamed(parentContext, Shop.pageName);
           showSnackBar(parentContext, "Le paiement est disponible sur un TPE", "success", 3);
           break;
         case "NOT_FOUND":
           paymentValidate = true;
+          _client.deactivate();
           Navigator.pushNamed(parentContext, Shop.pageName);
           showSnackBar(parentContext, "Erreur lors de la connexion avec la banque", "error", 3);
           break;

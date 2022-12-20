@@ -55,13 +55,17 @@ class ShopState extends State<Shop> {
         child: Center(
           child: Column(
             children: <Widget>[
-              FlipInX(
-                child: const Image(
-                  image: AssetImage('images/logo_cash_manager.png'),
-                  width: 200,
-                  height: 200,
+              SizedBox(
+                height: 150,
+                child: FlipInX(
+                  child: const Image(
+                    image: AssetImage('images/logo_cash_manager.png'),
+                    width: 200,
+                    height: 200,
+                  ),
                 ),
               ),
+              const Padding(padding: EdgeInsets.all(5)),
               Expanded(
                 child: ListView.builder(
                   itemCount: articlesInShop.length,
@@ -86,7 +90,7 @@ class ShopState extends State<Shop> {
                   ),
                   TextButton(
                     onPressed: () {
-                      RequestsClass.connect(double.parse(widget.total!), context);
+                      //RequestsClass.connect(double.parse(widget.total!), context);
                       Navigator.pushNamed(context, Payment.pageName);
                     },
                     style: ButtonStyle(
