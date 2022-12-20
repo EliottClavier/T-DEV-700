@@ -98,8 +98,7 @@ public class BankManager implements IBankManager {
     }
 
     /**
-     * Cancel a pending operation when trnasaction failed     *
-     *
+     * Cancel a pending operation when transaction failed
      * @param transaction The transaction to be canceled
      */
     private void cancelPendingOperation(BankTransaction transaction) {

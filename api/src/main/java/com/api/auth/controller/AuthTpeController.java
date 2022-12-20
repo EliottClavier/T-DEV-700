@@ -7,8 +7,10 @@ import com.api.auth.security.JWTUtil;
 import com.api.auth.security.providers.TpeAuthenticationProvider;
 import com.api.auth.service.AuthService;
 import com.api.bank.model.entity.Tpe;
-import com.api.bank.repository.TpeRepository;
+import com.api.bank.service.TpeService;
+import com.api.tools.mail.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,38 +39,50 @@ public class AuthTpeController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private TpeRepository tpeRepository;
+    private TpeService tpeService;
+
+    private final AuthService authService;
+    private final EmailService emailService;
+    private final Environment env;
 
     @Autowired
-    private AuthService authService;
+    AuthTpeController(AuthService authService, EmailService emailService, Environment env) {
+        this.authService = authService;
+        this.emailService = emailService;
+        this.env = env;
+    }
 
     @TpeRegisterSecuredRoute
     @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public ResponseEntity registerHandler(
+    public ResponseEntity<Object> registerHandler(
             @RequestBody TpeRegisterCredentials tpeRegisterCredentials,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        if (!tpeRepository.existsByAndroidId(tpeRegisterCredentials.getAndroidId())) {
+        if (!tpeService.existsByAndroidId(tpeRegisterCredentials.getAndroidId())) {
             String randomPassword = authService.alphaNumericString(12);
             String encodedPass = passwordEncoder.encode(randomPassword);
             Tpe tpe = new Tpe(tpeRegisterCredentials.getAndroidId(), encodedPass);
             tpe.setWhitelisted(false);
-            tpeRepository.save(tpe);
-            // Return list with two attributes: message and password
-            return new ResponseEntity<>(
-                Map.of(
-                "message", "TPE registered successfully. It needs to be whitelisted.",
-                "password", randomPassword
-                ), HttpStatus.OK
-            );
-        } else {
-            return new ResponseEntity<>(Collections.singletonMap("message", "TPE already registered."), HttpStatus.CONFLICT);
-        }
+                if (tpeService.add(tpe).isValid()) {
+                    // Return list with two attributes: message and password
+
+                    emailService.sendSimpleMail(
+                            env.getProperty("email.to.bank.admin"),
+                            "TPE Registration",
+                            "Your TPE has been registered. Your password is: " + randomPassword
+                    );
+                    return ResponseEntity.ok(Map.of(
+                            "message", "TPE registered successfully. It needs to be whitelisted." ));
+                } else {
+                    return new ResponseEntity<>(Collections.singletonMap("message", "TPE registration failed"), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+       return new ResponseEntity<>(Collections.singletonMap("message", "TPE already registered."), HttpStatus.CONFLICT);
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public ResponseEntity loginHandler(@RequestBody TpeLoginCredentials body){
+    public ResponseEntity loginHandler(@RequestBody TpeLoginCredentials body) {
         try {
             UsernamePasswordAuthenticationToken authInputToken =
                     new UsernamePasswordAuthenticationToken(body.getAndroidId(), body.getPassword());
