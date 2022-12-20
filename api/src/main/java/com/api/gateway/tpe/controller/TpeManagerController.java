@@ -1,6 +1,5 @@
 package com.api.gateway.tpe.controller;
 
-import com.api.bank.manager.BankManager;
 import com.api.bank.manager.IBankManager;
 import com.api.bank.model.enums.PaymentMethod;
 import com.api.bank.model.enums.TransactionStatus;
@@ -77,7 +76,8 @@ public class TpeManagerController {
                         transactionRequest.getPaymentMethod()
                     );
 
-                    TransactionResult transactionResult = bankManager.HandleTransaction(transaction);
+                    TransactionResult transactionResult = null;
+//                    TransactionResult transactionResult = bankManager.handleTransaction(transaction);
 
                     if (transactionResult.getTransactionStatus() == TransactionStatus.SUCCESS) {
                         // Remove transaction from Redis

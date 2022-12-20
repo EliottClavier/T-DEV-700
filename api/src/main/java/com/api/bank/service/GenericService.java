@@ -29,11 +29,11 @@ public class GenericService<T extends Base> {
         this.repository = repository;
     }
 
-    @Transactional()
+//    @Transactional()
     public ObjectResponse add(T entity) {
         try {
             var res = repository.save(entity);
-//            repository.flush();
+
             return new ObjectResponse("Success", res, true, HttpStatus.CREATED);
 
         } catch (Exception e) {

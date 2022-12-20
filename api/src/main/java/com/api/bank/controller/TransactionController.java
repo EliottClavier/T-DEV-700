@@ -1,18 +1,10 @@
 package com.api.bank.controller;
 
-import com.api.bank.manager.BankManager;
 import com.api.bank.manager.IBankManager;
-import com.api.bank.model.enums.TransactionStatus;
-import com.api.bank.model.exception.BankTransactionException;
+import com.api.bank.manager.BankManager;
 import com.api.bank.model.transaction.BankTransaction;
 import com.api.bank.model.transaction.TransactionResult;
-import com.api.bank.repository.AccountRepository;
-import com.api.bank.repository.CheckRepository;
-import com.api.bank.repository.ClientRepository;
-import com.api.bank.repository.OperationRepository;
-import com.api.bank.service.*;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +13,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/bank/transaction")
 public class TransactionController {
     private final IBankManager bankManager;
+    private final BankManager transManager;
 
     @Autowired
-    public TransactionController(IBankManager bankManager) {
+    public TransactionController(IBankManager bankManager, BankManager transManager) {
         super();
         this.bankManager = bankManager;
+        this.transManager = transManager;
     }
 
     @PostMapping("/add")
     public ResponseEntity<TransactionResult> add(@RequestBody BankTransaction data) {
         try{
-            return ResponseEntity.ok(bankManager.HandleTransaction(data));
+            var res = transManager.doTransaction(data);
+
+            return ResponseEntity.ok(res );
         }catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

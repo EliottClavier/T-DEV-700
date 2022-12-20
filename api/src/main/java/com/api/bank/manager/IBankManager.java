@@ -1,10 +1,17 @@
 package com.api.bank.manager;
 
+import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.BankTransaction;
 import com.api.bank.model.transaction.TransactionResult;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+import java.util.concurrent.ExecutionException;
 
 public interface IBankManager {
-    TransactionResult HandleTransaction(BankTransaction transaction);
+    @Transactional()
+    TransactionResult handleTransaction(BankTransaction transaction) throws ExecutionException, InterruptedException;
+    @Transactional()
+    TransactionResult executeTransaction(BankTransaction transaction) throws BankTransactionException;
+
+
 }
