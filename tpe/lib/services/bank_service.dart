@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:tpe/config/token.dart';
 import 'package:tpe/utils/transaction_status.dart';
 import 'package:tpe/config/environment/index.dart';
+import 'package:tpe/utils/android_id.dart';
+import 'package:tpe/utils/amount.dart';
 
 class BankService with ChangeNotifier {
   static final BankService _bankService = BankService._internal();
@@ -17,10 +19,10 @@ class BankService with ChangeNotifier {
   dynamic dotenv;
 
   late String _token;
-  String _sessionId = "";
   final String _baseUrl = API_URL;
-  String _status = "Disconnected";
   late StompClient _client;
+  late String _androidId;
+
   late BuildContext _context;
 
   bool isConnectedToApi = false;
@@ -29,8 +31,9 @@ class BankService with ChangeNotifier {
   bool isRegistered = false;
   bool isSynchronized = false;
 
-  String password = "p0;jRE:Ae6.:";
-  String androidId = "123456789";
+  String _sessionId = "";
+  String password = "-:|p4a(Lwsx0";
+  String _status = "Disconnected";
 
   void printStatus() {
     print("isConnectedToApi : ${isConnectedToApi}");
@@ -49,11 +52,9 @@ class BankService with ChangeNotifier {
   }
 
   Future<void> init(context) async {
-    /* dotenv = await dotenv.load(fileName: ".env");
-    _baseUrl = dotenv.env['IP']; */
+    _androidId = await getAndroidId();
     _context = context;
     await _connect();
-    print("IP : ${_baseUrl}");
   }
 
   Future<void> _connect() async {
@@ -61,7 +62,7 @@ class BankService with ChangeNotifier {
     final response = await http.post(
         Uri.parse("http://$_baseUrl/auth/tpe/login"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"androidId": androidId, "password": password}));
+        body: jsonEncode({"androidId": _androidId, "password": password}));
     print(response.body);
     print(response.statusCode);
     if (response.statusCode == 200) {
@@ -79,13 +80,14 @@ class BankService with ChangeNotifier {
 
   Future<void> _fullRegister() async {
     print("full register to server");
-    final response = await http.post(
-        Uri.parse("http://$_baseUrl/auth/tpe/register"),
-        headers: {
-          "Content-Type": "application/json",
-          REGISTER_HEADER: REGISTER_KEY
-        },
-        body: jsonEncode({"androidId": androidId}));
+    final response =
+        await http.post(Uri.parse("http://$_baseUrl/auth/tpe/register"),
+            headers: {
+              "Content-Type": "application/json",
+              // ignore: unnecessary_string_interpolations
+              "$REGISTER_HEADER": "$REGISTER_KEY"
+            },
+            body: jsonEncode({"androidId": _androidId}));
     print("fullRegister response : ${response.body}");
     print("fullRegister response status : ${response.statusCode}");
     if (response.statusCode == 200) {
@@ -169,7 +171,7 @@ class BankService with ChangeNotifier {
         callback: (frame) {
           print("Synchronise status");
           print(frame.body);
-          handleTransactionStatus(_context, frame.body);
+          handleTransactionStatus(_context, jsonDecode(frame.body!));
         });
 
     dynamic transactionStatus = _client.subscribe(
@@ -177,10 +179,16 @@ class BankService with ChangeNotifier {
         callback: (frame) {
           print("Transaction status");
           print(frame.body);
-          handleTransactionStatus(_context, frame.body);
+          handleTransactionStatus(_context, jsonDecode(frame.body!));
         });
     notifyListeners();
     return Future.value();
+  }
+
+  void onOpenTransaction(double amount) {
+    setAmount(amount);
+    setStatus("Transaction opened");
+    notifyListeners();
   }
 
   factory BankService() {

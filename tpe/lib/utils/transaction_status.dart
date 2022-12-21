@@ -1,32 +1,37 @@
 import 'package:tpe/utils/snackbar.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:tpe/utils/context.dart';
 
-void handleTransactionStatus(context, status) {
-  switch ("status") {
+String handleTransactionStatus(
+    BuildContext context, Map<String, dynamic> body) {
+  String status = body['type'];
+  String message = body['message'];
+  switch (status) {
     case "TRANSACTION_OPENED":
-      snackbarThenNavigate(
-          context, "Transaction beginning", status, "/payment");
+      snackbarThenNavigate(context, message, "success", "/payment");
       break;
     case "TRANSACTION_DONE":
       context.go("/payment/success");
       break;
     case "INVALID_PAYMENT_METHOD":
-      snackbarThenNavigate(
-          context, "Invalid payment method", "error", "/payment");
+      snackbarThenNavigate(context, message, "error", "/payment");
       break;
     case "ALREADY_SYNCHRONIZED":
-      snackbarThenNavigate(context, "Already synchronized", "", null);
+      snackbarThenNavigate(context, message, "", null);
       break;
     case "SYNCHRONIZED":
-      snackbarThenNavigate(
-          context, "Synchronized successfully", "success", null);
+      snackbarThenNavigate(context, message, "success", null);
       break;
     case "TPE_INVALID":
-      snackbarThenNavigate(context, "TPE invalid", "error", "/");
+      snackbarThenNavigate(context, message, "error", "/");
       break;
     case "NOT_FOUND":
-      snackbarThenNavigate(context, "TPE was not found", "error", "/");
+      snackbarThenNavigate(context, message, "error", "/");
       break;
     default:
       context.go('/');
   }
+
+  return message;
 }

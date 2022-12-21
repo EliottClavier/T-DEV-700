@@ -1,16 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:tpe/config/router.dart';
 import 'package:tpe/services/bank_service.dart';
+// ignore: unused_import
+import 'package:go_router/go_router.dart';
 
 class App extends StatelessWidget {
-  App({super.key});
+  const App({super.key});
 
-  static const String _title = 'Payment Terminal Home';
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Payment Terminal',
+      home: const Scaffold(
+        body: AppWidget(),
+      ),
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color(0xFF03045F),
+          primarySwatch: Colors.blue,
+          fontFamily: "Montserrat"),
+    );
+  }
+}
 
+class AppWidget extends StatefulWidget {
+  const AppWidget({super.key});
+
+  @override
+  State<AppWidget> createState() => _AppWidgetState();
+}
+
+class _AppWidgetState extends State<AppWidget> {
   final BankService bankService = BankService();
+  static const String _title = 'Payment Terminal';
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
-    bankService.killWebSocket();
+    super.dispose();
   }
 
   @override

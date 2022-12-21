@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:tpe/utils/navigator.dart';
 
-void snackbarThenNavigate(context, message, status, route) {
+import 'package:go_router/go_router.dart';
+
+void snackbarThenNavigate(BuildContext context, message, status, route) {
   showSnackBar(context, message, status, 3);
   if (route == null) return;
   Future.delayed(const Duration(seconds: 3), () {
-    context.go(route ?? "/");
+    navigatorKey.currentContext!.go(route ?? '/');
   });
 }
 

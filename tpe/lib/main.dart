@@ -7,7 +7,7 @@ void main() => {
       runApp(
         ChangeNotifierProvider(
           create: (context) => BankService(),
-          child: App(),
+          child: const App(),
         ),
       ),
     };

@@ -4,3 +4,7 @@ getAmount() {
   String amountString = "${amount} €";
   return amountString;
 }
+
+setAmount(double amount) {
+  amount = amount;
+}
