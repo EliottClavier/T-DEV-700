@@ -1,10 +1,4 @@
-var amount = 0.00;
-
-getAmount() {
+getAmountString(amount) {
   String amountString = "${amount} €";
   return amountString;
-}
-
-setAmount(double amount) {
-  amount = amount;
 }

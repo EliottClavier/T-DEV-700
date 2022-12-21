@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tpe/screens/home.dart';
-import 'package:tpe/utils/amount.dart';
+import 'package:tpe/services/transaction_service.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
   const PaymentSuccessScreen({super.key});
@@ -29,6 +29,9 @@ class PaymentSuccessScreenStatefulWidget extends StatefulWidget {
 
 class _PaymentSuccessScreenStatefulWidgetState
     extends State<PaymentSuccessScreenStatefulWidget> {
+
+  final TransactionService transactionService = TransactionService();
+
   @override
   void initState() {
     super.initState();
@@ -80,7 +83,7 @@ class _PaymentSuccessScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "Votre paiement de ${getAmount()} a bien été réalisé",
+                      "Votre paiement de ${transactionService.getAmount} a bien été réalisé",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.w300,

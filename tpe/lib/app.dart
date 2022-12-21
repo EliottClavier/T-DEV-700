@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tpe/config/router.dart';
-import 'package:tpe/services/bank_service.dart';
+import 'package:tpe/services/transaction_service.dart';
 // ignore: unused_import
 import 'package:go_router/go_router.dart';
 
@@ -30,7 +30,7 @@ class AppWidget extends StatefulWidget {
 }
 
 class _AppWidgetState extends State<AppWidget> {
-  final BankService bankService = BankService();
+  final TransactionService transactionService = TransactionService();
   static const String _title = 'Payment Terminal';
 
   @override
@@ -45,7 +45,7 @@ class _AppWidgetState extends State<AppWidget> {
 
   @override
   Widget build(BuildContext context) {
-    bankService.init(context);
+    transactionService.init(context);
     return MaterialApp.router(
       title: _title,
       routerConfig: router,

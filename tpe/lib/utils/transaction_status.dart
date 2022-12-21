@@ -1,7 +1,10 @@
 import 'package:tpe/utils/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tpe/utils/context.dart';
+import 'package:tpe/utils/amount.dart';
+import 'package:tpe/services/transaction_service.dart';
+
+TransactionService transactionService = TransactionService();
 
 String handleTransactionStatus(
     BuildContext context, Map<String, dynamic> body) {
@@ -9,6 +12,7 @@ String handleTransactionStatus(
   String message = body['message'];
   switch (status) {
     case "TRANSACTION_OPENED":
+      transactionService.setAmount(body['amount']);
       snackbarThenNavigate(context, message, "success", "/payment");
       break;
     case "TRANSACTION_DONE":

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tpe/services/bank_service.dart';
+import 'package:tpe/services/transaction_service.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -30,7 +30,7 @@ class HomeScreenStatefulWidget extends StatefulWidget {
 }
 
 class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
-  BankService bankService = BankService();
+  TransactionService transactionService = TransactionService();
   late bool isConnectedToApi;
   late String status;
 
@@ -52,12 +52,12 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
 
   void _initBank() async {
     isConnectedToApi = _isConnectedToApi();
-    status = Provider.of<BankService>(context, listen: true).getStatus();
+    status = Provider.of<TransactionService>(context, listen: true).getStatus();
   }
 
   bool _isConnectedToApi() {
     bool response =
-        Provider.of<BankService>(context, listen: true).isConnectedToApi;
+        Provider.of<TransactionService>(context, listen: true).isConnectedToApi;
     if (response) {
       onTransactionReceived();
     }
@@ -69,7 +69,7 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   }
 
   void _onClick(PointerEvent details) {
-    bankService.printStatus();
+    transactionService.printStatus();
     context.go("/payment");
   }
 

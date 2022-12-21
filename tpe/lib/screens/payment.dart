@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tpe/utils/amount.dart';
+import 'package:tpe/services/transaction_service.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
@@ -30,6 +30,8 @@ class PaymentScreenStatefulWidget extends StatefulWidget {
 
 class _PaymentScreenStatefulWidgetState
     extends State<PaymentScreenStatefulWidget> {
+  TransactionService transactionService = TransactionService();
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +62,7 @@ class _PaymentScreenStatefulWidgetState
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Text(
-                "Montant: ${getAmount()}",
+                "Montant: ${transactionService.getAmount()}",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,

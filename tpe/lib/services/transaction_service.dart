@@ -12,8 +12,8 @@ import 'package:tpe/config/environment/index.dart';
 import 'package:tpe/utils/android_id.dart';
 import 'package:tpe/utils/amount.dart';
 
-class BankService with ChangeNotifier {
-  static final BankService _bankService = BankService._internal();
+class TransactionService with ChangeNotifier {
+  static final TransactionService _transactionService = TransactionService._internal();
   static const MethodChannel _channel = MethodChannel('bank_service');
 
   dynamic dotenv;
@@ -22,6 +22,7 @@ class BankService with ChangeNotifier {
   final String _baseUrl = API_URL;
   late StompClient _client;
   late String _androidId;
+  late double _amount;
 
   late BuildContext _context;
 
@@ -49,6 +50,14 @@ class BankService with ChangeNotifier {
 
   String getStatus() {
     return _status;
+  }
+
+  void setAmount(amount) {
+    _amount = amount;
+  }
+
+  String getAmount() {
+    return getAmountString(_amount);
   }
 
   Future<void> init(context) async {
@@ -191,9 +200,9 @@ class BankService with ChangeNotifier {
     notifyListeners();
   }
 
-  factory BankService() {
-    return _bankService;
+  factory TransactionService() {
+    return _transactionService;
   }
 
-  BankService._internal();
+  TransactionService._internal();
 }
