@@ -29,7 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@
+
+
+        EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan(value = "com.api.auth")
 public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 
