@@ -1,7 +1,7 @@
 package com.api.bank.manager;
 
+import com.api.bank.controller.AccountController;
 import com.api.bank.model.BankConstants;
-import com.api.bank.model.ObjectResponse;
 import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.Operation;
 import com.api.bank.model.entity.QrCheck;
@@ -10,8 +10,8 @@ import com.api.bank.model.enums.OperationType;
 import com.api.bank.model.enums.PaymentMethod;
 import com.api.bank.model.enums.TransactionStatus;
 import com.api.bank.model.exception.BankTransactionException;
-import com.api.bank.model.transaction.BankTransaction;
-import com.api.bank.model.transaction.QrCheckTransaction;
+import com.api.bank.model.transaction.BankTransactionModel;
+import com.api.bank.model.transaction.QrCheckTransactionModel;
 import com.api.bank.model.transaction.TransactionResult;
 import com.api.bank.repository.AccountRepository;
 import com.api.bank.repository.CheckRepository;
@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -48,15 +49,12 @@ public class QrCheckManager implements IQrCheckManager {
 
     @Override
     @Transactional(rollbackOn = {BankTransactionException.class, Exception.class})
-    public TransactionResult buyQrCheck(QrCheckTransaction transaction)  {
+    public TransactionResult buyQrCheck(QrCheckTransactionModel transaction)  {
         try {
-            getBankAccount(transaction);
-
-            checkTransaction(transaction);
+//            getBankAccount(transaction);
+//            checkTransaction(transaction);
 
             checkToken(transaction);
-
-            //TODO DEBT THE WITHDRAWAL ACCOUNT
 
             var depositOperation = writeOperation(bankAccount, transaction, OperationStatus.PENDING, OperationType.DEPOSIT, "Qrcheck N°", PaymentMethod.TRANSFER);
 
@@ -76,7 +74,7 @@ public class QrCheckManager implements IQrCheckManager {
         }
     }
 
-    private void createQrCheck(QrCheckTransaction transaction, Operation depositOperation) throws BankTransactionException {
+    private void createQrCheck(QrCheckTransactionModel transaction, Operation depositOperation) throws BankTransactionException {
 
         var qrCheck = new QrCheck(transaction.getAmount(), transaction.getToken());
             if(this.checkService.add(qrCheck).isValid()){
@@ -84,7 +82,7 @@ public class QrCheckManager implements IQrCheckManager {
             }
     }
 
-    private void checkToken(QrCheckTransaction transaction) throws BankTransactionException {
+    private void checkToken(QrCheckTransactionModel transaction) throws BankTransactionException {
         if (transaction.getToken().isEmpty()) {
             throw new BankTransactionException(TransactionStatus.TOKEN_EMPTY_ERROR, transaction.getOperationId(), "Token is empty");
         }
@@ -93,13 +91,9 @@ public class QrCheckManager implements IQrCheckManager {
         }
     }
 
-    private void checkTransaction(QrCheckTransaction transaction) throws BankTransactionException {
-        if(transaction == null){
-            throw new BankTransactionException(TransactionStatus.EMPTY_TRANSACTION_ERROR,"","Transaction is Empty" );
-        }
-    }
 
-    private void getBankAccount(QrCheckTransaction transaction) throws BankTransactionException {
+
+    private void getBankAccount(QrCheckTransactionModel transaction) throws BankTransactionException {
         bankAccount = accountService.getAccountByOwnerName(BankConstants.BANK_NAME);
         if (bankAccount == null) {
             throw new BankTransactionException(TransactionStatus.BANK_ERROR, transaction.getOperationId(), " bank account not found");
@@ -116,6 +110,15 @@ public class QrCheckManager implements IQrCheckManager {
         return false;
     }
 
+    @Override
+    @Transactional(rollbackOn = {BankTransactionException.class, Exception.class})
+    public void updateQrCheck(BankTransactionModel transaction) throws BankTransactionException {
+        transaction.getQrCheck().setSoldAmount( transaction.getQrCheck().getSoldAmount() -  transaction.getAmount());
+        if(!checkService.update(transaction.getQrCheck()).isValid()){
+            throw new BankTransactionException(TransactionStatus.CHECK_ERROR,transaction.getOperationId(), "QrCheck update failed");
+        }
+    }
+
     /**
      * Proceed to balance operation and update new value of the account and operation
      *
@@ -124,7 +127,7 @@ public class QrCheckManager implements IQrCheckManager {
      * @param operation   The operation to be updated
      * @throws BankTransactionException If the operation is not valid
      */
-    private void updateBalanceAndOperation(Account account, QrCheckTransaction transaction, Operation operation) throws BankTransactionException {
+    private void updateBalanceAndOperation(Account account, QrCheckTransactionModel transaction, Operation operation) throws BankTransactionException {
 
         if (operation.getOperationType() == OperationType.DEPOSIT)
             account.setSold(account.getSold() + transaction.getAmount());
@@ -157,7 +160,7 @@ public class QrCheckManager implements IQrCheckManager {
      * Write a operation, add to an account and persist it in the database
      * @throws BankTransactionException If the persist is not valid
      */
-    private Operation writeOperation(Account account,QrCheckTransaction transaction, OperationStatus
+    private Operation writeOperation(Account account, QrCheckTransactionModel transaction, OperationStatus
             opStatus, OperationType opType, String label, PaymentMethod paymentMethod) throws BankTransactionException {
 
         var operation = new Operation(UUID.randomUUID().toString(), label, transaction.getAmount(), new Date(), account, null, opStatus, opType, paymentMethod);
@@ -174,7 +177,7 @@ public class QrCheckManager implements IQrCheckManager {
      * @param transaction     The transaction to be processed
      * @throws BankTransactionException If an existing operation is already processing
      */
-    private void isAlreadyPendingOperation(Account withdrawAccount, QrCheckTransaction transaction) throws BankTransactionException {
+    private void isAlreadyPendingOperation(Account withdrawAccount, QrCheckTransactionModel transaction) throws BankTransactionException {
         // Is an operation is already in progress ?
         if (operationService.isOperationPendingFor(withdrawAccount.getId()))
             throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
@@ -183,7 +186,7 @@ public class QrCheckManager implements IQrCheckManager {
      * Cancel a pending operation when transaction failed
      * @param transaction The transaction to be canceled
      */
-    private void cancelPendingOperation(QrCheckTransaction transaction) {
+    private void cancelPendingOperation(QrCheckTransactionModel transaction) {
         try {
             List<UUID> accounts = new ArrayList<>();
             accounts.add(bankAccount.getId());

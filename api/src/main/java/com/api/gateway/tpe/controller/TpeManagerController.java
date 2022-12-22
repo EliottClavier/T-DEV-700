@@ -3,7 +3,7 @@ package com.api.gateway.tpe.controller;
 import com.api.bank.manager.IBankManager;
 import com.api.bank.model.enums.PaymentMethod;
 import com.api.bank.model.enums.TransactionStatus;
-import com.api.bank.model.transaction.BankTransaction;
+import com.api.bank.model.transaction.ShoppingTransactionModel;
 import com.api.bank.model.transaction.TransactionResult;
 import com.api.gateway.tpe.model.TpeManager;
 import com.api.gateway.tpe.service.TpeManagerService;
@@ -67,7 +67,7 @@ public class TpeManagerController {
                     transactionRequest.setPaymentId(transactionRequestTpe.getPaymentId());
 
                     // Execute transaction
-                    BankTransaction transaction = new BankTransaction(
+                    ShoppingTransactionModel transaction = new ShoppingTransactionModel(
                         transactionRequest.getId(),
                         transactionRequest.getShopUsername(),
                         transactionRequest.getShopUsername(),

@@ -2,7 +2,7 @@ package com.api.bank.controller;
 
 import com.api.bank.manager.IBankManager;
 import com.api.bank.manager.BankManager;
-import com.api.bank.model.transaction.BankTransaction;
+import com.api.bank.model.transaction.ShoppingTransactionModel;
 import com.api.bank.model.transaction.TransactionResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +23,9 @@ public class TransactionController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<TransactionResult> add(@RequestBody BankTransaction data) {
+    public ResponseEntity<TransactionResult> add(@RequestBody ShoppingTransactionModel data) {
         try{
-            var res = transManager.doTransaction(data);
+            var res = transManager.shoppingTransaction(data);
 
             return ResponseEntity.ok(res );
         }catch (Exception e) {

@@ -9,15 +9,11 @@ import com.api.bank.model.enums.OperationType;
 import com.api.bank.model.enums.PaymentMethod;
 import com.api.bank.model.enums.TransactionStatus;
 import com.api.bank.model.exception.BankTransactionException;
-import com.api.bank.model.transaction.BankTransaction;
+import com.api.bank.model.transaction.BankTransactionModel;
 import com.api.bank.model.transaction.TransactionResult;
 import com.api.bank.repository.AccountRepository;
-import com.api.bank.repository.CheckRepository;
-import com.api.bank.repository.ClientRepository;
 import com.api.bank.repository.OperationRepository;
 import com.api.bank.service.AccountService;
-import com.api.bank.service.CheckService;
-import com.api.bank.service.ClientService;
 import com.api.bank.service.OperationService;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
@@ -31,30 +27,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 @Component()
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class BankTransactionManager implements IBankManager {
+public class BankTransactionManager {
     private final AccountService accountService;
     private final OperationService operationService;
-    private final ClientService clientService;
-    private final CheckService checkService;
-    private Account withdrawAccount;
-    private Account depositAccount;
+    private final IQrCheckManager qrCheckManager;
 
     @Autowired
-    public BankTransactionManager(OperationRepository operationRepository, AccountRepository accountRepository, ClientRepository clientRepository, CheckRepository checkRepository) {
+    public BankTransactionManager(OperationRepository operationRepository, AccountRepository accountRepository, IQrCheckManager qrCheckManager) {
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
-        this.clientService = new ClientService(clientRepository);
-        this.checkService = new CheckService(checkRepository);
-    }
+        this.qrCheckManager = qrCheckManager;
 
-    @Override
-    public TransactionResult handleTransaction(BankTransaction transaction) throws ExecutionException, InterruptedException {
-
-        return null;
     }
 
     /**
@@ -64,51 +50,37 @@ public class BankTransactionManager implements IBankManager {
      * @return The transaction status by the TransactionResult Object
      */
     @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRES_NEW)
-    public TransactionResult executeTransaction(BankTransaction transaction) throws BankTransactionException, RuntimeException {
+    public TransactionResult executeTransaction(BankTransactionModel transaction) throws BankTransactionException, RuntimeException {
 
-        withdrawAccount = getWithdrawAccountBy(transaction);
-        depositAccount = getDepositAccountBy(transaction);
+        checkTransaction(transaction);
+        checkAccount(transaction.getWithdrawalAccount(), transaction, OperationType.WITHDRAW);
+        checkMeansOfPayment(transaction.getWithdrawalAccount(), transaction);
 
-        checkAccount(withdrawAccount, transaction, OperationType.WITHDRAW);
-        checkMeansOfPayment(withdrawAccount, transaction);
+        isAlreadyPendingOperation(transaction.getWithdrawalAccount(), transaction);
+        var withdrawOperation = writeOperation(transaction.getWithdrawalAccount(), transaction, OperationStatus.PENDING, OperationType.WITHDRAW);  // Add the operation to the list of pending operations
 
-        isAlreadyPendingOperation(withdrawAccount, transaction);
-        var withdrawOperation = writeOperation(withdrawAccount, transaction, OperationStatus.PENDING, OperationType.WITHDRAW);  // Add the operation to the list of pending operations
+        checkBalance(transaction.getWithdrawalAccount(), transaction);
+        updateAccountBalanceAndOperation(transaction.getWithdrawalAccount(), transaction, withdrawOperation);
 
-        checkBalance(withdrawAccount, transaction);
-        updateBalanceAndOperation(withdrawAccount, transaction, withdrawOperation);
+        checkAccount(transaction.getDepositAccount(), transaction, OperationType.DEPOSIT);
+        var depositOperation = writeOperation(transaction.getDepositAccount(), transaction, OperationStatus.PENDING, OperationType.DEPOSIT);
 
-        checkAccount(depositAccount, transaction, OperationType.DEPOSIT);
-        var depositOperation = writeOperation(depositAccount, transaction, OperationStatus.PENDING, OperationType.DEPOSIT);
-
-        updateBalanceAndOperation(depositAccount, transaction, depositOperation);
+        updateAccountBalanceAndOperation(transaction.getDepositAccount(), transaction, depositOperation);
+        updateQrCheck(transaction);
 
         return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "Payment has been validated");
     }
 
-    /**
-     * Cancel a pending operation when transaction failed
-     *
-     * @param transaction The transaction to be canceled
-     */
-    private void cancelPendingOperation(BankTransaction transaction) {
-        try {
-            List<UUID> accounts = new ArrayList<>();
-            accounts.add(withdrawAccount.getId());
-            accounts.add(depositAccount.getId());
-            for (UUID accountId : accounts) {
-
-                if (operationService.isOperationPendingByOperationId(transaction.getOperationId(), accountId)) {
-                    Operation op = operationService.getByOperationId(transaction.getOperationId());
-                    op.setOperationStatus(OperationStatus.CANCELED);
-                    operationService.update(op);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void updateQrCheck(BankTransactionModel transaction) throws BankTransactionException {
+       qrCheckManager.updateQrCheck(transaction);
     }
 
+
+    private void checkTransaction(BankTransactionModel transaction) throws BankTransactionException {
+        if(transaction == null){
+            throw new BankTransactionException(TransactionStatus.EMPTY_TRANSACTION_ERROR,"","Transaction is Empty" );
+        }
+    }
 
     /**
      * Proceed to balance operation and update new value of the account and operation
@@ -118,7 +90,7 @@ public class BankTransactionManager implements IBankManager {
      * @param operation   The operation to be updated
      * @throws BankTransactionException If the operation is not valid
      */
-    private void updateBalanceAndOperation(Account account, BankTransaction transaction, Operation operation) throws BankTransactionException {
+    private void updateAccountBalanceAndOperation(Account account, BankTransactionModel transaction, Operation operation) throws BankTransactionException {
 
         if (operation.getOperationType() == OperationType.DEPOSIT)
             account.setSold(account.getSold() + transaction.getAmount());
@@ -136,7 +108,6 @@ public class BankTransactionManager implements IBankManager {
         }
     }
 
-
     /**
      * Check if the account or/and the qrCheck has enough balance to proceed the transaction
      *
@@ -144,11 +115,11 @@ public class BankTransactionManager implements IBankManager {
      * @param transaction     The transaction to be processed
      * @throws BankTransactionException If the account or qrCheck has not enough balance
      */
-    private void checkBalance(Account withdrawAccount, BankTransaction transaction) throws BankTransactionException {
+    private void checkBalance(Account withdrawAccount, BankTransactionModel transaction) throws BankTransactionException {
         if (!withdrawAccount.isEnoughMoney(transaction.getAmount()))
             throw new BankTransactionException(TransactionStatus.INSUFFICIENT_FUNDS_ERROR, transaction.getOperationId(), "Account's insufficient funds");
 
-        if (getCheck(transaction) != null && !getCheck(transaction).isEnoughMoney(transaction.getAmount()))
+        if (transaction.getQrCheck() != null && !transaction.getQrCheck().isEnoughMoney(transaction.getAmount()))
             throw new BankTransactionException(TransactionStatus.INSUFFICIENT_FUNDS_ERROR, transaction.getOperationId(), "Check amount invalid");
     }
 
@@ -161,8 +132,8 @@ public class BankTransactionManager implements IBankManager {
      * @param opType      The operation type to be persisted
      * @throws BankTransactionException If the operation is not valid
      */
-    private Operation writeOperation(Account account, BankTransaction transaction, OperationStatus opStatus, OperationType opType) throws BankTransactionException {
-        var operation = createOperation(transaction, account, getCheck(transaction), opStatus, opType, transaction.getPaymentMethod());
+    private Operation writeOperation(Account account, BankTransactionModel transaction, OperationStatus opStatus, OperationType opType) throws BankTransactionException {
+        var operation = createOperation(transaction, account, transaction.getQrCheck(), opStatus, opType, transaction.getPaymentMethod());
         if (!operationService.add(operation).isValid())
             throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
         return operation;
@@ -175,20 +146,10 @@ public class BankTransactionManager implements IBankManager {
      * @param transaction     The transaction to be processed
      * @throws BankTransactionException If an existing operation is already processing
      */
-    private void isAlreadyPendingOperation(Account withdrawAccount, BankTransaction transaction) throws BankTransactionException {
+    private void isAlreadyPendingOperation(Account withdrawAccount, BankTransactionModel transaction) throws BankTransactionException {
         // Is an operation is already in progress ?
         if (operationService.isOperationPendingFor(withdrawAccount.getId()))
             throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
-    }
-
-    /**
-     * Supply the QrCheck used for the transaction
-     *
-     * @param transaction The transaction to be processed
-     * @return The QrCheck object
-     */
-    private QrCheck getCheck(BankTransaction transaction) {
-        return checkService.getCheckByCheckToken(transaction.getMeansOfPaymentId());
     }
 
     /**
@@ -198,7 +159,7 @@ public class BankTransactionManager implements IBankManager {
      * @param transaction     the transaction to be processed
      * @throws BankTransactionException if the payment method is not valid
      */
-    private void checkMeansOfPayment(Account withdrawAccount, BankTransaction transaction) throws BankTransactionException {
+    private void checkMeansOfPayment(Account withdrawAccount, BankTransactionModel transaction) throws BankTransactionException {
 
         if (isCardPayment(transaction)) {
             // Is the card exist ?
@@ -209,12 +170,11 @@ public class BankTransactionManager implements IBankManager {
             if (withdrawAccount.getCard().isExpired())
                 throw new BankTransactionException(TransactionStatus.VALIDITY_DATE_ERROR, transaction.getOperationId(), "Card expired");
         } else if (isCheckPayment(transaction)) {
-            var qrCheck = getCheck(transaction);
             // Is the check exist ?
-            if (qrCheck == null)
+            if (transaction.getQrCheck() == null)
                 throw new BankTransactionException(TransactionStatus.CHECK_ERROR, transaction.getOperationId(), "Check not found");
             // Is the check expired ?
-            if (qrCheck.isExpired())
+            if (transaction.getQrCheck().isExpired())
                 throw new BankTransactionException(TransactionStatus.VALIDITY_DATE_ERROR, transaction.getOperationId(), "Check expired");
         }
     }
@@ -226,7 +186,7 @@ public class BankTransactionManager implements IBankManager {
      * @param account     Represents the account to be debited
      * @throws BankTransactionException if the account is not valid
      */
-    private void checkAccount(Account account, BankTransaction transaction, @Nullable OperationType opType) throws BankTransactionException {
+    private void checkAccount(Account account, BankTransactionModel transaction, @Nullable OperationType opType) throws BankTransactionException {
 
         if (account == null) {
             throw new BankTransactionException(TransactionStatus.ACCOUNT_ERROR, transaction.getOperationId(), "Account not found");
@@ -236,33 +196,33 @@ public class BankTransactionManager implements IBankManager {
         }
     }
 
-    /**
-     * Supply the account to withdraw
-     *
-     * @param transaction Represents the transaction to be processed
-     * @throws BankTransactionException if the means of payment is not valid
-     */
-    private Account getWithdrawAccountBy(BankTransaction transaction) throws BankTransactionException {
+//    /**
+//     * Supply the account to withdraw
+//     *
+//     * @param transaction Represents the transaction to be processed
+//     * @throws BankTransactionException if the means of payment is not valid
+//     */
+//    private Account getWithdrawAccountBy(ShoppingTransactionModel transaction) throws BankTransactionException {
+//
+//        if (isCardPayment(transaction)) {
+//            return accountService.getAccountByCardId(transaction.getMeansOfPaymentId());
+//
+//        } else if (isCheckPayment(transaction)) {
+//            return clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
+//        } else {
+//            throw new BankTransactionException(TransactionStatus.MEANS_OF_PAYMENT_ERROR, transaction.getOperationId(), "Means of Payment error was occurred");
+//        }
+//    }
 
-        if (isCardPayment(transaction)) {
-            return accountService.getAccountByCardId(transaction.getMeansOfPaymentId());
-
-        } else if (isCheckPayment(transaction)) {
-            return clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
-        } else {
-            throw new BankTransactionException(TransactionStatus.MEANS_OF_PAYMENT_ERROR, transaction.getOperationId(), "Means of Payment error was occurred");
-        }
-    }
-
-    /**
-     * Supply the account to deposit
-     *
-     * @param transaction Represents the transaction to be processed
-     * @return The account to deposit
-     */
-    private Account getDepositAccountBy(BankTransaction transaction) {
-        return accountService.getAccountByOwnerName(transaction.getDepositUsername());
-    }
+//    /**
+//     * Supply the account to deposit
+//     *
+//     * @param transaction Represents the transaction to be processed
+//     * @return The account to deposit
+//     */
+//    private Account getDepositAccountBy(ShoppingTransactionModel transaction) {
+//        return accountService.getAccountByOwnerName(transaction.getDepositUsername());
+//    }
 
     /**
      * Check if the transaction is a card payment
@@ -270,7 +230,7 @@ public class BankTransactionManager implements IBankManager {
      * @param transaction Represents the transaction to be processed
      * @return true if the transaction is a card payment
      */
-    private boolean isCardPayment(BankTransaction transaction) throws BankTransactionException {
+    private boolean isCardPayment(BankTransactionModel transaction) throws BankTransactionException {
         return transaction.getPaymentMethod() == PaymentMethod.CARD;
     }
 
@@ -280,7 +240,7 @@ public class BankTransactionManager implements IBankManager {
      * @param transaction Represents the transaction to be processed
      * @return true if the transaction is a check payment
      */
-    private boolean isCheckPayment(BankTransaction transaction) throws BankTransactionException {
+    private boolean isCheckPayment(BankTransactionModel transaction) throws BankTransactionException {
         return transaction.getPaymentMethod() == PaymentMethod.CHECK;
     }
 
@@ -295,7 +255,7 @@ public class BankTransactionManager implements IBankManager {
      * @param payMethod   Represents the payment method type
      * @return The new operation
      */
-    private @NotNull Operation createOperation(BankTransaction transaction, Account account, @Nullable QrCheck qrCheck, OperationStatus opStatus, OperationType opType, PaymentMethod payMethod) {
+    private @NotNull Operation createOperation(BankTransactionModel transaction, Account account, @Nullable QrCheck qrCheck, OperationStatus opStatus, OperationType opType, PaymentMethod payMethod) {
         return new Operation(transaction.getOperationId(), transaction.getLabel(), transaction.getAmount(),
                 transaction.getDate(), account, qrCheck, opStatus, opType, payMethod);
     }
@@ -310,6 +270,27 @@ public class BankTransactionManager implements IBankManager {
         operation.setOperationStatus(status);
         return operationService.update(operation).isValid();
     }
+    /**
+     * Cancel a pending operation when transaction failed
+     *
+     * @param transaction The transaction to be canceled
+     */
+    private void cancelPendingOperation(BankTransactionModel transaction) {
+        try {
+            List<UUID> accounts = new ArrayList<>();
+            accounts.add(transaction.getWithdrawalAccount().getId());
+            accounts.add(transaction.getDepositAccount().getId());
+            for (UUID accountId : accounts) {
 
+                if (operationService.isOperationPendingByOperationId(transaction.getOperationId(), accountId)) {
+                    Operation op = operationService.getByOperationId(transaction.getOperationId());
+                    op.setOperationStatus(OperationStatus.CANCELED);
+                    operationService.update(op);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

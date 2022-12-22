@@ -1,7 +1,8 @@
 package com.api.bank.manager;
 
 import com.api.bank.model.exception.BankTransactionException;
-import com.api.bank.model.transaction.BankTransaction;
+import com.api.bank.model.transaction.QrCheckTransactionModel;
+import com.api.bank.model.transaction.ShoppingTransactionModel;
 import com.api.bank.model.transaction.TransactionResult;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,9 +10,7 @@ import java.util.concurrent.ExecutionException;
 
 public interface IBankManager {
     @Transactional()
-    TransactionResult handleTransaction(BankTransaction transaction) throws ExecutionException, InterruptedException;
+    TransactionResult shoppingTransaction(ShoppingTransactionModel shoppingTransaction);
     @Transactional()
-    TransactionResult executeTransaction(BankTransaction transaction) throws BankTransactionException;
-
-
+    TransactionResult buyCheckTransaction(QrCheckTransactionModel transaction);
 }
