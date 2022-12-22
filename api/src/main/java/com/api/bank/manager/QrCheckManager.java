@@ -74,7 +74,7 @@ public class QrCheckManager implements IQrCheckManager {
     public TransactionResult createQrCheck(QrCheckTransactionModel transaction) throws BankTransactionException {
 
         var qrCheck = new QrCheck(transaction.getAmount(), transaction.getToken());
-            if(this.checkService.add(qrCheck).isValid()){
+            if(!this.checkService.add(qrCheck).isValid()){
                 throw new BankTransactionException(TransactionStatus.FAILED, transaction.getOperationId(), "QrCheck creation failed");
             }
         return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "QrCheck successfully created");
