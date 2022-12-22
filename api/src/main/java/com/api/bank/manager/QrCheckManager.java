@@ -40,30 +40,24 @@ public class QrCheckManager implements IQrCheckManager {
     private Account bankAccount;
     private Account withdrawAccount;
 
-    private BankTransactionManager bankTransactionManager;
+//    private BankTransactionManager bankTransactionManager;
 
     @Autowired
-    public QrCheckManager(CheckRepository qrCheckRepository, AccountRepository accountRepository, OperationRepository operationRepository, BankTransactionManager bankTransactionManager) {
+    public QrCheckManager(CheckRepository qrCheckRepository, AccountRepository accountRepository, OperationRepository operationRepository) {
         this.checkService = new CheckService(qrCheckRepository);
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
-        this.bankTransactionManager = bankTransactionManager;
+//        this.bankTransactionManager = bankTransactionManager;
     }
 
     @Override
     @Transactional(rollbackOn = {BankTransactionException.class, Exception.class})
     public TransactionResult buyQrCheck(QrCheckTransactionModel transaction)  {
         try {
-//            getBankAccount(transaction);
-//            checkTransaction(transaction);
 
             checkToken(transaction);
-            bankTransactionManager.executeTransaction(new BankTransactionModel(transaction));
-            var depositOperation = writeOperation(bankAccount, transaction, OperationStatus.PENDING, OperationType.DEPOSIT, "Qrcheck N°", PaymentMethod.TRANSFER);
-
-            updateBalanceAndOperation(bankAccount, transaction, depositOperation);
-
-            createQrCheck(transaction, depositOperation);
+//            bankTransactionManager.executeTransaction(new BankTransactionModel(transaction));
+            createQrCheck(transaction);
 
             return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "QrCheck successfully created");
 
@@ -77,15 +71,17 @@ public class QrCheckManager implements IQrCheckManager {
         }
     }
 
-    private void createQrCheck(QrCheckTransactionModel transaction, Operation depositOperation) throws BankTransactionException {
+    public TransactionResult createQrCheck(QrCheckTransactionModel transaction) throws BankTransactionException {
 
         var qrCheck = new QrCheck(transaction.getAmount(), transaction.getToken());
             if(this.checkService.add(qrCheck).isValid()){
-                throw new BankTransactionException(TransactionStatus.FAILED,transaction.getOperationId(), "QrCheck creation failed");
+                throw new BankTransactionException(TransactionStatus.FAILED, transaction.getOperationId(), "QrCheck creation failed");
             }
+        return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "QrCheck successfully created");
+
     }
 
-    private void checkToken(QrCheckTransactionModel transaction) throws BankTransactionException {
+    public void checkToken(QrCheckTransactionModel transaction) throws BankTransactionException {
         if (transaction.getToken().isEmpty()) {
             throw new BankTransactionException(TransactionStatus.TOKEN_EMPTY_ERROR, transaction.getOperationId(), "Token is empty");
         }
@@ -122,69 +118,6 @@ public class QrCheckManager implements IQrCheckManager {
         }
     }
 
-    /**
-     * Proceed to balance operation and update new value of the account and operation
-     *
-     * @param account     The account to be updated
-     * @param transaction The transaction to be processed
-     * @param operation   The operation to be updated
-     * @throws BankTransactionException If the operation is not valid
-     */
-    private void updateBalanceAndOperation(Account account, QrCheckTransactionModel transaction, Operation operation) throws BankTransactionException {
-
-        if (operation.getOperationType() == OperationType.DEPOSIT)
-            account.setSold(account.getSold() + transaction.getAmount());
-
-        else if (operation.getOperationType() == OperationType.WITHDRAW)
-            account.setSold(account.getSold() - transaction.getAmount());
-
-        var result = accountService.update(account);
-        if (result.isValid()) {
-            if (!this.updateOperationStatus(OperationStatus.CLOSED, operation))
-                throw new BankTransactionException(TransactionStatus.OPERATION_CLOSING_ERROR, transaction.getOperationId(), "Operation closing error");
-        } else {
-            this.updateOperationStatus(OperationStatus.CANCELED, operation);
-            throw new BankTransactionException(TransactionStatus.PAYMENT_ERROR, transaction.getOperationId(), "Payment error was occurred");
-        }
-    }
-
-    /**
-     * Update the status of transaction like Pending, Close or Failed
-     *
-     * @param status    Represents the operation status
-     * @param operation Represents the operation to be updated
-     */
-    private boolean updateOperationStatus(OperationStatus status, Operation operation) {
-        operation.setOperationStatus(status);
-        return operationService.update(operation).isValid();
-    }
-
-    /**
-     * Write a operation, add to an account and persist it in the database
-     * @throws BankTransactionException If the persist is not valid
-     */
-    private Operation writeOperation(Account account, QrCheckTransactionModel transaction, OperationStatus
-            opStatus, OperationType opType, String label, PaymentMethod paymentMethod) throws BankTransactionException {
-
-        var operation = new Operation(UUID.randomUUID().toString(), label, transaction.getAmount(), new Date(), account, null, opStatus, opType, paymentMethod);
-
-        if (!operationService.add(operation).isValid())
-            throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
-        return operation;
-    }
-
-    /**
-     * Check if an existing operation is already processing to the same account
-     *
-     * @param withdrawAccount The account to be checked
-     * @param transaction     The transaction to be processed
-     * @throws BankTransactionException If an existing operation is already processing
-     */
-    private void isAlreadyPendingOperation(Account withdrawAccount, QrCheckTransactionModel transaction) throws BankTransactionException {
-        // Is an operation is already in progress ?
-        if (operationService.isOperationPendingFor(withdrawAccount.getId()))
-            throw new BankTransactionException(TransactionStatus.OPERATION_PENDING_ERROR, transaction.getOperationId(), "Operation pending error");
-    }
     /**
      * Cancel a pending operation when transaction failed
      * @param transaction The transaction to be canceled

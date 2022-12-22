@@ -12,16 +12,16 @@ public class QrCheckTransactionModel {
     private String operationId;
     private String token;
     private String label;
-    private String debitAccount;
+    private UUID clientId;
     private double amount;
     private PaymentMethod paymentMethod;
     private Date date;
 
-    public QrCheckTransactionModel(String operationId, String token, double amount, String debitAccount, PaymentMethod paymentMethod) {
+    public QrCheckTransactionModel(String operationId, String token, double amount, UUID clientId, PaymentMethod paymentMethod) {
         this.operationId = operationId;
         this.token = token;
         this.amount = amount;
-        this.debitAccount = debitAccount;
+        this.clientId = clientId;
         this.paymentMethod = paymentMethod;
         init();
     }

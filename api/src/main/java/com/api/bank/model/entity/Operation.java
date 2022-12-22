@@ -18,7 +18,7 @@ public class Operation extends Base {
     @Column(nullable = false, length = 36)
     private String operationId;
 
-    @Column(nullable = true, length = 25)
+    @Column(nullable = true, length = 255)
     private String label;
 
     @Column(nullable = false)

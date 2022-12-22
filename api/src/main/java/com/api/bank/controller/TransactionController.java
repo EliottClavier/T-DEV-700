@@ -2,6 +2,7 @@ package com.api.bank.controller;
 
 import com.api.bank.manager.IBankManager;
 import com.api.bank.manager.BankManager;
+import com.api.bank.model.transaction.QrCheckTransactionModel;
 import com.api.bank.model.transaction.ShoppingTransactionModel;
 import com.api.bank.model.transaction.TransactionResult;
 
@@ -22,10 +23,20 @@ public class TransactionController {
         this.transManager = transManager;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<TransactionResult> add(@RequestBody ShoppingTransactionModel data) {
+    @PostMapping("/shopping")
+    public ResponseEntity<TransactionResult> shopping(@RequestBody ShoppingTransactionModel data) {
         try{
             var res = transManager.shoppingTransaction(data);
+
+            return ResponseEntity.ok(res );
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @PostMapping("/qrcheck/purchase")
+    public ResponseEntity<TransactionResult> qrCheckPurchase(@RequestBody QrCheckTransactionModel data) {
+        try{
+            var res = transManager.buyCheckTransaction(data);
 
             return ResponseEntity.ok(res );
         }catch (Exception e) {

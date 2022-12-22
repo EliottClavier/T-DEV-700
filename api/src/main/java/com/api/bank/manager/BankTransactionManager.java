@@ -4,10 +4,7 @@ import com.api.bank.model.BankConstants;
 import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.Operation;
 import com.api.bank.model.entity.QrCheck;
-import com.api.bank.model.enums.OperationStatus;
-import com.api.bank.model.enums.OperationType;
-import com.api.bank.model.enums.PaymentMethod;
-import com.api.bank.model.enums.TransactionStatus;
+import com.api.bank.model.enums.*;
 import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.BankTransactionModel;
 import com.api.bank.model.transaction.TransactionResult;
@@ -66,7 +63,10 @@ public class BankTransactionManager {
         var depositOperation = writeOperation(transaction.getDepositAccount(), transaction, OperationStatus.PENDING, OperationType.DEPOSIT);
 
         updateAccountBalanceAndOperation(transaction.getDepositAccount(), transaction, depositOperation);
-        updateQrCheck(transaction);
+
+        if(transaction.getBankTransactionType() == BankTransactionType.SHOPPING && transaction.getPaymentMethod() == PaymentMethod.CHECK) {
+            updateQrCheck(transaction);
+        }
 
         return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "Payment has been validated");
     }

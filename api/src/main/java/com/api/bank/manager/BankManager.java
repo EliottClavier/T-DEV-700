@@ -5,6 +5,7 @@ import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.QrCheck;
 import com.api.bank.model.enums.PaymentMethod;
 import com.api.bank.model.enums.TransactionStatus;
+import com.api.bank.model.enums.BankTransactionType;
 import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.BankTransactionModel;
 import com.api.bank.model.transaction.QrCheckTransactionModel;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 import java.util.concurrent.*;
 
 @Component
@@ -45,18 +47,17 @@ public class BankManager implements IBankManager {
 
     @Override
     public TransactionResult shoppingTransaction(ShoppingTransactionModel shoppingTransaction) {
-            Future<TransactionResult> result = executor.submit(new Callable<TransactionResult>() {
-                public TransactionResult call() throws InterruptedException {
-                    try {
+        Future<TransactionResult> result = executor.submit(new Callable<TransactionResult>() {
+            public TransactionResult call() throws InterruptedException {
+                try {
+                    var bankTransaction = createBankTransactionFrom(shoppingTransaction);
+                    return bankTransactionManager.executeTransaction(bankTransaction);
 
-                        var bankTransaction = createBankTransactionFrom(shoppingTransaction);
-                        return bankTransactionManager.executeTransaction(bankTransaction);
-
-                    } catch (BankTransactionException ex) {
-                        throw new InterruptedException(ex.getTransactionStatus().toString());
-                    }
+                } catch (BankTransactionException ex) {
+                    throw new InterruptedException(ex.getTransactionStatus().toString());
                 }
-            });
+            }
+        });
         try {
 
             return result.get();
@@ -65,15 +66,21 @@ public class BankManager implements IBankManager {
             return new TransactionResult(getEnum(e.getCause().getMessage()), shoppingTransaction.getOperationId(), getMessage(e.getCause().getMessage()));
         }
     }
+
     @Override
     public TransactionResult buyCheckTransaction(QrCheckTransactionModel qrCheckTransaction) {
         Future<TransactionResult> result = executor.submit(new Callable<TransactionResult>() {
             public TransactionResult call() throws InterruptedException {
                 try {
+
                     var bankTransaction = createBankTransactionFrom(qrCheckTransaction);
-                    return qrCheckManager.buyQrCheck(qrCheckTransaction);
+                    qrCheckManager.checkToken(qrCheckTransaction);
+                    bankTransactionManager.executeTransaction(bankTransaction);
+
+                    return qrCheckManager.createQrCheck(qrCheckTransaction);
 
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     throw new InterruptedException(ex.getMessage());
                 }
             }
@@ -90,6 +97,10 @@ public class BankManager implements IBankManager {
 
         var bankTransaction = new BankTransactionModel(qrCheckTransaction);
 
+        bankTransaction.setDepositAccount(getBankAccount());
+        var withdrawalAccount = accountService.getAccountByClientId(qrCheckTransaction.getClientId());
+        bankTransaction.setWithdrawalAccount(withdrawalAccount);
+
         return bankTransaction;
     }
 
@@ -98,7 +109,7 @@ public class BankManager implements IBankManager {
         var bankTransaction = new BankTransactionModel(shoppingTransaction);
 
         bankTransaction.setDepositAccount(getDepositAccountBy(shoppingTransaction));
-        bankTransaction.setWithdrawalAccount(getWithdrawAccountBy(shoppingTransaction));
+        bankTransaction.setWithdrawalAccount(getWithdrawAccountBy(shoppingTransaction, BankTransactionType.SHOPPING));
         bankTransaction.setQrCheck(getQrCheckFrom(shoppingTransaction));
 
         return bankTransaction;
@@ -121,7 +132,7 @@ public class BankManager implements IBankManager {
      * @param transaction Represents the transaction to be processed
      * @throws BankTransactionException if the means of payment is not valid
      */
-    private Account getWithdrawAccountBy(ShoppingTransactionModel transaction) throws BankTransactionException {
+    private Account getWithdrawAccountBy(ShoppingTransactionModel transaction, BankTransactionType bankTransactionType) throws BankTransactionException {
 
         if (isCardPayment(transaction)) {
             return accountService.getAccountByCardId(transaction.getMeansOfPaymentId());
@@ -151,6 +162,10 @@ public class BankManager implements IBankManager {
      */
     private boolean isCheckPayment(ShoppingTransactionModel transaction) {
         return transaction.getPaymentMethod() == PaymentMethod.CHECK;
+    }
+
+    private Account getBankAccount() {
+        return clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
     }
 
     /**

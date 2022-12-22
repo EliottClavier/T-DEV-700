@@ -71,11 +71,13 @@ public class GenericService<T extends Base> {
         try {
             entity.setModifiedAt(Instant.now());
             repository.save(entity);
-            repository.flush();
+//            repository.flush();
             return new ObjectResponse("Success", entity,true, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             return new ObjectResponse(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ObjectResponse(e.getMessage(), false , HttpStatus.CONFLICT);
         }
     }
