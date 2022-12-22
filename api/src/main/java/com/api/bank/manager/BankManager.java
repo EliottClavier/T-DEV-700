@@ -17,17 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.concurrent.*;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class BankManager implements IBankManager {
-    private BankTransactionManager bankTransactionManager;
-    private QrCheckManager qrCheckManager;
+    private final BankTransactionManager bankTransactionManager;
+    private final QrCheckManager qrCheckManager;
     private final ExecutorService executor;
     private final AccountService accountService;
     private final ClientService clientService;
@@ -35,11 +31,14 @@ public class BankManager implements IBankManager {
 
 
     @Autowired
-    public BankManager(BankTransactionManager bankTransactionManager, AccountService accountService, ClientService clientService, CheckService checkService) {
+    public BankManager(BankTransactionManager bankTransactionManager,
+                       AccountService accountService, ClientService clientService,
+                       CheckService checkService, QrCheckManager qrCheckManager) {
         this.bankTransactionManager = bankTransactionManager;
         this.accountService = accountService;
         this.clientService = clientService;
         this.checkService = checkService;
+        this.qrCheckManager = qrCheckManager;
 
         executor = Executors.newSingleThreadExecutor();
     }
@@ -49,17 +48,19 @@ public class BankManager implements IBankManager {
             Future<TransactionResult> result = executor.submit(new Callable<TransactionResult>() {
                 public TransactionResult call() throws InterruptedException {
                     try {
+
                         var bankTransaction = createBankTransactionFrom(shoppingTransaction);
-                        var res = bankTransactionManager.executeTransaction(bankTransaction);
-                        return res;
+                        return bankTransactionManager.executeTransaction(bankTransaction);
+
                     } catch (BankTransactionException ex) {
                         throw new InterruptedException(ex.getTransactionStatus().toString());
                     }
                 }
             });
-
         try {
+
             return result.get();
+
         } catch (ExecutionException | InterruptedException e) {
             return new TransactionResult(getEnum(e.getCause().getMessage()), shoppingTransaction.getOperationId(), getMessage(e.getCause().getMessage()));
         }
