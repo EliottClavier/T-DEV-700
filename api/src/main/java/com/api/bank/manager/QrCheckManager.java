@@ -40,11 +40,14 @@ public class QrCheckManager implements IQrCheckManager {
     private Account bankAccount;
     private Account withdrawAccount;
 
+    private BankTransactionManager bankTransactionManager;
+
     @Autowired
-    public QrCheckManager(CheckRepository qrCheckRepository, AccountRepository accountRepository, OperationRepository operationRepository) {
+    public QrCheckManager(CheckRepository qrCheckRepository, AccountRepository accountRepository, OperationRepository operationRepository, BankTransactionManager bankTransactionManager) {
         this.checkService = new CheckService(qrCheckRepository);
         this.accountService = new AccountService(accountRepository);
         this.operationService = new OperationService(operationRepository);
+        this.bankTransactionManager = bankTransactionManager;
     }
 
     @Override
@@ -55,7 +58,7 @@ public class QrCheckManager implements IQrCheckManager {
 //            checkTransaction(transaction);
 
             checkToken(transaction);
-
+            bankTransactionManager.executeTransaction(new BankTransactionModel(transaction));
             var depositOperation = writeOperation(bankAccount, transaction, OperationStatus.PENDING, OperationType.DEPOSIT, "Qrcheck N°", PaymentMethod.TRANSFER);
 
             updateBalanceAndOperation(bankAccount, transaction, depositOperation);

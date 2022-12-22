@@ -26,11 +26,13 @@ import java.util.concurrent.*;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class BankManager implements IBankManager {
-    public BankTransactionManager bankTransactionManager;
+    private BankTransactionManager bankTransactionManager;
+    private QrCheckManager qrCheckManager;
     private final ExecutorService executor;
     private final AccountService accountService;
     private final ClientService clientService;
     private final CheckService checkService;
+
 
     @Autowired
     public BankManager(BankTransactionManager bankTransactionManager, AccountService accountService, ClientService clientService, CheckService checkService) {
@@ -68,8 +70,8 @@ public class BankManager implements IBankManager {
             public TransactionResult call() throws InterruptedException {
                 try {
                     var bankTransaction = createBankTransactionFrom(qrCheckTransaction);
+                    return qrCheckManager.buyQrCheck(qrCheckTransaction);
 
-                    return null;
                 } catch (Exception ex) {
                     throw new InterruptedException(ex.getMessage());
                 }
