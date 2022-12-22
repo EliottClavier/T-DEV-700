@@ -2,23 +2,23 @@ version: '3'
 
 services:
 
-  tpe:
-    container_name: tpe
-    build:
-      context: ./tpe
-    volumes:
-      - ./apks:/tpe/apk
-    env_file:
-      - ./env/prod/tpe.env
+  # tpe:
+  #   container_name: tpe
+  #   build:
+  #     context: ./tpe
+  #   volumes:
+  #     - ./apks:/tpe/apk
+  #   env_file:
+  #     - ./env/prod/tpe.env
 
-  shop:
-    container_name: shop
-    build:
-      context: ./shop
-    volumes:
-      - ./apks:/shop/apk
-    env_file:
-      - ./env/prod/shop.env
+  # shop:
+  #   container_name: shop
+  #   build:
+  #     context: ./shop
+  #   volumes:
+  #     - ./apks:/shop/apk
+  #   env_file:
+  #     - ./env/prod/shop.env
 
   api:
     container_name: api
@@ -40,8 +40,8 @@ services:
       - back-net
     depends_on:
       - database
-      - shop
-      - tpe
+      # - shop
+      # - tpe
 
   redis:
     container_name: redis
@@ -50,6 +50,8 @@ services:
     command: redis-server --save 20 1 --requirepass ${REDIS_PASSWORD}
     volumes:
       - ./redis-data:/data
+    expose:
+      - "${REDIS_PORT}"
     networks:
       - back-net
 
@@ -61,6 +63,8 @@ services:
       - ./env/prod/database.env
     volumes:
       - ./database-data:/var/lib/mysql
+    expose:
+      - "${MARIADB_PORT}"
     networks:
       - back-net
   
