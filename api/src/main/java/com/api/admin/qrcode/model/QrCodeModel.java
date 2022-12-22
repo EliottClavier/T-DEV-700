@@ -1,8 +1,7 @@
-package com.api.admin.model;
+package com.api.admin.qrcode.model;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.Date;
 
 @Getter

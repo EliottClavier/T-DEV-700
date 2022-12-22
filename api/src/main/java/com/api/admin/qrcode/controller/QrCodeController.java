@@ -1,7 +1,6 @@
-package com.api.admin.controller;
+package com.api.admin.qrcode.controller;
 
-import com.api.admin.model.QrCodeModel;
-import com.api.bank.model.entity.QrCheck;
+import com.api.admin.qrcode.model.QrCodeModel;
 import com.api.tools.crypting.CryptingService;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -20,8 +19,8 @@ import java.io.*;
 import java.util.*;
 
 /**
-* Class creation of the Qr-code used on the TPE.
-*/
+ * Class creation of the Qr-code used on the TPE.
+ */
 
 @RestController
 @RequestMapping(path = "/admin/")
@@ -41,6 +40,10 @@ public class QrCodeController {
         try {
             String token = qrCode.getSoldAmount() + ":" + qrCode.getNbDayOfValidity() + ":" + qrCode.getExpirationDate();
             String encryptedString = cryptingService.encrypt(token, key);
+
+            //call qrCode manager
+            //Change qrCode => qrCheck (a qrcode don't need a nbDaysOfValidity)
+
             generateQrcode(encryptedString);
 
         } catch (IOException | WriterException e) {
