@@ -76,8 +76,7 @@ public class TpeManagerController {
                         transactionRequest.getPaymentMethod()
                     );
 
-                    TransactionResult transactionResult = null;
-//                    TransactionResult transactionResult = bankManager.handleTransaction(transaction);
+                    TransactionResult transactionResult = bankManager.shoppingTransaction(transaction);
 
                     if (transactionResult.getTransactionStatus() == TransactionStatus.SUCCESS) {
                         // Remove transaction from Redis
