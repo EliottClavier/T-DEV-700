@@ -14,8 +14,8 @@ public class AuthAdminController {
         return "thymeleafTemplate";
     }
 
-    @GetMapping(value = "/admin/whitelist/")
-    public String whitelist() {
-        return "thymeleafTemplate";
+    @GetMapping(value = "/admin/tpe/")
+    public String tpe() {
+        return "tpe";
     }
 }
