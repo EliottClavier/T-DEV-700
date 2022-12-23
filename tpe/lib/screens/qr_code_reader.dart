@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
-
-import 'package:tpe/screens/payment.dart';
 import 'package:tpe/screens/payment_sending.dart';
 import 'package:tpe/utils/snackbar.dart';
+import 'package:tpe/utils/transaction_status.dart';
+import 'package:tpe/utils/navigator.dart';
 
 class QrCodeReaderScreen extends StatelessWidget {
   const QrCodeReaderScreen({super.key});
@@ -104,12 +104,7 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   }
 
   void _onBackButtonPressed() {
-    dispose();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const PaymentScreen(),
-      ),
-    );
+    navigate("/payment");
   }
 
   String describeEnum(Object? e) {
@@ -123,16 +118,14 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   void onDataReaded(Barcode data) {
     showSnackBar(context, "Scan réussi", "success", 2);
     Future.delayed(const Duration(milliseconds: 2000), () {
-      dispose();
-      paymentSendingScreen(data.code.toString());
+      transactionService.payWithQrCode(data.code.toString());
     });
   }
 
   void paymentSendingScreen(String data) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) =>
-            PaymentSendingScreen(paymentData: data, paymentMethod: "qr_code"),
+        builder: (context) => const PaymentSendingScreen(),
       ),
     );
   }
@@ -145,8 +138,7 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   @override
   void dispose() {
     super.dispose();
-    Future.delayed(const Duration(milliseconds: 200), () {
-      controller?.stopCamera();
+    Future.delayed(const Duration(milliseconds: 5), () {
       controller?.dispose();
     });
   }

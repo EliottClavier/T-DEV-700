@@ -30,11 +30,8 @@ final router = GoRouter(
       builder: (context, state) => const PaymentScreen(),
       routes: [
         GoRoute(
-          path: 'sending/:method',
-          builder: (context, state) => PaymentSendingScreen(
-            paymentMethod: state.params['method']!,
-            paymentData: "Test",
-          ),
+          path: 'sending',
+          builder: (context, state) => const PaymentSendingScreen(),
         ),
         GoRoute(
           path: 'success',

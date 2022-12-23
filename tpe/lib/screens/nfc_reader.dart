@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:tpe/screens/payment.dart';
-import 'package:tpe/screens/payment_sending.dart';
+import 'package:tpe/services/transaction_service.dart';
 import 'package:tpe/utils/snackbar.dart';
 
 class NfcReaderScreen extends StatelessWidget {
@@ -33,6 +33,7 @@ class NfcReaderScreenWidget extends StatefulWidget {
 }
 
 class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
+  final TransactionService transactionService = TransactionService();
   String nfcDataString = "";
 
   @override
@@ -75,22 +76,10 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     nfcDataString = getFormatedDataFromNfcData(identifier);
     var snackBarMessage =
         nfcDataString.isNotEmpty ? "Scan NFC réussi" : "Erreur de scan";
-    showSnackBar(context, snackBarMessage, "success", 2);
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      dispose();
-      sendPayment(nfcDataString);
+    showSnackBar(context, snackBarMessage, "success", 1);
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      transactionService.payWithNfc(nfcDataString);
     });
-  }
-
-  void sendPayment(String nfcDataString) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PaymentSendingScreen(
-          paymentData: nfcDataString,
-          paymentMethod: "nfc",
-        ),
-      ),
-    );
   }
 
   void onNfcDiscovered(NfcTag tag) {

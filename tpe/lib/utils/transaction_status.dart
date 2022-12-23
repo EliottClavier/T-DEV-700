@@ -2,6 +2,7 @@ import 'package:tpe/utils/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tpe/utils/amount.dart';
+import 'package:tpe/utils/navigator.dart';
 import 'package:tpe/services/transaction_service.dart';
 
 TransactionService transactionService = TransactionService();
@@ -16,7 +17,7 @@ String handleTransactionStatus(
       snackbarThenNavigate(context, message, "success", "/payment");
       break;
     case "TRANSACTION_DONE":
-      context.go("/payment/success");
+      navigate("/payment/success");
       break;
     case "INVALID_PAYMENT_METHOD":
       snackbarThenNavigate(context, message, "error", "/payment");
@@ -33,8 +34,11 @@ String handleTransactionStatus(
     case "NOT_FOUND":
       snackbarThenNavigate(context, message, "error", "/");
       break;
+    case "SUCCESS":
+      snackbarThenNavigate(context, message, "success", "/payment/success");
+      break;
     default:
-      context.go('/');
+      navigate('/');
   }
 
   return message;

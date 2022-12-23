@@ -11,9 +11,12 @@ import 'package:tpe/utils/transaction_status.dart';
 import 'package:tpe/config/environment/index.dart';
 import 'package:tpe/utils/android_id.dart';
 import 'package:tpe/utils/amount.dart';
+import 'package:tpe/utils/enums/transaction_type.dart';
+import 'package:tpe/utils/navigator.dart';
 
 class TransactionService with ChangeNotifier {
-  static final TransactionService _transactionService = TransactionService._internal();
+  static final TransactionService _transactionService =
+      TransactionService._internal();
   static const MethodChannel _channel = MethodChannel('bank_service');
 
   dynamic dotenv;
@@ -31,6 +34,9 @@ class TransactionService with ChangeNotifier {
   bool isActiveWebSocket = false;
   bool isRegistered = false;
   bool isSynchronized = false;
+
+  late TransactionType _transactionType;
+  late String _paymentId;
 
   String _sessionId = "";
   String password = "-:|p4a(Lwsx0";
@@ -58,6 +64,22 @@ class TransactionService with ChangeNotifier {
 
   String getAmount() {
     return getAmountString(_amount);
+  }
+
+  Future<void> payWithNfc(payment_id) async {
+    navigate("/payment/sending");
+    _transactionType = TransactionType.NFC;
+    _paymentId = payment_id;
+    await completeTransaction();
+    print("payWithNfc completed");
+  }
+
+  Future<void> payWithQrCode(payment_id) async {
+    navigate("/payment/sending");
+    _transactionType = TransactionType.QR_CODE;
+    _paymentId = payment_id;
+    await completeTransaction();
+    print("payWithQrCode completed");
   }
 
   Future<void> init(context) async {
@@ -168,10 +190,16 @@ class TransactionService with ChangeNotifier {
   }
 
   Future<void> completeTransaction() async {
-    print("Complete transaction");
+    String transactionType = _transactionType == TransactionType.NFC
+        ? "CARD"
+        : _transactionType == TransactionType.QR_CODE
+            ? "CHECK"
+            : "UNKNOWN";
+    print(
+        "Complete transaction with paymentId : $_paymentId and type : $transactionType");
     _client.send(
         destination: '/websocket-manager/tpe/complete-transaction',
-        body: "{'paymentId': 'PAYMENT_ID', 'type': 'NFC'}");
+        body: "{'paymentId': '$_paymentId', 'type': '$transactionType'}");
   }
 
   Future<void> _onConnectCallback(StompFrame frame) {
@@ -180,7 +208,7 @@ class TransactionService with ChangeNotifier {
         callback: (frame) {
           print("Synchronise status");
           print(frame.body);
-          handleTransactionStatus(_context, jsonDecode(frame.body!));
+          setStatus(handleTransactionStatus(_context, jsonDecode(frame.body!)));
         });
 
     dynamic transactionStatus = _client.subscribe(
@@ -188,7 +216,7 @@ class TransactionService with ChangeNotifier {
         callback: (frame) {
           print("Transaction status");
           print(frame.body);
-          handleTransactionStatus(_context, jsonDecode(frame.body!));
+          setStatus(handleTransactionStatus(_context, jsonDecode(frame.body!)));
         });
     notifyListeners();
     return Future.value();

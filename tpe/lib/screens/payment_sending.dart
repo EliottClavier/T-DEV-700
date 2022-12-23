@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class PaymentSendingScreen extends StatelessWidget {
-  final String paymentMethod;
-  final String paymentData;
-
-  const PaymentSendingScreen(
-      {super.key, required this.paymentMethod, required this.paymentData});
+  const PaymentSendingScreen({super.key});
 
   static const String _title = 'Sending Payment';
 
@@ -14,10 +10,7 @@ class PaymentSendingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: PaymentSendingScreenStatefulWidget(
-        paymentMethod: paymentMethod,
-        paymentData: paymentData,
-      ),
+      home: const PaymentSendingScreenStatefulWidget(),
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF03045F),
           primarySwatch: Colors.blue,
@@ -27,11 +20,7 @@ class PaymentSendingScreen extends StatelessWidget {
 }
 
 class PaymentSendingScreenStatefulWidget extends StatefulWidget {
-  const PaymentSendingScreenStatefulWidget(
-      {super.key, required this.paymentMethod, required this.paymentData});
-
-  final String paymentMethod;
-  final String paymentData;
+  const PaymentSendingScreenStatefulWidget({super.key});
 
   @override
   State<PaymentSendingScreenStatefulWidget> createState() =>
@@ -43,16 +32,11 @@ class _PaymentSendingScreenStatefulWidgetState
   @override
   void initState() {
     super.initState();
-    sendData();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  void sendData() async {
-    context.go("/payment_success");
   }
 
   @override
