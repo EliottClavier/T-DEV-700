@@ -29,7 +29,7 @@ public class GenericService<T extends Base> {
         this.repository = repository;
     }
 
-//    @Transactional()
+    @Transactional()
     public ObjectResponse add(T entity) {
         try {
             var res = repository.save(entity);
@@ -54,6 +54,7 @@ public class GenericService<T extends Base> {
         }
     }
 
+    @Transactional
     public ObjectResponse deleteByUUID(String id) {
         try {
             repository.deleteById(UUID.fromString(id));
@@ -66,12 +67,11 @@ public class GenericService<T extends Base> {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BankTransactionException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public ObjectResponse update(T entity) {
         try {
             entity.setModifiedAt(Instant.now());
             repository.save(entity);
-//            repository.flush();
             return new ObjectResponse("Success", entity,true, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
