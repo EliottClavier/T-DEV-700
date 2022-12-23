@@ -11,27 +11,27 @@ import 'package:shop/widgets/category_card.dart';
 
 void main() {
   testWidgets('Test liste des articles', (WidgetTester tester) async {
-    // Création de l'objet ListArticles
+    // Creating the ListArticles object
     final listArticlesState = ListArticles();
 
-    // Vérification de l'initialisation de l'objet
+    // Checking object initialization
     expect(listArticlesState.total, '0');
     expect(listArticlesState.listArticles, isEmpty);
 
-    // Insertion de l'objet dans le widget tester
+    // Inserting the object into the widget tester
     await tester.pumpWidget(listArticlesState);
 
-    // Vérification de la présence des catégories dans la liste
+    // Checking for the presence of categories in the list
     expect(find.byType(CategoryCard), findsNWidgets(categories.length));
 
-    // Sélection d'une catégorie
+    // Selecting a category
     final category = categories[0];
     category.selected = true;
 
-    // Insertion de la liste mise à jour dans le widget tester
+    // Inserting the updated list into the widget tester
     await tester.pumpWidget(listArticlesState);
 
-    // Vérification de la présence de deux articles par ligne
+    // Checking for the presence of two articles per line
     expect(find.byType(ArticleCard), findsNWidgets(2));
   });
 }

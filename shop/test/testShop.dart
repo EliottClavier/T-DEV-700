@@ -9,12 +9,12 @@ import 'package:shop/widgets/shop_card.dart';
 
 void main() {
   testWidgets('Test Shop', (WidgetTester tester) async {
-    // Création de l'objet Shop
+    // Creating the Shop object
     var shop = Shop();
     Widget app = MediaQuery(
         data: const MediaQueryData(), child: MaterialApp(home: shop));
 
-    // Vérification de l'initialisation de l'objet
+    // Checking object initialization
     expect(shop.totalOfArticles, '0');
     expect(shop.total, '0.0');
     expect(shop_articles, isEmpty);
@@ -42,14 +42,12 @@ void main() {
     shop_articles.add(ArticleAdd);
 
     shop = Shop();
-    // Insertion de l'objet dans le widget tester
+
+    // Inserting the object into the widget tester
     await tester.pumpWidget(app);
 
-    // Vérification de la présence des cartes de produit dans la liste
+    // Checking for the presence of product cards in the list
     expect(find.byType(ShopCard), findsNWidgets(shop_articles.length));
-
-    // Insertion du total mis à jour dans le widget tester
-    await tester.pumpWidget(app);
 
     expect(shop.totalOfArticles, '3');
     expect(shop.total, '5.92');
