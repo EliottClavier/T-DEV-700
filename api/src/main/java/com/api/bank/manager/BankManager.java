@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.*;
 
@@ -48,10 +50,14 @@ public class BankManager implements IBankManager {
     @Override
     public TransactionResult shoppingTransaction(ShoppingTransactionModel shoppingTransaction) {
         Future<TransactionResult> result = executor.submit(new Callable<TransactionResult>() {
+            @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRES_NEW)
             public TransactionResult call() throws InterruptedException {
                 try {
                     var bankTransaction = createBankTransactionFrom(shoppingTransaction);
-                    return bankTransactionManager.executeTransaction(bankTransaction);
+                     bankTransactionManager.executeTransaction(bankTransaction);
+
+                    return new TransactionResult(TransactionStatus.SUCCESS, bankTransaction.getOperationId(), "Payment has been validated");
+
 
                 } catch (BankTransactionException ex) {
                     throw new InterruptedException(ex.getTransactionStatus().toString());
@@ -70,6 +76,7 @@ public class BankManager implements IBankManager {
     @Override
     public TransactionResult buyCheckTransaction(QrCheckTransactionModel qrCheckTransaction) {
         Future<TransactionResult> result = executor.submit(new Callable<TransactionResult>() {
+            @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRES_NEW)
             public TransactionResult call() throws InterruptedException {
                 try {
 

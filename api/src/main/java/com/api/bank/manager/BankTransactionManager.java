@@ -46,8 +46,8 @@ public class BankTransactionManager {
      * @param transaction Represents the transaction to be processed
      * @return The transaction status by the TransactionResult Object
      */
-    @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRES_NEW)
-    public TransactionResult executeTransaction(BankTransactionModel transaction) throws BankTransactionException, RuntimeException {
+    @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
+    public void executeTransaction(BankTransactionModel transaction) throws BankTransactionException, RuntimeException {
 
         checkTransaction(transaction);
         checkAccount(transaction.getWithdrawalAccount(), transaction, OperationType.WITHDRAW);
@@ -67,9 +67,7 @@ public class BankTransactionManager {
         if(transaction.getBankTransactionType() == BankTransactionType.SHOPPING && transaction.getPaymentMethod() == PaymentMethod.CHECK) {
             updateQrCheck(transaction);
         }
-
-        return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "Payment has been validated");
-    }
+   }
 
     private void updateQrCheck(BankTransactionModel transaction) throws BankTransactionException {
        qrCheckManager.updateQrCheck(transaction);
@@ -195,34 +193,6 @@ public class BankTransactionManager {
             throw new BankTransactionException(TransactionStatus.BANK_ERROR, transaction.getOperationId(), "Bank not found");
         }
     }
-
-//    /**
-//     * Supply the account to withdraw
-//     *
-//     * @param transaction Represents the transaction to be processed
-//     * @throws BankTransactionException if the means of payment is not valid
-//     */
-//    private Account getWithdrawAccountBy(ShoppingTransactionModel transaction) throws BankTransactionException {
-//
-//        if (isCardPayment(transaction)) {
-//            return accountService.getAccountByCardId(transaction.getMeansOfPaymentId());
-//
-//        } else if (isCheckPayment(transaction)) {
-//            return clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
-//        } else {
-//            throw new BankTransactionException(TransactionStatus.MEANS_OF_PAYMENT_ERROR, transaction.getOperationId(), "Means of Payment error was occurred");
-//        }
-//    }
-
-//    /**
-//     * Supply the account to deposit
-//     *
-//     * @param transaction Represents the transaction to be processed
-//     * @return The account to deposit
-//     */
-//    private Account getDepositAccountBy(ShoppingTransactionModel transaction) {
-//        return accountService.getAccountByOwnerName(transaction.getDepositUsername());
-//    }
 
     /**
      * Check if the transaction is a card payment

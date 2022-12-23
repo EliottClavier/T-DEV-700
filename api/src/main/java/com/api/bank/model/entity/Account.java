@@ -12,7 +12,6 @@ import java.util.List;
 @Setter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Account extends Base {
-
     private double sold;
 
     @OneToMany(mappedBy = "account", cascade=CascadeType.ALL)
