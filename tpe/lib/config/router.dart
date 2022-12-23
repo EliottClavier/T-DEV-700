@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tpe/utils/navigator.dart';
-
 import 'package:tpe/screens/home.dart';
 import 'package:tpe/screens/nfc_reader.dart';
 import 'package:tpe/screens/qr_code_reader.dart';
@@ -36,6 +36,11 @@ final router = GoRouter(
         GoRoute(
           path: 'success',
           builder: (context, state) => const PaymentSuccessScreen(),
+          pageBuilder: (context, state) => buildPageWithDefaultTransition<void>(
+            context: context,
+            state: state,
+            child: const PaymentSuccessScreen(),
+          ),
         ),
         GoRoute(
           path: 'error',
@@ -45,3 +50,16 @@ final router = GoRouter(
     ),
   ],
 );
+
+CustomTransitionPage buildPageWithDefaultTransition<T>({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(opacity: animation, child: child),
+  );
+}

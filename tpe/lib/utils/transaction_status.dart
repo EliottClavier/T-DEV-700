@@ -1,7 +1,5 @@
 import 'package:tpe/utils/snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:tpe/utils/amount.dart';
 import 'package:tpe/utils/navigator.dart';
 import 'package:tpe/services/transaction_service.dart';
 
@@ -35,10 +33,10 @@ String handleTransactionStatus(
       snackbarThenNavigate(context, message, "error", "/");
       break;
     case "SUCCESS":
-      snackbarThenNavigate(context, message, "success", "/payment/success");
+      navigate("/payment/success");
       break;
     default:
-      navigate('/');
+      navigate('/payment/error');
   }
 
   return message;

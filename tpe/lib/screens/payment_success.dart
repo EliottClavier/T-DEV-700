@@ -29,7 +29,6 @@ class PaymentSuccessScreenStatefulWidget extends StatefulWidget {
 
 class _PaymentSuccessScreenStatefulWidgetState
     extends State<PaymentSuccessScreenStatefulWidget> {
-
   final TransactionService transactionService = TransactionService();
 
   @override
@@ -83,7 +82,7 @@ class _PaymentSuccessScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "Votre paiement de ${transactionService.getAmount} a bien été réalisé",
+                      "Votre paiement de ${transactionService.getAmount()} a bien été réalisé",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.w300,
