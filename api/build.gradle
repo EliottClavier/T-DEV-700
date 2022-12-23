@@ -31,7 +31,8 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '3.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
     implementation group: 'com.google.zxing', name: 'javase', version: '3.5.1'
     implementation 'org.springframework.boot:spring-boot-starter-mail'

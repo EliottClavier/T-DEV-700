@@ -1,16 +1,21 @@
 package com.api.admin.auth.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@RestController
-@RequestMapping(path = "/admin/auth/login")
+@Controller
 public class AuthAdminController {
 
-    @RequestMapping(value = {"/", ""}, method = RequestMethod.GET)
-    public String getPage(Model model) {
-        return "index";
+    @GetMapping(value = "/admin/auth/login/")
+    public String getTemplate(@RequestParam(name="name", required = false, defaultValue = "World") String name, Model model) {
+        model.addAttribute("name", name);
+        return "thymeleafTemplate";
+    }
+
+    @GetMapping(value = "/admin/whitelist/")
+    public String whitelist() {
+        return "thymeleafTemplate";
     }
 }
