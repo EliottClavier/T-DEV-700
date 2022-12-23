@@ -36,8 +36,8 @@ services:
       - ./env/prod/shop.env
     volumes:
       - ./apks:/apks
-    expose:
-      - ${API_PORT}
+    ports:
+      - 80:${API_PORT}
     networks:
       - back-net
     depends_on:
