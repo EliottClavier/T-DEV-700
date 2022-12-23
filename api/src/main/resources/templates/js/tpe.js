@@ -24,20 +24,33 @@ function refreshTpeList() {
 function updateList(list) {
     var table = document.getElementById("list");
     var i;
+    
+    while (table.hasChildNodes()) {
+        table.removeChild(table.firstChild);
+    }
+    
     for (i = 0; i < list.length; i++) {
         // Create a list item element
-        var listItem = document.createElement("li");
+        var listItem = document.createElement("tr");
 
+        var itemId = document.createElement("td");
+        itemId.innerHTML = list[i].id;
+
+        var itemName = document.createElement("td");
+        itemName.innerHTML = list[i].name;
+
+        var itemWhitelist = document.createElement("td");
         // Create a button element
         var button = document.createElement("button");
         button.innerHTML = "Button";
         button.id = list[i].id;
+        itemWhitelist.appendChild(button);
 
-        // Set the text of the list item to "Item X" (where X is the index of the item)
-        listItem.innerHTML = list[i].name;
 
         // Append the button to the list item
-        listItem.appendChild(button);
+        listItem.appendChild(itemId);
+        listItem.appendChild(itemName);
+        listItem.appendChild(itemWhitelist);
 
         // Append the list item to the list
         table.appendChild(listItem);

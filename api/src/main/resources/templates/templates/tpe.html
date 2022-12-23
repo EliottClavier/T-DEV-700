@@ -9,10 +9,20 @@
     </head>
 <body>
 <div class="container">
-    <ul id="list">
-    </ul>
-    
-    <button id="add-item-button" onclick="refreshTpeList()">Add Item</button>
+    <button id="refresh" onclick="refreshTpeList()">Refresh list of TPE</button>
+    <table class="table-style">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Android ID</th>
+                <th>Whitelist</th>
+            </tr>
+        </thead>
+        <tbody id="list">
+            
+        </tbody>
+
+    </table>
 </div>
 </body>
 </html>
