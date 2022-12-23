@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:tpe/screens/api_connexion.dart';
 
 import 'package:tpe/screens/payment_success.dart';
 import 'package:tpe/screens/payment_error.dart';
@@ -65,59 +64,92 @@ class _PaymentScreenStatefulWidgetState
     );
   }
 
-  void _apiConnexion() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: ((context) => const MyApp())));
-    //MaterialPageRoute(builder: ((context) => const ApiConnexionWidget())));
+  void _onNfcSelected() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => NfcReaderScreen(price: widget.price),
+      ),
+    );
+  }
 
-    void _onQrCodeSelected() {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => QrCodeReaderScreen(price: widget.price),
-        ),
-      );
-    }
+  void _onQrCodeSelected() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => QrCodeReaderScreen(price: widget.price),
+      ),
+    );
+  }
 
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-          body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 35),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(
-                  "Montant: ${widget.price}",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    fontSize: 32,
-                    letterSpacing: 0.02,
-                    height: 1.2,
-                  ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 35),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Text(
+                "Montant: ${widget.price}",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  fontSize: 32,
+                  letterSpacing: 0.02,
+                  height: 1.2,
                 ),
-                Stack(
+              ),
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: IconButton(
+                      icon: Image.asset('assets/img/qr_code.png'),
+                      iconSize: 300,
+                      onPressed: () {
+                        _onQrCodeSelected();
+                      },
+                    ),
+                  ),
+                  const Positioned(
+                    bottom: 45,
+                    child: Text(
+                      "Payer par chèque",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        fontSize: 25,
+                        letterSpacing: 0.02,
+                        height: 1.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Stack(
                   clipBehavior: Clip.none,
                   alignment: Alignment.center,
                   children: <Widget>[
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
                       child: IconButton(
-                        icon: Image.asset('assets/img/qr_code.png'),
+                        icon: Image.asset('assets/img/nfc.png'),
                         iconSize: 300,
                         onPressed: () {
-                          _onQrCodeSelected();
+                          _onNfcSelected();
                         },
                       ),
                     ),
                     const Positioned(
                       bottom: 45,
                       child: Text(
-                        "Payer par chèque",
+                        "Payer par NFC",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
@@ -128,42 +160,11 @@ class _PaymentScreenStatefulWidgetState
                         ),
                       ),
                     ),
-                  ],
-                ),
-                Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: IconButton(
-                          icon: Image.asset('assets/img/nfc.png'),
-                          iconSize: 300,
-                          onPressed: () {
-                            _onNfcSelected();
-                          },
-                        ),
-                      ),
-                      const Positioned(
-                        bottom: 45,
-                        child: Text(
-                          "Payer par NFC",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            fontSize: 25,
-                            letterSpacing: 0.02,
-                            height: 1.2,
-                          ),
-                        ),
-                      ),
-                    ]),
-              ],
-            ),
+                  ]),
+            ],
           ),
         ),
-      ));
-    }
+      ),
+    ));
   }
 }
