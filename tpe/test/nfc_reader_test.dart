@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:tpe/screens/nfc_reader.dart';
+import 'package:tpe/screens/scan/nfc_reader.dart';
 
 void main() {
   testWidgets('NFC data formatter test', (WidgetTester tester) async {

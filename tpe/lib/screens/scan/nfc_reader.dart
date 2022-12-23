@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:tpe/screens/payment.dart';
+import 'package:tpe/screens/payment/payment.dart';
 import 'package:tpe/services/transaction_service.dart';
 import 'package:tpe/utils/snackbar.dart';
 

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tpe/utils/navigator.dart';
+import 'package:tpe/config/router/navigator.dart';
 import 'package:tpe/screens/home.dart';
-import 'package:tpe/screens/nfc_reader.dart';
-import 'package:tpe/screens/qr_code_reader.dart';
-import 'package:tpe/screens/payment.dart';
-import 'package:tpe/screens/payment_success.dart';
-import 'package:tpe/screens/payment_error.dart';
-import 'package:tpe/screens/payment_sending.dart';
+import 'package:tpe/screens/scan/nfc_reader.dart';
+import 'package:tpe/screens/scan/qr_code_reader.dart';
+import 'package:tpe/screens/payment/payment.dart';
+import 'package:tpe/screens/payment/payment_success.dart';
+import 'package:tpe/screens/payment/payment_error.dart';
+import 'package:tpe/screens/payment/payment_sending.dart';
 
 // GoRouter configuration
 final router = GoRouter(

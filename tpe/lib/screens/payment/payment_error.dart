@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tpe/screens/home.dart';
+import 'package:tpe/services/transaction_service.dart';
 
 class PaymentErrorScreen extends StatelessWidget {
   const PaymentErrorScreen({super.key});
@@ -28,6 +29,8 @@ class PaymentErrorScreenStatefulWidget extends StatefulWidget {
 
 class _PaymentErrorScreenStatefulWidgetState
     extends State<PaymentErrorScreenStatefulWidget> {
+  TransactionService transactionService = TransactionService();
+
   @override
   void initState() {
     super.initState();
@@ -66,8 +69,8 @@ class _PaymentErrorScreenStatefulWidgetState
               children: <Widget>[
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>[
-                    Text(
+                  children: <Widget>[
+                    const Text(
                       "Une erreur est survenue",
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -79,9 +82,9 @@ class _PaymentErrorScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "Veuillez réessayer plus tard",
+                      "$transactionService.getStatus()",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w300,
                         color: Colors.white,
                         fontSize: 15,

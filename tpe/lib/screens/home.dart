@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tpe/services/transaction_service.dart';
-import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -31,7 +30,6 @@ class HomeScreenStatefulWidget extends StatefulWidget {
 
 class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   TransactionService transactionService = TransactionService();
-  late bool isConnectedToApi;
   late String status;
 
   @override
@@ -51,26 +49,7 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   }
 
   void _initBank() async {
-    isConnectedToApi = _isConnectedToApi();
     status = Provider.of<TransactionService>(context, listen: true).getStatus();
-  }
-
-  bool _isConnectedToApi() {
-    bool response =
-        Provider.of<TransactionService>(context, listen: true).isConnectedToApi;
-    if (response) {
-      onTransactionReceived();
-    }
-    return response;
-  }
-
-  void onTransactionReceived() {
-    print("Transaction received");
-  }
-
-  void _onClick(PointerEvent details) {
-    transactionService.printStatus();
-    context.go("/payment");
   }
 
   @override
@@ -78,27 +57,24 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Listener(
-          onPointerDown: _onClick,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image.asset("assets/gif/home_loader.gif",
-                      width: 300, height: 300),
-                ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset("assets/gif/home_loader.gif",
+                    width: 300, height: 300),
+              ],
+            ),
+            Text(
+              status,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
               ),
-              Text(
-                status,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

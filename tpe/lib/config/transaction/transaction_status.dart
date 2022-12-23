@@ -1,7 +1,8 @@
 import 'package:tpe/utils/snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:tpe/utils/navigator.dart';
+import 'package:tpe/config/router/navigator.dart';
 import 'package:tpe/services/transaction_service.dart';
+import 'package:tpe/config/transaction/transaction_reset.dart';
 
 TransactionService transactionService = TransactionService();
 
@@ -15,6 +16,7 @@ String handleTransactionStatus(
       snackbarThenNavigate(context, message, "success", "/payment");
       break;
     case "TRANSACTION_DONE":
+      transactionService.setStatus(message);
       navigate("/payment/success");
       break;
     case "INVALID_PAYMENT_METHOD":
@@ -35,8 +37,11 @@ String handleTransactionStatus(
     case "SUCCESS":
       navigate("/payment/success");
       break;
+    case "RESET":
+      onTransactionReset(message);
+      break;
     default:
-      navigate('/payment/error');
+      onTransactionReset(message);
   }
 
   return message;

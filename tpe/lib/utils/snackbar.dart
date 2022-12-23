@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tpe/utils/navigator.dart';
+import 'package:tpe/config/router/navigator.dart';
 
 import 'package:go_router/go_router.dart';
 

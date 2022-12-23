@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
-import 'package:tpe/screens/payment_sending.dart';
+import 'package:tpe/screens/payment/payment_sending.dart';
 import 'package:tpe/utils/snackbar.dart';
-import 'package:tpe/utils/transaction_status.dart';
-import 'package:tpe/utils/navigator.dart';
+import 'package:tpe/config/transaction/transaction_status.dart';
+import 'package:tpe/config/router/navigator.dart';
 
 class QrCodeReaderScreen extends StatelessWidget {
   const QrCodeReaderScreen({super.key});
