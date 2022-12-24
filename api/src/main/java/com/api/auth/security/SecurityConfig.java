@@ -68,6 +68,9 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             .antMatchers("/tpe-manager/**").hasRole("TPE")
             .antMatchers("/websocket-manager/tpe/**").hasRole("TPE")
             .antMatchers("/websocket-manager/shop/**").hasRole("SHOP")
+            // Interfaces for downloading apps
+            .antMatchers("/download/tpe.apk").permitAll()
+            .antMatchers("/download/shop.apk").permitAll()
             // Interfaces for Admin
             .antMatchers("/admin/auth/login").permitAll()
             .antMatchers("/admin/qr-code/**").hasRole("MANAGER")
