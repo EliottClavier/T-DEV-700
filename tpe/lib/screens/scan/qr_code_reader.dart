@@ -116,10 +116,8 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   }
 
   void onDataReaded(Barcode data) {
-    showSnackBar(context, "Scan réussi", "success", 2);
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      transactionService.payWithQrCode(data.code.toString());
-    });
+    showSnackBar(context, "Scan réussi", "success", 1);
+    transactionService.payWithQrCode(data.code.toString());
   }
 
   void paymentSendingScreen(String data) {

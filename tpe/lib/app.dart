@@ -47,6 +47,7 @@ class _AppWidgetState extends State<AppWidget> {
   @override
   Widget build(BuildContext context) {
     transactionService.init(context);
+    setContext(context);
     return MaterialApp.router(
       title: _title,
       routerConfig: router,
@@ -56,4 +57,14 @@ class _AppWidgetState extends State<AppWidget> {
           fontFamily: "Montserrat"),
     );
   }
+}
+
+late BuildContext _context;
+
+void setContext(BuildContext context) {
+  _context = context;
+}
+
+BuildContext getContext() {
+  return _context;
 }

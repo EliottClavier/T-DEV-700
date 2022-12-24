@@ -21,7 +21,7 @@ class TransactionService with ChangeNotifier {
   final String _baseUrl = API_URL;
   late StompClient _client;
   late String _androidId;
-  late double _amount;
+  double _amount = 0.0;
   late BuildContext _context;
 
   bool resetStatus = false;
@@ -59,8 +59,8 @@ class TransactionService with ChangeNotifier {
 
   Future<void> killTransaction() async {
     await killWebSocket();
-    reset();
-    notifyListeners();
+    _transactionService = TransactionService._internal();
+    return Future.value();
   }
 
   void reset() {

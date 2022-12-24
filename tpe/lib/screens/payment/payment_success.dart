@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tpe/screens/home.dart';
 import 'package:tpe/services/transaction_service.dart';
+import 'package:tpe/config/transaction/transaction_reset.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
   const PaymentSuccessScreen({super.key});
@@ -42,12 +43,7 @@ class _PaymentSuccessScreenStatefulWidgetState
   }
 
   void _onBackHome() {
-    dispose();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
-      ),
-    );
+    resetTransaction();
   }
 
   @override

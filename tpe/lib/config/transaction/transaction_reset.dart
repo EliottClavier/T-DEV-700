@@ -1,5 +1,6 @@
 import "package:tpe/services/transaction_service.dart";
 import "package:tpe/config/router/navigator.dart";
+import "package:tpe/app.dart";
 
 TransactionService transactionService = TransactionService();
 
@@ -8,8 +9,12 @@ void onTransactionReset([String message = ""]) async {
     transactionService.setStatus(message);
   }
   navigate("/payment/error");
-  await Future.delayed(const Duration(seconds: 2));
-  await transactionService.killTransaction();
+  resetTransaction();
+}
+
+void resetTransaction() async {
+  transactionService.killTransaction();
   navigate("/");
-  transactionService.init(navigatorKey.currentContext!);
+  await Future.delayed(const Duration(seconds: 2));
+  transactionService.init(getContext());
 }
