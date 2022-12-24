@@ -1,4 +1,4 @@
-name: Build and publish TPE APK
+name: Build and publish Shop APK
 
 on:
   push:
@@ -11,9 +11,9 @@ jobs:
   build_from_build_workflow:
     uses: ./.github/workflows/build-apks.yml
     with:
-      app_dir: tpe
-      apk_name: tpe.apk
+      app_dir: shop
+      apk_name: shop.apk
       dart_defines: |
         API_URL=API_URL
-        TPE_REGISTER_SECRET_HEADER=TPE_REGISTER_SECRET_HEADER
-        TPE_REGISTER_SECRET_KEY=TPE_REGISTER_SECRET_KEY
+        SHOP_USERNAME=SHOP_USERNAME
+        SHOP_PASSWORD=SHOP_PASSWORD

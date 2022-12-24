@@ -1,0 +1,40 @@
+name: Build and publish APKs
+
+on:
+  workflow_call:
+    inputs:
+      app_dir:
+        required: true
+        type: string
+      apk_name:
+        required: true
+        type: string
+      dart_defines:
+        required: true
+        type: string
+
+jobs:
+  build_apk:    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+      
+      - name: Get dependencies
+        run: flutter pub get
+        working-directory: ./${{ inputs.app_dir }}
+      
+      - name: Build APK
+        run: flutter build apk 
+            --release
+            --dart-define "$(echo ${{ inputs.dart_defines }} | tr ' ' '\n' | sed 's/^/-D /' | tr '\n' ' ')"
+        working-directory: ./${{ inputs.app_dir }}
+      
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ inputs.apk_name }}
+          path: build/app/outputs/flutter-apk/app-release.apk
