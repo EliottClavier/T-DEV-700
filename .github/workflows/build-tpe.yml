@@ -1,11 +1,6 @@
 name: Build and publish TPE APK
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-      - feature/variabilize
+on: [workflow_call]
 
 jobs:
   build_from_build_workflow:

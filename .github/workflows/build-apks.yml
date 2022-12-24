@@ -31,9 +31,7 @@ jobs:
         working-directory: ./${{ inputs.app_dir }}
       
       - name: Build APK
-        run: flutter build apk 
-            --release
-            $(echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)")
+        run: flutter build apk --release $(echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)")
         working-directory: ./${{ inputs.app_dir }}
       
       - name: Upload APK artifact

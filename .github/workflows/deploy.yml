@@ -1,0 +1,13 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - feature/variabilize
+
+jobs:
+  build_tpe_apk:
+    uses: ./.github/workflows/build-tpe.yml
+
+  build_shop_apk:
+    uses: ./.github/workflows/build-shop.yml
