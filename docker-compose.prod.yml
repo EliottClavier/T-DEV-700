@@ -40,6 +40,7 @@ services:
       - 80:${API_PORT}
     networks:
       - back-net
+      - proxy-net
     depends_on:
       - database
       # - shop
@@ -77,3 +78,6 @@ volumes:
   
 networks:
   back-net:
+  proxy-net:
+    external:
+      name: proxy-net
