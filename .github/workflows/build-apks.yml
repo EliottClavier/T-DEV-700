@@ -14,7 +14,8 @@ on:
         type: string
 
 jobs:
-  build_apk:    
+  build_apk:
+    name: Build APK    
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

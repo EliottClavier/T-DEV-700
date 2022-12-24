@@ -7,7 +7,9 @@ on:
 
 jobs:
   build_tpe_apk:
+    name: Build and publish TPE APK
     uses: ./.github/workflows/build-tpe.yml
 
   build_shop_apk:
+    name: Build and publish Shop APK
     uses: ./.github/workflows/build-shop.yml

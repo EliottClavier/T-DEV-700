@@ -4,6 +4,7 @@ on: [workflow_call]
 
 jobs:
   build_from_build_workflow:
+    name: Build and publish TPE APK 
     uses: ./.github/workflows/build-apks.yml
     with:
       app_dir: tpe
