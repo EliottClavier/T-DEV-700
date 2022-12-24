@@ -14,6 +14,6 @@ jobs:
       app_dir: shop
       apk_name: shop.apk
       dart_defines: |
-        API_URL=API_URL
-        SHOP_USERNAME=SHOP_USERNAME
-        SHOP_PASSWORD=SHOP_PASSWORD
+        API_URL=API_URL;
+        SHOP_USERNAME=SHOP_USERNAME;
+        SHOP_PASSWORD=SHOP_PASSWORD;

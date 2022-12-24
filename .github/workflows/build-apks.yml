@@ -20,6 +20,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Test
+        run: echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)"
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
       
@@ -30,11 +33,11 @@ jobs:
       - name: Build APK
         run: flutter build apk 
             --release
-            --dart-define "$(echo ${{ inputs.dart_defines }} | tr ' ' '\n' | sed 's/^/-D /' | tr '\n' ' ')"
+            $(echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)")
         working-directory: ./${{ inputs.app_dir }}
       
       - name: Upload APK artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.apk_name }}
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: ./${{ inputs.app_dir }}/build/app/outputs/flutter-apk/app-release.apk
