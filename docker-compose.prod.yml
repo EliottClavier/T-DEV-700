@@ -36,11 +36,11 @@ services:
       - ./env/prod/shop.env
     volumes:
       - ./apks:/apks
-    ports:
-      - 80:${API_PORT}
+    expose:
+      - "${API_PORT}"
     networks:
       - back-net
-      - proxy-net
+      - nginx-proxy
     depends_on:
       - database
       # - shop
@@ -69,7 +69,7 @@ services:
     expose:
       - "${MARIADB_PORT}"
     networks:
-      - back-net
+        - back-net
   
 volumes:
   database-data:
@@ -78,6 +78,6 @@ volumes:
   
 networks:
   back-net:
-  proxy-net:
+  nginx-proxy:
     external:
-      name: proxy-net
+      name: nginx-proxy

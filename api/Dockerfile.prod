@@ -15,5 +15,6 @@ COPY --from=builder ./api-build/build/libs/api.war /usr/local/tomcat/webapps/
 
 ARG API_PORT
 RUN sed -i 's/8080/'"$API_PORT"'/g' /usr/local/tomcat/conf/server.xml
+EXPOSE $API_PORT
 
 CMD ["catalina.sh", "run"]
