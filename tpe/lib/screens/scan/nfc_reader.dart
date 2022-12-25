@@ -33,8 +33,8 @@ class NfcReaderScreenWidget extends StatefulWidget {
 }
 
 class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
-  final TransactionService transactionService = TransactionService();
   String nfcDataString = "";
+  TransactionService transactionService = TransactionService();
 
   @override
   void initState() {
@@ -67,6 +67,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
   }
 
   void setNfcData(Map<String, dynamic> nfcData) {
+    transactionService = transactionService.getInstance();
     List<int> identifier = [];
     nfcData.forEach((key, value) {
       if (key == "isodep" && value["identifier"] is List<int>) {

@@ -8,6 +8,7 @@ TransactionService transactionService = TransactionService();
 
 String handleTransactionStatus(
     BuildContext context, Map<String, dynamic> body) {
+  transactionService = TransactionService();
   String status = body['type'];
   String message = body['message'];
   switch (status) {
@@ -20,12 +21,15 @@ String handleTransactionStatus(
       navigate("/payment/success");
       break;
     case "INVALID_PAYMENT_METHOD":
+      transactionService.setStatus(message);
       snackbarThenNavigate(context, message, "error", "/payment");
       break;
     case "ALREADY_SYNCHRONIZED":
+      transactionService.setStatus(message);
       snackbarThenNavigate(context, message, "", null);
       break;
     case "SYNCHRONIZED":
+      transactionService.setStatus(message);
       snackbarThenNavigate(context, message, "success", null);
       break;
     case "TPE_INVALID":
@@ -35,9 +39,11 @@ String handleTransactionStatus(
       snackbarThenNavigate(context, message, "error", "/");
       break;
     case "SUCCESS":
+      transactionService.setStatus(message);
       navigate("/payment/success");
       break;
     case "RESET":
+      transactionService.setStatus(message);
       onTransactionReset(message);
       break;
     default:
