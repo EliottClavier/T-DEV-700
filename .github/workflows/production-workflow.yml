@@ -1,0 +1,53 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - feature/variabilize
+
+env:
+  API_URL: ${{ secrets.API_URL }}
+  TPE_REGISTER_SECRET_HEADER: ${{ secrets.TPE_REGISTER_SECRET_HEADER }}
+  TPE_REGISTER_SECRET_KEY: ${{ secrets.TPE_REGISTER_SECRET_KEY }}
+  SHOP_USERNAME: ${{ secrets.SHOP_USERNAME }}
+  SHOP_PASSWORD: ${{ secrets.SHOP_PASSWORD }}
+
+jobs:
+  build_tpe_apk:
+    name: Build and publish TPE APK 
+    uses: ./.github/workflows/build-apks.yml
+    with:
+      app_dir: tpe
+      dart_defines: |
+        API_URL=$API_URL;
+        TPE_REGISTER_SECRET_HEADER=$TPE_REGISTER_SECRET_HEADER;
+        TPE_REGISTER_SECRET_KEY=$TPE_REGISTER_SECRET_KEY;
+
+  build_shop_apk:
+    name: Build and publish Shop APK 
+    uses: ./.github/workflows/build-apks.yml
+    with:
+      app_dir: shop
+      dart_defines: |
+        API_URL=$API_URL;
+        SHOP_USERNAME=$SHOP_USERNAME;
+        SHOP_PASSWORD=$SHOP_PASSWORD;
+
+  build_publish_docker_image:
+    needs: [build_tpe_apk, build_shop_apk]
+    name: Build and publish API Image
+    uses: ./.github/workflows/build-publish-docker-image.yml
+    secrets: inherit
+
+  deploy:
+    needs: [build_publish_docker_image]
+    name: Deploy on remote server
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+
+  transfer_artifacts:
+    needs: [deploy]
+    name: Transfer artifacts to remote server
+    uses: ./.github/workflows/transfer_artifacts.yml
+    secrets: inherit
+  

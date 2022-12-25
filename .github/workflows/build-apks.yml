@@ -6,9 +6,6 @@ on:
       app_dir:
         required: true
         type: string
-      apk_name:
-        required: true
-        type: string
       dart_defines:
         required: true
         type: string
@@ -35,8 +32,13 @@ jobs:
         run: flutter build apk --release $(echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)")
         working-directory: ./${{ inputs.app_dir }}
       
-      - name: Upload APK artifact
+      - name: Create .tar artifact
+        run: mv app-release.apk ${{ inputs.app_dir }}.apk && tar -cvf ${{ inputs.app_dir }}.tar ${{ inputs.app_dir }}.apk
+        working-directory: ./${{ inputs.app_dir }}/build/app/outputs/flutter-apk/
+
+      - name: Upload .tar APK artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ inputs.apk_name }}
-          path: ./${{ inputs.app_dir }}/build/app/outputs/flutter-apk/app-release.apk
+          name: ${{ inputs.app_dir }}.tar
+          artifact_format: tar
+          path: ./${{ inputs.app_dir }}/build/app/outputs/flutter-apk/${{ inputs.app_dir }}.tar

@@ -1,0 +1,23 @@
+name: Transfer artifacts to remote server
+
+on:
+  workflow_call:
+
+jobs:
+  transfer_artifacts:
+    name: Transfer artifacts to remote server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: app/apks
+      
+      - name: Transfer artifacts
+        run: |
+          scp -i "${{ secrets.SERVER_SSH_KEY }}" -r app/apks ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/app/apks
+
+      - name: Execute script to unzip artifacts
+        run: |
+          ssh -i "${{ secrets.SERVER_SSH_KEY }}" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} \
+          'cd /app/ && sh ./manage-artifacts.sh'
