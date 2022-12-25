@@ -31,5 +31,5 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/cashmanager-api:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/cashmanager-api:1.0.0
+            ${{ secrets.DOCKERHUB_USERNAME }}/cashmanager-api:${{ github.ref_name }}
         

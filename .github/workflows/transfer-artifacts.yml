@@ -14,10 +14,21 @@ jobs:
           path: app/apks
       
       - name: Transfer artifacts
-        run: |
-          scp -i "${{ secrets.SERVER_SSH_KEY }}" -r app/apks ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/app/apks
-
+        uses: appleboy/scp-action@master
+        with:
+          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.SERVER_IP }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          source: app/apks
+          target: /app/T-DEV-700/apks
+          
       - name: Execute script to unzip artifacts
-        run: |
-          ssh -i "${{ secrets.SERVER_SSH_KEY }}" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} \
-          'cd /app/ && sh ./manage-artifacts.sh'
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.SERVER_IP }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            cd /app/ && sh ./manage-artifacts.sh

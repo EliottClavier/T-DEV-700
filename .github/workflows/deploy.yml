@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Execute script to setup docker-compose architecture
-        run: |
-          ssh -i "${{ secrets.SERVER_SSH_KEY }}" ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} \
-          'cd /app/ && sh ./deploy.sh'
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.SERVER_IP }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            cd /app/ && sh ./deploy.sh

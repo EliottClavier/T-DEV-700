@@ -1,9 +1,8 @@
 name: Deploy
 
 on:
-  push:
-    branches:
-      - feature/variabilize
+  release:
+    types: [published]
 
 env:
   API_URL: ${{ secrets.API_URL }}
