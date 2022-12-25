@@ -48,6 +48,6 @@ jobs:
   transfer_artifacts:
     needs: [deploy]
     name: Transfer artifacts to remote server
-    uses: ./.github/workflows/transfer_artifacts.yml
+    uses: ./.github/workflows/transfer-artifacts.yml
     secrets: inherit
   
