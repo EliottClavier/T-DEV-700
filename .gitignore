@@ -12,7 +12,5 @@ apks
 
 ### .env (except examples) ###
 .env
-env/dev/*
-!env/dev/*.example.*
-env/prod/*
-!env/prod/*.example.*
+env/*
+!env/*.example.*
