@@ -1,64 +1,35 @@
 version: '3'
 
 services:
-
-  tpe:
-    container_name: tpe
-    build:
-      context: ./tpe
-    volumes:
-      - ./apks:/tpe/apk
-
-  shop:
-    container_name: shop
-    build:
-      context: ./shop
-    volumes:
-      - ./apks:/shop/apk
-
   api:
     container_name: api
-    build: 
-      context: ./api
-      dockerfile: Dockerfile.prod
+    image: eliottclavier/cashmanager-api:latest
     restart: unless-stopped
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_PORT: ${DB_PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO}
-      HIBERNATE_SHOW_SQL: ${HIBERNATE_SHOW_SQL}
-      DEVTOOLS_REMOTE_SECRET: ${DEVTOOLS_REMOTE_SECRET}
-      DEVTOOLS_LIVERELOAD_ENABLED: ${DEVTOOLS_LIVERELOAD_ENABLED}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      JWT_SECRET: ${JWT_SECRET}
-      DEFAULT_MANAGER_USERNAME: ${DEFAULT_MANAGER_USERNAME}
-      DEFAULT_MANAGER_PASSWORD: ${DEFAULT_MANAGER_PASSWORD}
-      TPE_REGISTER_SECRET_HEADER: ${TPE_REGISTER_SECRET_HEADER}
-      TPE_REGISTER_SECRET_KEY: ${TPE_REGISTER_SECRET_KEY}
+    env_file:
+      - ./env/database.env
+      - ./env/redis.env
+      - ./env/api.env
+      - ./env/tpe.env
+      - ./env/shop.env
     volumes:
-      - ./apks:/apks
-    ports:
-      - ${API_PORT}:${API_PORT}
+      - /app-data/cash-manager/apks:/apks
+    expose:
+      - "${API_PORT}"
     networks:
       - back-net
+      - nginx-proxy
     depends_on:
       - database
-      - shop
-      - tpe
 
   redis:
     container_name: redis
     image: redis:alpine
     restart: unless-stopped
     command: redis-server --save 20 1 --requirepass ${REDIS_PASSWORD}
-    ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
     volumes:
-      - ./redis-data:/data
+      - /app-data/cash-manager/redis:/data
+    expose:
+      - "${REDIS_PORT}"
     networks:
       - back-net
 
@@ -66,17 +37,14 @@ services:
     container_name: database
     image: mariadb:latest
     restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-    ports:
-      - ${DB_PORT}:${DB_PORT}
+    env_file:
+      - ./env/database.env
     volumes:
-      - ./database-data:/var/lib/mysql
+      - /app-data/cash-manager/database:/var/lib/mysql
+    expose:
+      - "${MARIADB_PORT}"
     networks:
-      - back-net
+        - back-net
   
 volumes:
   database-data:
@@ -85,3 +53,6 @@ volumes:
   
 networks:
   back-net:
+  nginx-proxy:
+    external:
+      name: nginx-proxy

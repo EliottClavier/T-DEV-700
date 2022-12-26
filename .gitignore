@@ -7,11 +7,10 @@ database-data
 ### Redis volume ###
 redis-data
 
-
 ### APKS volume ###
 apks
 
-### .env ###
+### .env (except examples) ###
 .env
-
-tpe/.flutter-plugins-dependencies
+env/*
+!env/*.example.*

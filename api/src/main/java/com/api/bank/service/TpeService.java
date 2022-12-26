@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 @Service
@@ -47,6 +46,14 @@ public class TpeService extends GenericService<Tpe> {
             return new ObjectResponse(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ObjectResponse(e.getMessage(), HttpStatus.CONFLICT);
+        }
+    }
+
+    public boolean existsByAndroidId(String androidId) {
+        try {
+            return tpeRepository.existsByAndroidId(androidId);
+        }catch (Exception e) {
+            return false;
         }
     }
 }
