@@ -1,0 +1,41 @@
+name: Transfer artifacts to remote server
+
+on:
+  workflow_call:
+
+jobs:
+  transfer_artifacts:
+    name: Transfer artifacts to remote server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download TPE artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: tpe.tar
+          path: .
+
+      - name: Download Shop artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: shop.tar
+          path: .
+      
+      - name: Transfer artifacts
+        uses: appleboy/scp-action@master
+        with:
+          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.SERVER_IP }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          source: .
+          target: /app-data/cash-manager/apks
+
+      - name: Execute script to unzip artifacts
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.SERVER_IP }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            cd /app/ && sh ./manage-artifacts.sh

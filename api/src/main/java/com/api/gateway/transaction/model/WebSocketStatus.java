@@ -1,10 +1,7 @@
 package com.api.gateway.transaction.model;
 
 public enum WebSocketStatus {
-    PENDING,
     TRANSACTION_OPENED,
-    TRANSACTION_DONE,
-    TRANSACTION_INVALID,
     TRANSACTION_CANCELLED,
     TRANSACTION_ERROR,
     SYNCHRONIZED,
