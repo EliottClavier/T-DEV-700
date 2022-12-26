@@ -8,17 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TRANSACTION;
+import static com.api.gateway.constants.RedisConstants.HASH_KEY_TTL_TRANSACTION;
+
 @Service
 public class TransactionRequestService {
-
-    public static final String HASH_KEY_NAME_TRANSACTION = "TRANSACTION";
-
-    public static final Long TTl_HASH_KEY = 10L;
-
     @Autowired
     private RedisTemplate<String, String> customRedisTemplate;
 
@@ -73,7 +70,7 @@ public class TransactionRequestService {
     public void updateTransactionRequestRedis(TransactionRequest transactionRequest) {
         customRedisTemplate.opsForValue().set(
                 HASH_KEY_NAME_TRANSACTION + ":" + transactionRequest.getId(), transactionRequest.toString(),
-                TTl_HASH_KEY, TimeUnit.MINUTES
+                HASH_KEY_TTL_TRANSACTION, TimeUnit.MINUTES
         );
         customRedisTemplate.opsForHash().put(HASH_KEY_NAME_TRANSACTION, transactionRequest.getId(), transactionRequest.toString());
     }

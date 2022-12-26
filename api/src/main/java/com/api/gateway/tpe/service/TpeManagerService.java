@@ -12,12 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TPE;
+import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TRANSACTION;
+
 @Service
 public class TpeManagerService {
-
-    public static final String HASH_KEY_NAME_TPE = "TPE";
-    public static final String HASH_KEY_NAME_TRANSACTION = "TRANSACTION";
-
     @Autowired
     private RedisTemplate<String, String> customRedisTemplate;
 
