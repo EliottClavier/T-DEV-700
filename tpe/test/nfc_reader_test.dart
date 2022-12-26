@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:tpe/screens/nfc_reader.dart';
+import 'package:tpe/screens/scan/nfc_reader.dart';
 
 void main() {
   testWidgets('NFC data formatter test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const NfcReaderScreen(price: "1.00"));
+    await tester.pumpWidget(const NfcReaderScreen());
 
     NfcReaderScreenWidgetState nfcReaderScreenWidgetState =
         NfcReaderScreenWidgetState();

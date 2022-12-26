@@ -74,7 +74,6 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             // Interfaces for Admin
             .antMatchers("/admin/auth/login").permitAll()
             .antMatchers("/admin/qr-code/**").hasRole("MANAGER")
-            .anyRequest().hasRole("MANAGER")
             .and()
             .authenticationManager(authenticationManager)
             .exceptionHandling()
