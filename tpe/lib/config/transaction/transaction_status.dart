@@ -44,10 +44,18 @@ String handleTransactionStatus(
       break;
     case "RESET":
       transactionService.setStatus(message);
-      onTransactionReset(message);
+      onTransactionResetWithError(message);
+      break;
+    case "LOST_CONNECTION":
+      transactionService.setStatus(message);
+      onTransactionResetWithError(message);
+      break;
+    case "TRANSACTION_TIMED_OUT":
+      transactionService.setStatus(message);
+      onTransactionResetWithError(message);
       break;
     default:
-      onTransactionReset(message);
+      onTransactionResetWithError(message);
   }
 
   return message;

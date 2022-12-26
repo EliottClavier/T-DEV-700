@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tpe/screens/home.dart';
 import 'package:tpe/services/transaction_service.dart';
 import 'package:tpe/config/transaction/transaction_reset.dart';
 
@@ -65,9 +64,9 @@ class _PaymentSuccessScreenStatefulWidgetState
               children: <Widget>[
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "Paiement réalisé avec succès",
+                  children: const <Widget>[
+                    Text(
+                      "Payment successful",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
@@ -78,9 +77,9 @@ class _PaymentSuccessScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "Votre paiement de ${transactionService.getAmount()} a bien été réalisé",
+                      "Payment has been successfully processed",
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w300,
                         color: Colors.white,
                         fontSize: 15,

@@ -1,16 +1,14 @@
 import "package:tpe/services/transaction_service.dart";
 import "package:tpe/config/router/navigator.dart";
 import "package:tpe/app.dart";
-import "package:provider/provider.dart";
 
 TransactionService transactionService = TransactionService();
 
-void onTransactionReset([String message = ""]) async {
+void onTransactionResetWithError([String message = "Error"]) async {
   if (message.isNotEmpty) {
     transactionService.setStatus(message);
   }
   navigate("/payment/error");
-  resetTransaction();
 }
 
 void resetTransaction() async {

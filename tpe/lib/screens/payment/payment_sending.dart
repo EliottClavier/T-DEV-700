@@ -50,7 +50,7 @@ class _PaymentSendingScreenStatefulWidgetState
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
                 Text(
-                  "Paiement en cours",
+                  "Payment Sending",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 30,

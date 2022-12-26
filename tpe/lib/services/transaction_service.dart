@@ -174,6 +174,7 @@ class TransactionService with ChangeNotifier {
         await _activateWebSocket();
         setStatus("Connected to websocket");
         await _synchronizeTpe();
+        setStatus("TPE available for transaction.");
       });
     } else {
       setStatus("Connexion to websocket failed.");

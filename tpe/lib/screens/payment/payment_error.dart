@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tpe/screens/home.dart';
+import 'package:provider/provider.dart';
 import 'package:tpe/services/transaction_service.dart';
+import 'package:tpe/config/transaction/transaction_reset.dart';
 
 class PaymentErrorScreen extends StatelessWidget {
   const PaymentErrorScreen({super.key});
@@ -30,10 +31,21 @@ class PaymentErrorScreenStatefulWidget extends StatefulWidget {
 class _PaymentErrorScreenStatefulWidgetState
     extends State<PaymentErrorScreenStatefulWidget> {
   TransactionService transactionService = TransactionService();
+  late String status;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    initStatus();
+  }
 
   @override
   void initState() {
     super.initState();
+  }
+
+  void initStatus() {
+    status = Provider.of<TransactionService>(context, listen: true).getStatus();
   }
 
   @override
@@ -42,12 +54,7 @@ class _PaymentErrorScreenStatefulWidgetState
   }
 
   void _onBackHome() {
-    dispose();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
-      ),
-    );
+    resetTransaction();
   }
 
   @override
@@ -71,7 +78,7 @@ class _PaymentErrorScreenStatefulWidgetState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const Text(
-                      "Une erreur est survenue",
+                      "Payment refused",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
@@ -82,7 +89,7 @@ class _PaymentErrorScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "$transactionService.getStatus()",
+                      status,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.w300,
