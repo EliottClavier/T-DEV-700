@@ -8,24 +8,17 @@ jobs:
     name: Transfer artifacts to remote server
     runs-on: ubuntu-latest
     steps:
-      - name: Make dirs
-        run: mkdir -p ./app/apks
-
       - name: Download TPE artifact
         uses: actions/download-artifact@v2
         with:
           name: tpe.tar
-          path: ./app/apks
+          path: .
 
       - name: Download Shop artifact
         uses: actions/download-artifact@v2
         with:
           name: shop.tar
-          path: ./app/apks
-
-      - name: LS
-        run: ls -la
-        working-directory: ./app/apks
+          path: .
       
       - name: Transfer artifacts
         uses: appleboy/scp-action@master
@@ -34,8 +27,8 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
-          source: ./app/apks
-          target: /app/T-DEV-700/apks
+          source: .
+          target: /app-data/cash-manager/apks
 
       - name: Execute script to unzip artifacts
         uses: appleboy/ssh-action@master
