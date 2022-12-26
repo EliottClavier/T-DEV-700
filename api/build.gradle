@@ -48,9 +48,8 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    developmentOnly 'org.springframework.boot:spring-boot-starter-tomcat'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
@@ -58,6 +57,10 @@ task getDeps(type: Copy) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from configurations.compileClasspath into "libs/"
     from configurations.runtimeClasspath into "libs/"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
 
 tasks.named('test') {

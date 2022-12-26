@@ -1,0 +1,44 @@
+name: Build and publish APKs
+
+on:
+  workflow_call:
+    inputs:
+      app_dir:
+        required: true
+        type: string
+      dart_defines:
+        required: true
+        type: string
+
+jobs:
+  build_apk:
+    name: Build APK    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Test
+        run: echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+      
+      - name: Get dependencies
+        run: flutter pub get
+        working-directory: ./${{ inputs.app_dir }}
+      
+      - name: Build APK
+        run: flutter build apk --release $(echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)")
+        working-directory: ./${{ inputs.app_dir }}
+      
+      - name: Create .tar artifact
+        run: mv app-release.apk ${{ inputs.app_dir }}.apk && tar -cvf ${{ inputs.app_dir }}.tar ${{ inputs.app_dir }}.apk
+        working-directory: ./${{ inputs.app_dir }}/build/app/outputs/flutter-apk/
+
+      - name: Upload .tar APK artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ inputs.app_dir }}.tar
+          artifact_format: tar
+          path: ./${{ inputs.app_dir }}/build/app/outputs/flutter-apk/${{ inputs.app_dir }}.tar

@@ -7,12 +7,10 @@ database-data
 ### Redis volume ###
 redis-data
 
-
 ### APKS volume ###
 apks
 
-### QR Codes volume ###
-qr-code
-
-### .env ###
+### .env (except examples) ###
 .env
+env/*
+!env/*.example.*

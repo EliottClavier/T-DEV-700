@@ -4,10 +4,9 @@ import com.api.bank.model.enums.PaymentMethod;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Data
-public class BankTransaction {
+public class ShoppingTransactionModel {
 
     private String operationId;
     private String depositUsername;
@@ -17,7 +16,7 @@ public class BankTransaction {
     private Date date;
     private PaymentMethod paymentMethod;
 
-    public BankTransaction(String operationId, String depositUsername, String label, String meansOfPaymentId, float amount, PaymentMethod paymentMethod) {
+    public ShoppingTransactionModel(String operationId, String depositUsername, String label, String meansOfPaymentId, float amount, PaymentMethod paymentMethod) {
         this.operationId = operationId;
         this.depositUsername = depositUsername;
         this.label = label;
@@ -28,7 +27,7 @@ public class BankTransaction {
     }
 
 
-    public BankTransaction() {
+    public ShoppingTransactionModel() {
         init();
     }
 

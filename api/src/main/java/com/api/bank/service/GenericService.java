@@ -33,7 +33,7 @@ public class GenericService<T extends Base> {
     public ObjectResponse add(T entity) {
         try {
             var res = repository.save(entity);
-//            repository.flush();
+
             return new ObjectResponse("Success", res, true, HttpStatus.CREATED);
 
         } catch (Exception e) {
@@ -54,6 +54,7 @@ public class GenericService<T extends Base> {
         }
     }
 
+    @Transactional
     public ObjectResponse deleteByUUID(String id) {
         try {
             repository.deleteById(UUID.fromString(id));
@@ -66,16 +67,17 @@ public class GenericService<T extends Base> {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BankTransactionException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public ObjectResponse update(T entity) {
         try {
             entity.setModifiedAt(Instant.now());
             repository.save(entity);
-            repository.flush();
             return new ObjectResponse("Success", entity,true, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             return new ObjectResponse(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ObjectResponse(e.getMessage(), false , HttpStatus.CONFLICT);
         }
     }
