@@ -1,0 +1,19 @@
+name: Deploy on remote server
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    name: Deploy on remote server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute script to setup docker-compose architecture
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.SERVER_IP }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            cd /app/ && sh ./deploy.sh

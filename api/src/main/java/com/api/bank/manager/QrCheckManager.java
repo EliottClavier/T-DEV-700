@@ -1,66 +1,68 @@
 package com.api.bank.manager;
 
-import com.api.bank.model.BankConstants;
-import com.api.bank.model.ObjectResponse;
-import com.api.bank.model.entity.Account;
-import com.api.bank.model.entity.Operation;
 import com.api.bank.model.entity.QrCheck;
-import com.api.bank.model.enums.OperationStatus;
-import com.api.bank.model.enums.OperationType;
 import com.api.bank.model.enums.TransactionStatus;
 import com.api.bank.model.exception.BankTransactionException;
-import com.api.bank.repository.AccountRepository;
+import com.api.bank.model.transaction.BankTransactionModel;
+import com.api.bank.model.transaction.QrCheckTransactionModel;
+import com.api.bank.model.transaction.TransactionResult;
 import com.api.bank.repository.CheckRepository;
-import com.api.bank.repository.OperationRepository;
-import com.api.bank.service.AccountService;
 import com.api.bank.service.CheckService;
-import com.api.bank.service.OperationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.UUID;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class QrCheckManager implements IQrCheckManager {
     private final CheckService checkService;
-    private final AccountService accountService;
-    private final OperationService operationService;
 
     @Autowired
-    public QrCheckManager(CheckRepository qrCheckRepository, AccountRepository accountRepository, OperationRepository operationRepository) {
+    public QrCheckManager(CheckRepository qrCheckRepository) {
         this.checkService = new CheckService(qrCheckRepository);
-        this.accountService = new AccountService(accountRepository);
-        this.operationService = new OperationService(operationRepository);
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
-    public QrCheck buyQrCheck(QrCheck qrCheck) {
+    @Transactional(rollbackFor= {BankTransactionException.class, Exception.class}, propagation = Propagation.REQUIRED  )
+    public TransactionResult buyQrCheck(QrCheckTransactionModel transaction) {
         try {
-            //check if the check is valid
-            if (qrCheck.getCheckToken().isEmpty()) {
-                throw new Exception("Invalid check");
-            }
-            //CHECK IF THE QRCHECK IS ALREADY IN THE DATABASE
-            if (checkService.existsCheckByCheckToken(qrCheck.getCheckToken())) {
-                throw new Exception("Check already exists");     //IF IT IS, THROW AN EXCEPTION
-            }
-            var bankAccount = accountService.getAccountByOwnerName(BankConstants.BANK_NAME);
 
-            var res = writeOperation(bankAccount, qrCheck, OperationStatus.PENDING, OperationType.WITHDRAW, "Qrcheck Buy");
+            checkToken(transaction);
+            createQrCheck(transaction);
 
-            if(res.isValid())
-                this.checkService.add(qrCheck);
+            return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "QrCheck successfully created");
 
-            return new QrCheck();
+        } catch (BankTransactionException e) {
+            return new TransactionResult(e.getTransactionStatus(), transaction.getOperationId(), e.getMessage());
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            return new TransactionResult(TransactionStatus.FAILED, transaction.getOperationId(), e.getMessage());
         }
     }
+    @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
+    public TransactionResult createQrCheck(QrCheckTransactionModel transaction) throws BankTransactionException {
+
+        var qrCheck = new QrCheck(transaction.getAmount(), transaction.getToken());
+        if (!this.checkService.add(qrCheck).isValid()) {
+            throw new BankTransactionException(TransactionStatus.FAILED, transaction.getOperationId(), "QrCheck creation failed");
+        }
+        return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "QrCheck successfully created");
+    }
+
+    @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
+    public void checkToken(QrCheckTransactionModel transaction) throws BankTransactionException {
+        if (transaction.getToken().isEmpty()) {
+            throw new BankTransactionException(TransactionStatus.TOKEN_EMPTY_ERROR, transaction.getOperationId(), "Token is empty");
+        }
+        if (checkService.existsCheckByCheckToken(transaction.getToken())) {
+            throw new BankTransactionException(TransactionStatus.TOKEN_ERROR, transaction.getOperationId(), "Token is already used");
+        }
+    }
+
 
     @Override
     public boolean checkQrCheck(QrCheck qrCheck) {
@@ -72,20 +74,14 @@ public class QrCheckManager implements IQrCheckManager {
         return false;
     }
 
-    /**
-     * Write a operation, add to an account and persist it in the database
-     * @throws Exception If the persist is not valid
-     */
-    private ObjectResponse writeOperation(Account account, QrCheck qrCheck, OperationStatus
-            opStatus, OperationType opType, String label) throws Exception {
-        var operation = new Operation(UUID.randomUUID().toString(), label, qrCheck.getSoldAmount(), new Date(), account, qrCheck, opStatus, opType, null);
-
-        account.setSold(account.getSold() - qrCheck.getSoldAmount());
-        var res = accountService.update(account);
-
-        if (!res.isValid())
-            throw new Exception("Error");
-        return res;
+    @Override
+    @Transactional(rollbackFor = {BankTransactionException.class, Exception.class}, propagation = Propagation.REQUIRED)
+    public void updateQrCheck(BankTransactionModel transaction) throws BankTransactionException {
+        transaction.getQrCheck().setSoldAmount(transaction.getQrCheck().getSoldAmount() - transaction.getAmount());
+        if (!checkService.update(transaction.getQrCheck()).isValid()) {
+            throw new BankTransactionException(TransactionStatus.CHECK_ERROR, transaction.getOperationId(), "QrCheck update failed");
+        }
     }
+
 
 }

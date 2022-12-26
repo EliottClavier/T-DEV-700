@@ -10,16 +10,24 @@ import com.api.bank.repository.AccountRepository;
 import com.api.bank.service.AccountService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-@Component
+
+@SpringBootTest
 public class AccountTest {
 
+
+    private final AccountService accountService;
+
     @Autowired
-    private AccountService accountService;
+    public AccountTest(AccountRepository accountRepository) {
+        accountService = new AccountService(accountRepository);
+    }
 
 
     @Test
@@ -68,7 +76,7 @@ public class AccountTest {
     @Test
     void testGetAccountById() {
         //Arrange
-        var id = "ae06d731-0ff2-43a8-aa92-ea0e0fc1f0e1";
+        var id = "0fa04e93-6b37-475d-ad72-d2917ea42fb0";
         //Act
         var objectResponse = accountService.get(id);
 
