@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:tpe/config/router/router.dart';
 import 'package:tpe/services/transaction_service.dart';
 // ignore: unused_import
