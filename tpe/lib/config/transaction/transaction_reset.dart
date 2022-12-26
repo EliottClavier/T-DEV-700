@@ -1,6 +1,6 @@
-import "package:tpe/services/transaction_service.dart";
 import "package:tpe/config/router/navigator.dart";
 import "package:tpe/app.dart";
+import "package:tpe/services/transaction_service.dart";
 
 TransactionService transactionService = TransactionService();
 

@@ -47,7 +47,7 @@ String handleTransactionStatus(
       onTransactionResetWithError(message);
       break;
     case "LOST_CONNECTION":
-      transactionService.setStatus(message);
+      transactionService.setStatus("Lost server connection. Try again.");
       onTransactionResetWithError(message);
       break;
     case "TRANSACTION_TIMED_OUT":

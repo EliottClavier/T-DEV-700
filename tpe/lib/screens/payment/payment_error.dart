@@ -71,36 +71,31 @@ class _PaymentErrorScreenStatefulWidgetState
                 Image(image: AssetImage("assets/img/x-circle.png")),
               ],
             ),
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "Payment refused",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 15,
-                        letterSpacing: 0.02,
-                        height: 1.2,
-                      ),
-                    ),
-                    Text(
-                      status,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w300,
-                        color: Colors.white,
-                        fontSize: 15,
-                        letterSpacing: 0.02,
-                        height: 1.2,
-                      ),
-                    ),
-                  ],
-                )
+                const Text(
+                  "Payment refused",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                    fontSize: 15,
+                    letterSpacing: 0.02,
+                    height: 1.2,
+                  ),
+                ),
+                Text(
+                  status,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                    fontSize: 15,
+                    letterSpacing: 0.02,
+                    height: 1.2,
+                  ),
+                ),
               ],
             ),
             Row(
