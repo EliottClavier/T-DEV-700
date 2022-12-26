@@ -22,6 +22,21 @@ public class TransactionRequest implements Serializable {
     public String paymentId;
     public PaymentMethod paymentMethod;
 
+    public TransactionRequest() {
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public TransactionRequest(String tpeSessionId, String tpeUsername, String shopSessionId, String shopUsername, float amount, String paymentId, String paymentMethod) {
+        this.id = UUID.randomUUID().toString();
+        this.tpeSessionId = tpeSessionId;
+        this.tpeUsername = tpeUsername;
+        this.shopSessionId = shopSessionId;
+        this.shopUsername = shopUsername;
+        this.amount = amount;
+        this.paymentId = paymentId;
+        this.paymentMethod = PaymentMethod.valueOf(paymentMethod);
+    }
+
     public TransactionRequest(String shopUsername, String shopSessionId, float amount) {
         this.id = UUID.randomUUID().toString();
         this.shopUsername = shopUsername;

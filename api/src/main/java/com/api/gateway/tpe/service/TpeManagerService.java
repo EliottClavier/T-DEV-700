@@ -65,8 +65,8 @@ public class TpeManagerService {
 
     public TransactionRequest retrieveTransactionRequestByTpeSessionId(String sessionId) {
         // For each transaction return value
-        for (Object transaction : customRedisTemplate.opsForHash().values(HASH_KEY_NAME_TRANSACTION)) {
-            TransactionRequest transactionRequest = new Gson().fromJson((String) transaction, TransactionRequest.class);
+        for (String key : customRedisTemplate.keys(HASH_KEY_NAME_TRANSACTION + ":*")) {
+            TransactionRequest transactionRequest = new Gson().fromJson(customRedisTemplate.opsForValue().get(key), TransactionRequest.class);
             if (transactionRequest.getTpeSessionId().equals(sessionId)) {
                 return transactionRequest;
             }
@@ -83,7 +83,7 @@ public class TpeManagerService {
     }
 
     public void deleteTransactionByTransactionId(String transactionId) {
-        this.customRedisTemplate.opsForHash().delete(HASH_KEY_NAME_TRANSACTION, transactionId);
+        customRedisTemplate.delete(HASH_KEY_NAME_TRANSACTION + ":" + transactionId);
     }
 
     public List<Object> getAllTpeRedis() {
