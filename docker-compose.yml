@@ -8,11 +8,11 @@ services:
       context: ./api
     restart: unless-stopped
     env_file:
-      - ./env/dev/database.env
-      - ./env/dev/redis.env
-      - ./env/dev/api.env
-      - ./env/dev/tpe.env
-      - ./env/dev/shop.env
+      - ./env/database.env
+      - ./env/redis.env
+      - ./env/api.env
+      - ./env/tpe.env
+      - ./env/shop.env
     ports:
       - ${API_PORT}:${API_PORT}
     volumes:
@@ -41,7 +41,7 @@ services:
     image: mariadb:latest
     restart: unless-stopped
     env_file:
-      - ./env/dev/database.env
+      - ./env/database.env
     ports:
       - ${MARIADB_PORT}:${MARIADB_PORT}
     volumes:

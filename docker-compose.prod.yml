@@ -1,41 +1,18 @@
 version: '3'
 
 services:
-
-  # tpe:
-  #   container_name: tpe
-  #   build:
-  #     context: ./tpe
-  #   volumes:
-  #     - ./apks:/tpe/apk
-  #   env_file:
-  #     - ./env/prod/tpe.env
-
-  # shop:
-  #   container_name: shop
-  #   build:
-  #     context: ./shop
-  #   volumes:
-  #     - ./apks:/shop/apk
-  #   env_file:
-  #     - ./env/prod/shop.env
-
   api:
     container_name: api
-    build: 
-      context: ./api
-      dockerfile: Dockerfile.prod
-      args:
-        API_PORT: ${API_PORT}
+    image: eliottclavier/cashmanager-api:latest
     restart: unless-stopped
     env_file:
-      - ./env/prod/database.env
-      - ./env/prod/redis.env
-      - ./env/prod/api.env
-      - ./env/prod/tpe.env
-      - ./env/prod/shop.env
+      - ./env/database.env
+      - ./env/redis.env
+      - ./env/api.env
+      - ./env/tpe.env
+      - ./env/shop.env
     volumes:
-      - ./apks:/apks
+      - /app-data/cash-manager/apks:/apks
     expose:
       - "${API_PORT}"
     networks:
@@ -43,8 +20,6 @@ services:
       - nginx-proxy
     depends_on:
       - database
-      # - shop
-      # - tpe
 
   redis:
     container_name: redis
@@ -52,7 +27,7 @@ services:
     restart: unless-stopped
     command: redis-server --save 20 1 --requirepass ${REDIS_PASSWORD}
     volumes:
-      - ./redis-data:/data
+      - /app-data/cash-manager/redis:/data
     expose:
       - "${REDIS_PORT}"
     networks:
@@ -63,9 +38,9 @@ services:
     image: mariadb:latest
     restart: unless-stopped
     env_file:
-      - ./env/prod/database.env
+      - ./env/database.env
     volumes:
-      - ./database-data:/var/lib/mysql
+      - /app-data/cash-manager/database:/var/lib/mysql
     expose:
       - "${MARIADB_PORT}"
     networks:
