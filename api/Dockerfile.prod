@@ -20,9 +20,5 @@ ARG API_PORT
 RUN sed -i 's/8080/'"$API_PORT"'/g' /usr/local/tomcat/conf/server.xml
 EXPOSE $API_PORT
 
-# Change ownership on the app folder to the github-actions user
-RUN chown -R github-actions:github-actions /app-data/cash-manager/
-USER github-actions
-
 # Run tomcat server
 CMD ["catalina.sh", "run"]
