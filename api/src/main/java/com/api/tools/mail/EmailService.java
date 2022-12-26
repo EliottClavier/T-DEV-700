@@ -20,18 +20,21 @@ public class EmailService {
         this.env = env;
         this.emailSender = emailSender;
     }
-
-    public void sendSimpleMail(String to, String subject, String text) {
+    public boolean sendSimpleMail(String to, String subject, String text) {
 
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(env.getProperty("email.from", String.class, ""));
+            message.setFrom(env.getProperty("email.from", String.class, "support@cash-manager.live"));
             message.setTo(to);
             message.setSubject(subject);
             message.setText(text);
             emailSender.send(message);
+
+            return true;
+
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 }
