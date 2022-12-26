@@ -29,6 +29,8 @@ jobs:
           context: api
           file: api/Dockerfile.prod
           push: true
+          build-args: |
+            API_PORT=${{ secrets.API_PORT }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/cashmanager-api:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/cashmanager-api:${{ github.ref_name }}
