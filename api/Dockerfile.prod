@@ -1,5 +1,5 @@
-# On fixe la version de gradle à la 7.5.1, ce qui permet de ne pas utiliser gradlew
-# qui télécharge la bonne version de gradle à chaque build
+# We use gradle 7.5.1 in order to not use .gradlew that takes the most recent gradle version
+# and could create imcompatibility issues
 FROM gradle:7.5.1-jdk17-alpine as builder
 ENV HOME=/api-build
 RUN mkdir $HOME
@@ -8,13 +8,21 @@ WORKDIR /$HOME
 
 RUN export LANG='en_US.UTF-8'
 
+# Build war file
 RUN gradle war
 
+# Retrieve built war file from builder image
 FROM tomcat:9.0.69-jdk17-corretto
 COPY --from=builder ./api-build/build/libs/api.war /usr/local/tomcat/webapps/
 
+# Replace default tomcat port by the one defined in the build arg API_PORT
 ARG API_PORT
 RUN sed -i 's/8080/'"$API_PORT"'/g' /usr/local/tomcat/conf/server.xml
 EXPOSE $API_PORT
 
+# Change ownership on the app folder to the github-actions user
+RUN chown -R github-actions:github-actions /app/T-DEV-700/api
+USER github-actions
+
+# Run tomcat server
 CMD ["catalina.sh", "run"]
