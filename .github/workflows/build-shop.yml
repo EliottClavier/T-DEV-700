@@ -20,9 +20,9 @@ jobs:
       
       - name: Build APK
         run: flutter build apk --release 
-          --dart-define=API_URL=\'${{ secrets.API_URL }}\' 
-          --dart-define=SHOP_USERNAME=\'${{ secrets.SHOP_USERNAME }}\'
-          --dart-define=SHOP_PASSWORD=\'${{ secrets.SHOP_PASSWORD }}\'
+          --dart-define=API_URL='${{ secrets.API_URL }}' 
+          --dart-define=SHOP_USERNAME='${{ secrets.SHOP_USERNAME }}'
+          --dart-define=SHOP_PASSWORD='${{ secrets.SHOP_PASSWORD }}'
         working-directory: ./shop
       
       - name: Create .tar artifact
