@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:tpe/screens/home.dart';
+import 'package:tpe/services/transaction_service.dart';
+import 'package:tpe/config/transaction/transaction_reset.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
-  const PaymentSuccessScreen({super.key, required this.price});
+  const PaymentSuccessScreen({super.key});
 
   static const String _title = 'Payment method';
-  final String price;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: PaymentSuccessScreenStatefulWidget(
-        price: price,
-      ),
+      home: const PaymentSuccessScreenStatefulWidget(),
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF1EBE4B),
           fontFamily: "Montserrat"),
@@ -22,9 +20,7 @@ class PaymentSuccessScreen extends StatelessWidget {
 }
 
 class PaymentSuccessScreenStatefulWidget extends StatefulWidget {
-  const PaymentSuccessScreenStatefulWidget({super.key, this.price});
-
-  final String? price;
+  const PaymentSuccessScreenStatefulWidget({super.key});
 
   @override
   State<PaymentSuccessScreenStatefulWidget> createState() =>
@@ -33,6 +29,8 @@ class PaymentSuccessScreenStatefulWidget extends StatefulWidget {
 
 class _PaymentSuccessScreenStatefulWidgetState
     extends State<PaymentSuccessScreenStatefulWidget> {
+  final TransactionService transactionService = TransactionService();
+
   @override
   void initState() {
     super.initState();
@@ -44,12 +42,7 @@ class _PaymentSuccessScreenStatefulWidgetState
   }
 
   void _onBackHome() {
-    dispose();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
-      ),
-    );
+    resetTransaction();
   }
 
   @override
@@ -71,9 +64,9 @@ class _PaymentSuccessScreenStatefulWidgetState
               children: <Widget>[
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "Paiement réalisé avec succès",
+                  children: const <Widget>[
+                    Text(
+                      "Payment successful",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
@@ -84,9 +77,9 @@ class _PaymentSuccessScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "Votre paiement de ${widget.price} a bien été réalisé",
+                      "Payment has been successfully processed",
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w300,
                         color: Colors.white,
                         fontSize: 15,
