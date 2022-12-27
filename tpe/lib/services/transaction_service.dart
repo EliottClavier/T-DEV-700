@@ -18,8 +18,7 @@ class TransactionService with ChangeNotifier {
       TransactionService._internal();
 
   String _token = "";
-  //final String _baseUrl = API_URL;
-  final String _baseUrl = "api.cash-manager.live";
+  final String _baseUrl = API_URL;
   String _androidId = "";
   double _amount = 0.0;
   late BuildContext _context;
@@ -107,7 +106,7 @@ class TransactionService with ChangeNotifier {
 
   Future<void> _connect() async {
     final response = await http.post(
-        Uri.parse("https://$_baseUrl/auth/tpe/login"),
+        Uri.parse("http://$_baseUrl/auth/tpe/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"androidId": _androidId, "password": password}));
     print(response.statusCode);
@@ -126,7 +125,7 @@ class TransactionService with ChangeNotifier {
 
   Future<void> _fullRegister() async {
     final response =
-        await http.post(Uri.parse("https://$_baseUrl/auth/tpe/register"),
+        await http.post(Uri.parse("http://$_baseUrl/auth/tpe/register"),
             headers: {
               "Content-Type": "application/json",
               // ignore: unnecessary_string_interpolations
