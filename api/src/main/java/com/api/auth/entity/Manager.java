@@ -31,4 +31,9 @@ public class Manager {
 
     public Manager() {
     }
+
+    public Manager(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }

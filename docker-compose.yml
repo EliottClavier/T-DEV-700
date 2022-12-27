@@ -7,25 +7,13 @@ services:
     build: 
       context: ./api
     restart: unless-stopped
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_PORT: ${DB_PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO}
-      HIBERNATE_SHOW_SQL: ${HIBERNATE_SHOW_SQL}
-      DEVTOOLS_REMOTE_SECRET: ${DEVTOOLS_REMOTE_SECRET}
-      DEVTOOLS_LIVERELOAD_ENABLED: ${DEVTOOLS_LIVERELOAD_ENABLED}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      QR_CODE_SECRET: ${QR_CODE_SECRET}
-      JWT_SECRET: ${JWT_SECRET}
-      DEFAULT_MANAGER_USERNAME: ${DEFAULT_MANAGER_USERNAME}
-      DEFAULT_MANAGER_PASSWORD: ${DEFAULT_MANAGER_PASSWORD}
-      TPE_REGISTER_SECRET_HEADER: ${TPE_REGISTER_SECRET_HEADER}
-      TPE_REGISTER_SECRET_KEY: ${TPE_REGISTER_SECRET_KEY}
+    env_file:
+      - ./env/database.env
+      - ./env/redis.env
+      - ./env/api.env
+      - ./env/tpe.env
+      - ./env/shop.env
+      - ./env/mail.env
     ports:
       - ${API_PORT}:${API_PORT}
     volumes:
@@ -37,6 +25,7 @@ services:
     depends_on:
       - database
       - redis
+      - mailhog
 
   redis:
     container_name: redis
@@ -54,24 +43,40 @@ services:
     container_name: database
     image: mariadb:latest
     restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    env_file:
+      - ./env/database.env
     ports:
-      - ${DB_PORT}:${DB_PORT}
+      - ${MARIADB_PORT}:${MARIADB_PORT}
     volumes:
       - ./database-data:/var/lib/mysql
     networks:
       - back-net
-    
+  
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    restart: unless-stopped
+    environment:
+      MH_AUTH_FILE: /mailhog.auth
+      MH_MAILDIR_PATH: /mail-data
+      MH_STORAGE: maildir
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - ./env/mailhog.auth:/mailhog.auth:ro
+      - ./mail-data:/mail-data:rw
+    networks:
+      - back-net
+
 volumes:
   database-data:
   redis-data:
   api:
   apks:
   qr-code:
+  mail-data:
+  mailhog.auth:
 
 networks:
   back-net:

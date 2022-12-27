@@ -1,0 +1,23 @@
+name: Create auth file to configure mail server
+
+on:
+  workflow_call:
+
+jobs:
+  transfer_artifacts:
+    name: Create auth file to configure mail server
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Create auth file
+        run: echo ${{ secrets.MAILHOG_USERNAME }}:${{ secrets.MAILHOG_HASH }} > mailhog.auth
+      
+      - name: Transfer auth file
+        uses: appleboy/scp-action@master
+        with:
+          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.SERVER_IP }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          source: ./mailhog.auth
+          target: /app-data/cash-manager/mail

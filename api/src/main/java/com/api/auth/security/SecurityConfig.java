@@ -29,7 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@
+
+
+        EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan(value = "com.api.auth")
 public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 
@@ -63,12 +66,19 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             .antMatchers("/auth/**").permitAll()
             .antMatchers("/bank/**").hasRole("MANAGER")
             .antMatchers("/tpe-manager/**").hasRole("TPE")
+            // Endpoints to get Redis data
+            .antMatchers("/tpe-manager-redis/**").hasRole("MANAGER")
+            .antMatchers("/transaction-request-redis/**").hasRole("MANAGER")
+            // Endpoints to connect to websockets
             .antMatchers("/websocket-manager/tpe/**").hasRole("TPE")
             .antMatchers("/websocket-manager/shop/**").hasRole("SHOP")
+            // Interfaces for downloading apps
+            .antMatchers("/download/tpe.apk").permitAll()
+            .antMatchers("/download/shop.apk").permitAll()
             // Interfaces for Admin
             .antMatchers("/admin/auth/login/**").permitAll()
             .antMatchers("/admin/**").hasRole("MANAGER")
-            .anyRequest().hasRole("MANAGER")
+            //.anyRequest().hasRole("MANAGER")
             .and()
             .authenticationManager(authenticationManager)
             .exceptionHandling()

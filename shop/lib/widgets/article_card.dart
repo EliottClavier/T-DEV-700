@@ -67,6 +67,7 @@ class ArticleCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
+                    maxLines: 1,
                   ),
                 ),
                 Center(
