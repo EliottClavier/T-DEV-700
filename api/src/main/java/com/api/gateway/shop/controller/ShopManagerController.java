@@ -66,7 +66,7 @@ public class ShopManagerController {
                                     )
                             );
 
-                            // Send processing message to Shop
+                            // Send transaction opened message to Shop
                             smt.convertAndSendToUser(
                                     user.getName(),
                                     destinationGenerator.getShopTransactionStatusDest(sessionId),

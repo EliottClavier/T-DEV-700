@@ -34,10 +34,6 @@ public class TpeManagerController {
     @Autowired
     private IBankManager bankManager;
 
-    public static void realizeTransaction(TransactionRequest transactionRequest) {
-        System.out.println("Transaction realized: " + transactionRequest);
-    }
-
     @MessageMapping("/tpe/synchronize")
     public void synchronizeTpeRedis(
             Principal user,
