@@ -2,21 +2,19 @@ import 'dart:io';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
-
-import 'package:tpe/screens/payment.dart';
-import 'package:tpe/screens/payment_sending.dart';
+import 'package:tpe/screens/payment/payment_sending.dart';
 import 'package:tpe/utils/snackbar.dart';
+import 'package:tpe/config/router/navigator.dart';
+import 'package:tpe/services/transaction_service.dart';
 
 class QrCodeReaderScreen extends StatelessWidget {
-  const QrCodeReaderScreen({super.key, required this.price});
-
-  final String price;
+  const QrCodeReaderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'QR Code Reader',
-      home: QrCodeReaderScreenWidget(price: price),
+      home: const QrCodeReaderScreenWidget(),
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF03045F),
         primarySwatch: Colors.blue,
@@ -27,9 +25,7 @@ class QrCodeReaderScreen extends StatelessWidget {
 }
 
 class QrCodeReaderScreenWidget extends StatefulWidget {
-  const QrCodeReaderScreenWidget({super.key, required this.price});
-
-  final String price;
+  const QrCodeReaderScreenWidget({super.key});
 
   @override
   State<QrCodeReaderScreenWidget> createState() =>
@@ -108,14 +104,7 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   }
 
   void _onBackButtonPressed() {
-    dispose();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PaymentScreen(
-          price: widget.price,
-        ),
-      ),
-    );
+    navigate("/payment");
   }
 
   String describeEnum(Object? e) {
@@ -127,18 +116,15 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
   }
 
   void onDataReaded(Barcode data) {
-    showSnackBar(context, "Scan réussi", "success", 2);
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      dispose();
-      paymentSendingScreen(data.code.toString());
-    });
+    TransactionService transactionService = TransactionService();
+    showSnackBar(context, "Scan réussi", "success", 1);
+    transactionService.payWithQrCode(data.code.toString());
   }
 
   void paymentSendingScreen(String data) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => PaymentSendingScreen(
-            paymentData: data, price: widget.price, paymentMethod: "qr_code"),
+        builder: (context) => const PaymentSendingScreen(),
       ),
     );
   }
@@ -150,10 +136,9 @@ class QrCodeReaderScreenWidgetState extends State<QrCodeReaderScreenWidget> {
 
   @override
   void dispose() {
-    Future.delayed(const Duration(milliseconds: 200), () {
-      controller?.stopCamera();
+    super.dispose();
+    Future.delayed(const Duration(milliseconds: 5), () {
       controller?.dispose();
     });
-    super.dispose();
   }
 }

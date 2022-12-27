@@ -68,7 +68,7 @@ public class AuthTpeController {
                 // Return list with two attributes: message and password
                 emailService.sendSimpleMail(
                         env.getProperty("email.to"),
-                        "TPE Registration",
+                        "TPE Registration - " + tpeRegisterCredentials.getAndroidId(),
                         "Your TPE has been registered. Your password is: " + randomPassword
                 );
                 return ResponseEntity.ok(Map.of(
