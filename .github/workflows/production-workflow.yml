@@ -2,6 +2,8 @@ name: Deploy
 
 on:
   release:
+    branches:
+      - "release/*"
     types: [published]
 
 env:
@@ -38,8 +40,14 @@ jobs:
     uses: ./.github/workflows/build-publish-docker-image.yml
     secrets: inherit
 
-  deploy:
+  generate_auth_mail:
     needs: [build_publish_docker_image]
+    name: Create auth file to configure mail server
+    uses: ./.github/workflows/generate_auth_mail.yml
+    secrets: inherit
+
+  deploy:
+    needs: [generate_auth_mail]
     name: Deploy on remote server
     uses: ./.github/workflows/deploy.yml
     secrets: inherit

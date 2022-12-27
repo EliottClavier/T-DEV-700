@@ -2,6 +2,7 @@ package com.api.auth.runner;
 
 import com.api.auth.entity.Manager;
 import com.api.auth.repository.ManagerRepository;
+import com.api.auth.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -10,13 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ManagerLoader implements ApplicationRunner {
+public class ManagerRunner implements ApplicationRunner {
 
     @Autowired
-    private ManagerRepository managerRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private ManagerService managerService;
 
     @Value("${default.manager.username}")
     private String username;
@@ -25,11 +23,7 @@ public class ManagerLoader implements ApplicationRunner {
     private String password;
 
     public void run(ApplicationArguments args) {
-        if (managerRepository.findByUsername(username).isEmpty()) {
-            Manager manager = new Manager();
-            manager.setUsername(username);
-            manager.setPassword(passwordEncoder.encode(password));
-            managerRepository.save(manager);
-        }
+        Manager manager = new Manager(username, password);
+        managerService.registerManager(manager);
     }
 }
