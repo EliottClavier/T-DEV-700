@@ -12,4 +12,10 @@ public class AuthAdminController {
     public String getTemplate() {
         return "loginView";
     }
+
+    @GetMapping( value = {"/login/test/", "/login/test"})
+    public String getAdmin() {
+        System.out.println("Get Connected ! ");
+        return null;
+    }
 }
