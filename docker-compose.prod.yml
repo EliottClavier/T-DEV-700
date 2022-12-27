@@ -59,7 +59,7 @@ services:
       MH_AUTH_FILE: /mailhog.auth
       MH_MAILDIR_PATH: /mail-data
       MH_STORAGE: maildir
-      VIRTUAL_HOST: ${MAIl_VIRTUAL_HOST}
+      VIRTUAL_HOST: ${MAIL_VIRTUAL_HOST}
       VIRTUAL_PORT: 8025
       LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
     expose:
