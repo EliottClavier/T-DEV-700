@@ -18,8 +18,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Test
-        run: echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)"
+      - name: Set environment variables
+        env:
+          DART_DEFINES: ${{ inputs.dart_defines }}
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -29,7 +30,7 @@ jobs:
         working-directory: ./${{ inputs.app_dir }}
       
       - name: Build APK
-        run: flutter build apk --release $(echo "$(for key in $(echo "${{ inputs.dart_defines }}" | tr ';' ' '); do echo "--dart-define=$key "; done)")
+        run: flutter build apk --release $(echo "$(for key in $(echo "$DART_DEFINES" | tr ';' ' '); do echo "--dart-define=$key "; done)")
         working-directory: ./${{ inputs.app_dir }}
       
       - name: Create .tar artifact
