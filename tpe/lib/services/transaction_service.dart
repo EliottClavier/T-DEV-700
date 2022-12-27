@@ -28,7 +28,7 @@ class TransactionService with ChangeNotifier {
   String _paymentId = "";
 
   String _sessionId = "";
-  String password = "Kp59KO\$7gGtu";
+  String password = "0yTwyw5iNwlK";
   String _status = "Disconnected";
 
   void setStatus(status) {
