@@ -55,7 +55,6 @@ flutter:
     - assets/gif/animation_nfc.gif
     - assets/gif/home_loader.gif
     - assets/gif/payment_loader.gif
-    - .env
   fonts:
     - family: Montserrat
       fonts:
