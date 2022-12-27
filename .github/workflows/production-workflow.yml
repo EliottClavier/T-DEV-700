@@ -20,9 +20,9 @@ jobs:
     with:
       app_dir: tpe
       dart_defines: |
-        API_URL=$API_URL;
-        TPE_REGISTER_SECRET_HEADER=$TPE_REGISTER_SECRET_HEADER;
-        TPE_REGISTER_SECRET_KEY=$TPE_REGISTER_SECRET_KEY;
+        API_URL=\'$API_URL\';
+        TPE_REGISTER_SECRET_HEADER=\'$TPE_REGISTER_SECRET_HEADER\';
+        TPE_REGISTER_SECRET_KEY=\'$TPE_REGISTER_SECRET_KEY\';
 
   build_shop_apk:
     name: Build and publish Shop APK 
@@ -30,9 +30,9 @@ jobs:
     with:
       app_dir: shop
       dart_defines: |
-        API_URL=$API_URL;
-        SHOP_USERNAME=$SHOP_USERNAME;
-        SHOP_PASSWORD=$SHOP_PASSWORD;
+        API_URL=\'$API_URL\';
+        SHOP_USERNAME=\'$SHOP_USERNAME\';
+        SHOP_PASSWORD=\'$SHOP_PASSWORD\';
 
   build_publish_docker_image:
     needs: [build_tpe_apk, build_shop_apk]
