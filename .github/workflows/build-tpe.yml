@@ -20,9 +20,9 @@ jobs:
       
       - name: Build APK
         run: flutter build apk --release 
-          --dart-define=API_URL=\'${{ secrets.API_URL }}\' 
-          --dart-define=TPE_REGISTER_SECRET_HEADER=\'${{ secrets.TPE_REGISTER_SECRET_HEADER }}\'
-          --dart-define=TPE_REGISTER_SECRET_KEY=\'${{ secrets.TPE_REGISTER_SECRET_KEY }}\'
+          --dart-define=API_URL='${{ secrets.API_URL }}' 
+          --dart-define=TPE_REGISTER_SECRET_HEADER='${{ secrets.TPE_REGISTER_SECRET_HEADER }}'
+          --dart-define=TPE_REGISTER_SECRET_KEY='${{ secrets.TPE_REGISTER_SECRET_KEY }}'
         working-directory: ./tpe
       
       - name: Create .tar artifact
