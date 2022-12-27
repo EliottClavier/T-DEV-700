@@ -7,8 +7,8 @@ plugins {
 
 apply plugin: 'war'
 war {
-    archiveName = 'api.war'
-    baseName = 'api'
+    archiveName = 'ROOT.war'
+    baseName = 'ROOT'
     version = '0.0.1'
 }
 
