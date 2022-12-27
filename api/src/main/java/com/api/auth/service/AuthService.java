@@ -8,7 +8,7 @@ import java.util.Random;
 public class AuthService {
 
     public String alphaNumericString(int len) {
-        String AB = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&/()=?*+-_.:,;<>|";
+        String AB = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Random rnd = new Random();
 
         StringBuilder sb = new StringBuilder(len);
