@@ -13,6 +13,7 @@ services:
       - ./env/api.env
       - ./env/tpe.env
       - ./env/shop.env
+      - ./env/mail.env
     ports:
       - ${API_PORT}:${API_PORT}
     volumes:
@@ -23,6 +24,7 @@ services:
     depends_on:
       - database
       - redis
+      - mailhog
 
   redis:
     container_name: redis
@@ -48,12 +50,31 @@ services:
       - ./database-data:/var/lib/mysql
     networks:
       - back-net
-    
+  
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    restart: unless-stopped
+    environment:
+      MH_AUTH_FILE: /mailhog.auth
+      MH_MAILDIR_PATH: /mail-data
+      MH_STORAGE: maildir
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - ./env/mailhog.auth:/mailhog.auth:ro
+      - ./mail-data:/mail-data:rw
+    networks:
+      - back-net
+
 volumes:
   database-data:
   redis-data:
   api:
   apks:
+  mail-data:
+  mailhog.auth:
 
 networks:
   back-net:
