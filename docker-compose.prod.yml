@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+  api:
+    container_name: api
+    image: eliottclavier/cashmanager-api:latest
+    restart: unless-stopped
+    env_file:
+      - ./env/database.env
+      - ./env/redis.env
+      - ./env/api.env
+      - ./env/tpe.env
+      - ./env/shop.env
+      - ./env/mail.env
+    environment:
+      VIRTUAL_HOST: ${API_VIRTUAL_HOST}
+      VIRTUAL_PORT: ${API_PORT}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+    volumes:
+      - /app-data/cash-manager/apks:/apks
+    expose:
+      - "${API_PORT}"
+    networks:
+      - back-net
+      - nginx-proxy
+    depends_on:
+      - database
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    restart: unless-stopped
+    command: redis-server --save 20 1 --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - /app-data/cash-manager/redis:/data
+    expose:
+      - "${REDIS_PORT}"
+    networks:
+      - back-net
+
+  database:
+    container_name: database
+    image: mariadb:latest
+    restart: unless-stopped
+    env_file:
+      - ./env/database.env
+    volumes:
+      - /app-data/cash-manager/database:/var/lib/mysql
+    expose:
+      - "${MARIADB_PORT}"
+    networks:
+        - back-net
+
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    restart: unless-stopped
+    environment:
+      MH_AUTH_FILE: /mailhog.auth
+      MH_MAILDIR_PATH: /mail-data
+      MH_STORAGE: maildir
+      VIRTUAL_HOST: ${MAIL_VIRTUAL_HOST}
+      VIRTUAL_PORT: 8025
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+    expose:
+      - "1025"
+      - "8025"
+    volumes:
+      - /app-data/cash-manager/mail/mailhog.auth:/mailhog.auth:ro
+      - /app-data/cash-manager/mail/mail-data:/mail-data:rw
+    networks:
+      - back-net
+      - nginx-proxy
+  
+volumes:
+  database-data:
+  redis-data:
+  apks:
+  mail-data:
+  mailhog.auth:
+  
+networks:
+  back-net:
+  nginx-proxy:
+    external:
+      name: nginx-proxy

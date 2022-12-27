@@ -6,19 +6,16 @@ services:
     container_name: api
     build: 
       context: ./api
-    #image: image sur le registry
     restart: unless-stopped
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO}
-      HIBERNATE_SHOW_SQL: ${HIBERNATE_SHOW_SQL}
-      DEVTOOLS_REMOTE_SECRET: ${DEVTOOLS_REMOTE_SECRET}
-      DEVTOOLS_LIVERELOAD_ENABLED: ${DEVTOOLS_LIVERELOAD_ENABLED}
+    env_file:
+      - ./env/database.env
+      - ./env/redis.env
+      - ./env/api.env
+      - ./env/tpe.env
+      - ./env/shop.env
+      - ./env/mail.env
     ports:
-      - 8080:8080
+      - ${API_PORT}:${API_PORT}
     volumes:
       - ./api:/api
       - ./apks:/apks
@@ -26,27 +23,58 @@ services:
       - back-net
     depends_on:
       - database
+      - redis
+      - mailhog
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    restart: unless-stopped
+    command: redis-server --save 20 1 --requirepass ${REDIS_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - back-net
 
   database:
     container_name: database
     image: mariadb:latest
     restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    env_file:
+      - ./env/database.env
     ports:
-      - 3306:3306
+      - ${MARIADB_PORT}:${MARIADB_PORT}
     volumes:
       - ./database-data:/var/lib/mysql
     networks:
       - back-net
-    
+  
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    restart: unless-stopped
+    environment:
+      MH_AUTH_FILE: /mailhog.auth
+      MH_MAILDIR_PATH: /mail-data
+      MH_STORAGE: maildir
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - ./env/mailhog.auth:/mailhog.auth:ro
+      - ./mail-data:/mail-data:rw
+    networks:
+      - back-net
+
 volumes:
   database-data:
+  redis-data:
   api:
   apks:
+  mail-data:
+  mailhog.auth:
 
 networks:
   back-net:

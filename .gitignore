@@ -4,8 +4,16 @@
 ### Database volume ###
 database-data
 
+### Redis volume ###
+redis-data
+
 ### APKS volume ###
 apks
 
-### .env ###
+### Mail volume ###
+mail-data
+
+### .env (except examples) ###
 .env
+env/*
+!env/*.example.*

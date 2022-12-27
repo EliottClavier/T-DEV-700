@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tpe/screens/home.dart';
-import 'package:tpe/screens/payment.dart';
-import 'package:tpe/screens/payment_success.dart';
-import 'package:tpe/screens/payment_error.dart';
+import 'package:provider/provider.dart';
+import 'package:tpe/app.dart';
+import 'package:tpe/services/transaction_service.dart';
 
-void main() => runApp(const HomeScreen());
+void main() => {
+      runApp(
+        ChangeNotifierProvider(
+          create: (context) => TransactionService(),
+          child: const App(),
+        ),
+      ),
+    };

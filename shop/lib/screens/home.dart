@@ -1,14 +1,20 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:shop/screens/listArticles.dart';
+import 'package:shop/router/router.dart';
 
+import 'package:shop/connectors/requests.dart';
+import 'package:shop/screens/payment.dart';
 
 class Home extends StatelessWidget {
   static const String pageName = '/';
 
   void initState(BuildContext context) async {
     Future.delayed(Duration(seconds: 2), () {
-      Navigator.pushNamed(context, ListArticles.pageName);
+      RouterShop.pushRoute(context, Payment.pageName);
+      RouterShop.pushRoute(context, ListArticles.pageName);
     });
   }
 

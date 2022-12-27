@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:tpe/screens/payment.dart';
+import 'package:provider/provider.dart';
+import 'package:tpe/services/transaction_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -29,60 +28,28 @@ class HomeScreenStatefulWidget extends StatefulWidget {
       _HomeScreenStatefulWidgetState();
 }
 
-class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget>
-    with TickerProviderStateMixin {
-  late AnimationController controller;
-  late CurvedAnimation _animation;
+class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
+  TransactionService transactionService = TransactionService();
+  late String status;
 
-  String getPrice() {
-    Random rng = Random();
-    var price = rng.nextInt(100);
-    return "${price.toString()}.00 €";
-  }
-
-  void _onClick(PointerEvent details) {
-    String price = getPrice();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PaymentScreen(
-          price: price,
-        ),
-      ),
-    );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _initBank();
   }
 
   @override
   void initState() {
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )
-      ..addListener(
-        () {
-          setState(() {});
-        },
-      )
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          controller.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          controller.forward();
-        }
-      });
-
-    _animation = CurvedAnimation(
-      parent: controller,
-      curve: Curves.linear,
-    );
-
-    controller.repeat(reverse: true);
     super.initState();
   }
 
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
+  }
+
+  void _initBank() async {
+    status = Provider.of<TransactionService>(context, listen: true).getStatus();
   }
 
   @override
@@ -90,24 +57,24 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget>
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Listener(
-          onPointerDown: _onClick,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator(
-                    value: controller.value,
-                    color: Colors.white,
-                    strokeWidth: 3,
-                    semanticsLabel: 'Circular progress indicator',
-                  ),
-                ],
-              )
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset("assets/gif/home_loader.gif",
+                    width: 300, height: 300),
+              ],
+            ),
+            Text(
+              status,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+              ),
+            ),
+          ],
         ),
       ),
     );
