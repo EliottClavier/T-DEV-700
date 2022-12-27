@@ -16,23 +16,13 @@ env:
 jobs:
   build_tpe_apk:
     name: Build and publish TPE APK 
-    uses: ./.github/workflows/build-apks.yml
-    with:
-      app_dir: tpe
-      dart_defines: |
-        API_URL=\'$API_URL\';
-        TPE_REGISTER_SECRET_HEADER=\'$TPE_REGISTER_SECRET_HEADER\';
-        TPE_REGISTER_SECRET_KEY=\'$TPE_REGISTER_SECRET_KEY\';
+    uses: ./.github/workflows/build-tpe.yml
+    secrets: inherit
 
   build_shop_apk:
     name: Build and publish Shop APK 
-    uses: ./.github/workflows/build-apks.yml
-    with:
-      app_dir: shop
-      dart_defines: |
-        API_URL=\'$API_URL\';
-        SHOP_USERNAME=\'$SHOP_USERNAME\';
-        SHOP_PASSWORD=\'$SHOP_PASSWORD\';
+    uses: ./.github/workflows/build-shop.yml
+    secrets: inherit
 
   build_publish_docker_image:
     needs: [build_tpe_apk, build_shop_apk]
