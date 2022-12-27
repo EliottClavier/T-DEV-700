@@ -39,10 +39,6 @@ class TransactionService with ChangeNotifier {
     return _transactionService;
   }
 
-  void test() {
-    password = "-:|p4a(Lwsx0";
-  }
-
   String getStatus() {
     return _status;
   }
