@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:shop/util/shop.dart';
 import 'package:stomp_dart_client/parser.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
@@ -11,6 +12,7 @@ import 'package:shop/widgets/snackBar.dart';
 import 'package:shop/screens/shop.dart';
 import 'package:shop/screens/validation.dart';
 import 'config/config.dart';
+import 'package:shop/util/env.dart';
 
 class RequestsClass {
   static String token = "";
@@ -25,7 +27,7 @@ class RequestsClass {
     try {
       final response = await http.post(Uri.parse("http://$_ip/auth/shop/login"),
           headers: {"Content-Type": "application/json"},
-          body: jsonEncode({"name": "SHOP", "password": "PASSWORD"}));
+          body: jsonEncode({"name": SHOP_USERNAME, "password": SHOP_PASSWORD}));
       print(response);
       if (response.statusCode == 200) {
         token = Token.fromJson(jsonDecode(response.body)).token;
@@ -91,6 +93,7 @@ class RequestsClass {
             case "TRANSACTION_DONE":
               paymentValidate = true;
               _client.deactivate();
+              shop_articles = [];
               Navigator.pushNamed(parentContext, Validation.pageName);
               break;
             case "TRANSACTION_ERROR":
@@ -128,6 +131,17 @@ class RequestsClass {
               Navigator.pushNamed(parentContext, Shop.pageName);
               showSnackBar(parentContext,
                   "Erreur lors de la connexion avec la banque", "error", 3);
+              break;
+            case "TRANSACTION_TIMED_OUT":
+              paymentValidate = true;
+              _client.deactivate();
+              Navigator.pushNamed(parentContext, Shop.pageName);
+              showSnackBar(parentContext, "Transaction timed out", "error", 3);
+              break;
+            default:
+              Navigator.pushNamed(parentContext, Shop.pageName);
+              showSnackBar(
+                  parentContext, "Erreur lors de la transaction", "error", 3);
               break;
           }
         });

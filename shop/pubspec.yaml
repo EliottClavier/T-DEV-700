@@ -39,6 +39,7 @@ dependencies:
   animate_do: ^3.0.2
   http: ^0.13.5
   stomp_dart_client: ^0.4.4
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
