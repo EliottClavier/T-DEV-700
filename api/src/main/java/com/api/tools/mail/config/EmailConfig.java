@@ -27,12 +27,12 @@ public class EmailConfig {
         mailSender.setHost(env.getProperty("spring.mail.host", String.class));
         mailSender.setPort(env.getProperty("spring.mail.port", Integer.class, 587));
 
-        mailSender.setUsername(env.getProperty("spring.mail.username", String.class));
-        mailSender.setPassword(env.getProperty("spring.mail.password", String.class));
+        mailSender.setUsername(env.getProperty("spring.mail.username", String.class, ""));
+        mailSender.setPassword(env.getProperty("spring.mail.password", String.class, ""));
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.auth", "false");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.debug", "true");
 

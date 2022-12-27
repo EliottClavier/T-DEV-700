@@ -11,6 +11,11 @@ services:
       - ./env/api.env
       - ./env/tpe.env
       - ./env/shop.env
+      - ./env/mail.env
+    environment:
+      VIRTUAL_HOST: ${API_VIRTUAL_HOST}
+      VIRTUAL_PORT: ${API_PORT}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
     volumes:
       - /app-data/cash-manager/apks:/apks
     expose:
@@ -45,11 +50,34 @@ services:
       - "${MARIADB_PORT}"
     networks:
         - back-net
+
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    restart: unless-stopped
+    environment:
+      MH_AUTH_FILE: /mailhog.auth
+      MH_MAILDIR_PATH: /mail-data
+      MH_STORAGE: maildir
+      VIRTUAL_HOST: ${MAIl_VIRTUAL_HOST}
+      VIRTUAL_PORT: 8025
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+    expose:
+      - "1025"
+      - "8025"
+    volumes:
+      - /app-data/cash-manager/mail/mailhog.auth:/mailhog.auth:ro
+      - /app-data/cash-manager/mail/mail-data:/mail-data:rw
+    networks:
+      - back-net
+      - nginx-proxy
   
 volumes:
   database-data:
   redis-data:
   apks:
+  mail-data:
+  mailhog.auth:
   
 networks:
   back-net:
