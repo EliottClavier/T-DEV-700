@@ -28,7 +28,7 @@ class TransactionService with ChangeNotifier {
   String _paymentId = "";
 
   String _sessionId = "";
-  String password = "-:|p4a(Lwsx0";
+  String password = "Kp59KO\$7gGtu";
   String _status = "Disconnected";
 
   void setStatus(status) {
@@ -102,10 +102,9 @@ class TransactionService with ChangeNotifier {
 
   Future<void> _connect() async {
     final response = await http.post(
-        Uri.parse("http://$_baseUrl/auth/tpe/login"),
+        Uri.parse("https://$_baseUrl/auth/tpe/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"androidId": _androidId, "password": password}));
-    print(response.statusCode);
     if (response.statusCode == 200) {
       _token = Token.fromJson(jsonDecode(response.body)).token;
       print(response.body);
@@ -121,33 +120,33 @@ class TransactionService with ChangeNotifier {
 
   Future<void> _fullRegister() async {
     final response =
-        await http.post(Uri.parse("http://$_baseUrl/auth/tpe/register"),
+        await http.post(Uri.parse("https://$_baseUrl/auth/tpe/register"),
             headers: {
               "Content-Type": "application/json",
               // ignore: unnecessary_string_interpolations
               "$REGISTER_HEADER": "$REGISTER_KEY"
             },
             body: jsonEncode({"androidId": _androidId}));
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 409) {
       password = jsonDecode(response.body)['password'];
       setStatus('Register successfull. Please wait for Device whitelist');
     } else {
       onFullRegisterError();
-      setStatus("Register to server failed. New attempt in 30 seconds");
+      setStatus("Register to server failed. New attempt in 5 seconds");
     }
     notifyListeners();
     return Future.value();
   }
 
   Future<void> onFullRegisterError() async {
-    await Future.delayed(const Duration(seconds: 30));
+    await Future.delayed(const Duration(seconds: 5));
     await _connect();
     return Future.value();
   }
 
   StompConfig getClientConfig() {
     return StompConfig.SockJS(
-      url: "http://$_baseUrl/websocket-manager/secured/tpe/socket",
+      url: "https://$_baseUrl/websocket-manager/secured/tpe/socket",
       onConnect: _onConnectCallback,
       onWebSocketError: (dynamic error) => print(error.toString()),
       stompConnectHeaders: {'Authorization': "Bearer $_token"},
@@ -167,7 +166,7 @@ class TransactionService with ChangeNotifier {
     _client = createClient();
     if (_token.isNotEmpty) {
       await Future.delayed(const Duration(seconds: 1), () async {
-        await _activateWebSocket();
+        _activateWebSocket();
         setStatus("Connected to websocket");
         await _synchronizeTpe();
         setStatus("TPE available for transaction.");
@@ -198,7 +197,7 @@ class TransactionService with ChangeNotifier {
   }
 
   Future<void> _synchronizeTpe() async {
-    await Future.delayed(const Duration(seconds: 1), () {
+    await Future.delayed(const Duration(seconds: 1), () async {
       _client.send(destination: '/websocket-manager/tpe/synchronize');
     });
     return Future.value();
