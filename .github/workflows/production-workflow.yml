@@ -2,6 +2,8 @@ name: Deploy
 
 on:
   release:
+    branches:
+      - "release/*"
     types: [published]
 
 env:
