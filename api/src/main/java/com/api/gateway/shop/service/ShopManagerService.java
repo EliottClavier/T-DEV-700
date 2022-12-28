@@ -8,6 +8,7 @@ import com.api.gateway.transaction.model.Message;
 import com.api.gateway.transaction.model.WebSocketStatus;
 import com.api.gateway.transaction.model.TransactionRequest;
 import com.api.gateway.transaction.service.TransactionRequestService;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,12 @@ import org.springframework.stereotype.Service;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TRANSACTION;
+
 @Service
 public class ShopManagerService {
+    @Autowired
+    private RedisTemplate<String, String> customRedisTemplate;
     @Autowired
     private TpeManagerService tpeManagerService;
 
@@ -41,6 +46,17 @@ public class ShopManagerService {
     public Boolean isShopValid(String shopName) {
         Optional<Shop> shopOptional = shopRepository.findByName(shopName);
         return shopOptional.isPresent() && shopOptional.get().getWhitelisted();
+    }
+
+    public TransactionRequest retrieveTransactionRequestByShopSessionId(String sessionId) {
+        // For each transaction return value
+        for (String key : customRedisTemplate.keys(HASH_KEY_NAME_TRANSACTION + ":*")) {
+            TransactionRequest transactionRequest = new Gson().fromJson(customRedisTemplate.opsForValue().get(key), TransactionRequest.class);
+            if (transactionRequest.getShopSessionId().equals(sessionId)) {
+                return transactionRequest;
+            }
+        }
+        return null;
     }
 
 }
