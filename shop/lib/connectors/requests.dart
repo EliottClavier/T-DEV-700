@@ -13,15 +13,28 @@ import 'package:shop/screens/validation.dart';
 import 'config/config.dart';
 import 'package:shop/config/index.dart';
 
+/* This class is responsible for making requests to the server and handling the websocket connection with it.
+It contains functions to connect to the server using a HTTP request, to connect to the websocket and to send a payment request or cancel a payment request through the websocket.
+It also contains a callback function that is called whenever a message is received on the websocket, which updates the state of the application depending on the type of message received. */
 class RequestsClass {
+  // Token for authenticated requests to the server
   static String token = "";
+  // Base URL for the server
   static final String _url = Token.url;
+  // Total amount of the payment
   static double totalAmount = 0.0;
+  // Whether a payment has been successfully sent
   static bool paymentSended = false;
+  // Websocket client
   static late StompClient _client;
+  // Build context of the parent widget
   static late BuildContext parentContext;
+  // Session ID of the websocket connection
   static String _sessionId = "";
 
+  /* Connects to the server using a HTTP request and initiates the websocket connection
+  If the connection is successful, the websocket connection is initiated and the total amount of the payment is set to the amount parameter 
+  and the parent context is set to the context parameter of the function call */
   static connect(double amount, BuildContext context) async {
     try {
       final response = await http.post(
@@ -57,6 +70,9 @@ class RequestsClass {
     }
   }
 
+  /* Connects to a WebSocket using the specified url, authorization token, and connection headers
+  If the connection is successful, the onConnect callback is called
+  If there is an error with the WebSocket, the onWebSocketError callback is called with the error as an argument */
   static void connectWebSocket() {
     try {
       if (token.isNotEmpty) {
@@ -80,6 +96,7 @@ class RequestsClass {
     }
   }
 
+  // Activates the websocket connection
   static void activateWebSocket() async {
     _client.activate();
     String url = _client.config.url;
@@ -92,16 +109,19 @@ class RequestsClass {
     }
   }
 
+  // Sends a payment request through the websocket connection
   static void pay() {
     var json = {"token": token, "sessionId": _sessionId, "amount": totalAmount};
     _client.send(
         destination: '/websocket-manager/shop/pay', body: jsonEncode(json));
   }
 
+  // Sends a cancel payment request through the websocket connection
   static void cancelPayment() {
     _client.send(destination: '/websocket-manager/shop/cancel-transaction');
   }
 
+  // Callback function called whenever a message is received on the websocket connection
   static void onConnectCallback(StompFrame connectFrame) {
     dynamic transactionStatus = _client.subscribe(
         destination: '/user/queue/shop/transaction-status/$_sessionId',

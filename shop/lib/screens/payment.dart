@@ -8,13 +8,19 @@ import 'package:shop/connectors/requests.dart';
 import '../util/shop.dart';
 import '../widgets/separation.dart';
 
+// Class representing a payment page
 class Payment extends StatelessWidget {
+  // Static constant for the route name of the page
   static const String pageName = '/payment';
+  // Variable for the total price of the articles in the shop
   String? total = totalPrice();
+  // Static late BuildContext variable for the context of the payment page
   static late BuildContext contextPayment;
 
+  // Constructor for the Payment class that takes in a required key
   Payment({super.key});
 
+  // Method that builds and returns the widget tree for the Payment widget
   @override
   Widget build(BuildContext context) {
     contextPayment = context;

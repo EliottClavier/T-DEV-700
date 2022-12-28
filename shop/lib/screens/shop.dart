@@ -11,25 +11,36 @@ import 'package:shop/widgets/separation.dart';
 import 'package:shop/router/router.dart';
 import 'package:shop/widgets/snackBar.dart';
 
+// Class representing a shop page
 class Shop extends StatefulWidget {
+  // Static constant for the route name of the page
   static const String pageName = '/shop';
+  // Static late BuildContext variable for the context of the shop page
   static late BuildContext contextShop;
+  // Variable for the total number of articles in the shop
   String? totalOfArticles = totalArticles();
+  // Variable for the total price of the articles in the shop
   String? total = totalPrice();
+  // Constructor for the Shop class that takes in a required key
   Shop({super.key});
 
+  // Method that creates and returns the state for the Shop widget
   @override
   State<Shop> createState() => ShopState();
 }
 
+// Class representing the state for the Shop widget
 class ShopState extends State<Shop> {
+  // List of articles in the shop
   List articlesInShop = shop_articles;
 
+  // Method that initializes the state of the ShopState object
   @override
   void initState() {
     super.initState();
   }
 
+  // Method that updates the total price and number of articles in the shop
   void updateTotal() {
     setState(() {
       widget.total = totalPrice();
@@ -37,12 +48,14 @@ class ShopState extends State<Shop> {
     });
   }
 
+  // Method that updates the list of articles in the shop
   void removeArticle() {
     setState(() {
       articlesInShop = shop_articles;
     });
   }
 
+  // Method that builds and returns the widget tree for the Shop widget
   @override
   Widget build(BuildContext context) {
     Shop.contextShop = context;
