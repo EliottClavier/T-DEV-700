@@ -21,9 +21,6 @@ public class FixedTokenPermissionEvaluator implements PermissionEvaluator {
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
         if (targetDomainObject instanceof SecurityContextHolderAwareRequestWrapper requestWrapper) {
             String fixedToken = requestWrapper.getHeader(secretHeader);
-            System.out.println(fixedToken);
-            System.out.println(permission);
-            System.out.println(secretHeader);
             return fixedToken != null && fixedToken.equals(secretKey);
         }
         return false;

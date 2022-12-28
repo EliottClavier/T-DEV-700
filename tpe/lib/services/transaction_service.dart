@@ -28,8 +28,8 @@ class TransactionService with ChangeNotifier {
   String _paymentId = "";
 
   String _sessionId = "";
-  String password = "0yTwyw5iNwlK";
-  String _status = "Disconnected";
+  String password = "LgLIAArWIW8P";
+  String _status = "Disconnected.";
 
   void setStatus(status) {
     _status = status;
@@ -58,7 +58,7 @@ class TransactionService with ChangeNotifier {
   }
 
   void resetAttributes() {
-    _status = "Disconnected";
+    _status = "Disconnected.";
     _amount = 0.0;
     _transactionType = TransactionType.NFC;
     _paymentId = "";
@@ -108,7 +108,7 @@ class TransactionService with ChangeNotifier {
     if (response.statusCode == 200) {
       _token = Token.fromJson(jsonDecode(response.body)).token;
       print(response.body);
-      setStatus("Connected to server");
+      setStatus("Connected to server.");
       await _connectWebSocket();
     } else {
       _fullRegister();
@@ -129,10 +129,10 @@ class TransactionService with ChangeNotifier {
             body: jsonEncode({"androidId": _androidId}));
     if (response.statusCode == 200 || response.statusCode == 409) {
       password = jsonDecode(response.body)['password'];
-      setStatus('Register successfull. Please wait for Device whitelist');
+      setStatus('Register successfull. Please wait for Device whitelist.');
     } else {
       onFullRegisterError();
-      setStatus("Register to server failed. New attempt in 5 seconds");
+      setStatus("Register to server failed. New attempt in 5 seconds.");
     }
     notifyListeners();
     return Future.value();
@@ -167,7 +167,7 @@ class TransactionService with ChangeNotifier {
     if (_token.isNotEmpty) {
       await Future.delayed(const Duration(seconds: 1), () async {
         _activateWebSocket();
-        setStatus("Connected to websocket");
+        setStatus("Connected to websocket.");
         await _synchronizeTpe();
         setStatus("TPE available for transaction.");
       });

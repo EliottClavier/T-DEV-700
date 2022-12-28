@@ -68,6 +68,7 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
                     width: 300, height: 300),
               ],
             ),
+            const Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
             Text(
               status,
               style: const TextStyle(
