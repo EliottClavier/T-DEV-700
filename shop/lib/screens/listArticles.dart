@@ -12,6 +12,8 @@ class ListArticles extends StatefulWidget {
   String? total = totalArticles();
   List listArticles = [];
 
+  ListArticles({super.key});
+
   @override
   State<ListArticles> createState() => ListArticlesState();
 

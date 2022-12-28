@@ -107,7 +107,6 @@ class TransactionService with ChangeNotifier {
         body: jsonEncode({"androidId": _androidId, "password": password}));
     if (response.statusCode == 200) {
       _token = Token.fromJson(jsonDecode(response.body)).token;
-      print(response.body);
       setStatus("Connected to server.");
       await _connectWebSocket();
     } else {
@@ -220,8 +219,6 @@ class TransactionService with ChangeNotifier {
     dynamic synchronizationStatus = _client.subscribe(
         destination: '/user/queue/tpe/synchronization-status/$_sessionId',
         callback: (frame) {
-          print("Synchronise status");
-          print(frame.body);
           setStatus(handleTransactionStatus(_context, jsonDecode(frame.body!)));
         });
 
@@ -229,8 +226,6 @@ class TransactionService with ChangeNotifier {
     dynamic transactionStatus = _client.subscribe(
         destination: '/user/queue/tpe/transaction-status/$_sessionId',
         callback: (frame) {
-          print("Transaction status");
-          print(frame.body);
           setStatus(handleTransactionStatus(_context, jsonDecode(frame.body!)));
         });
     notifyListeners();

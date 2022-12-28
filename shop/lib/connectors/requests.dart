@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shop/util/shop.dart';
-import 'package:stomp_dart_client/parser.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
@@ -28,17 +27,13 @@ class RequestsClass {
       final response = await http.post(Uri.parse("$HTTP_PROTOCOL://$_url/auth/shop/login"),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({"name": SHOP_USERNAME, "password": SHOP_PASSWORD}));
-      print(response);
       if (response.statusCode == 200) {
         token = Token.fromJson(jsonDecode(response.body)).token;
         connectWebSocket();
         totalAmount = amount;
         parentContext = context;
       } else {
-        print("Error : " +
-            response.statusCode.toString() +
-            " - " +
-            response.body.toString());
+        print("Error : ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
       print(e);
@@ -81,14 +76,12 @@ class RequestsClass {
   }
 
   static void pay() {
-    print("Pay : " + totalAmount.toString() + "€");
     var json = {"token": token, "sessionId": _sessionId, "amount": totalAmount};
     _client.send(
         destination: '/websocket-manager/shop/pay', body: jsonEncode(json));
   }
 
   static void onConnectCallback(StompFrame connectFrame) {
-    print("Connected");
     dynamic transactionStatus = _client.subscribe(
         destination: '/user/queue/shop/transaction-status/$_sessionId',
         callback: (frame) {
