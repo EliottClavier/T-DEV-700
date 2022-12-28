@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tpe/services/transaction_service.dart';
+import 'package:tpe/config/transaction/transaction_cancel.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
@@ -53,73 +54,43 @@ class _PaymentScreenStatefulWidgetState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 35),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Text(
-                "Amount: ${transactionService.getAmount()}",
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  fontSize: 32,
-                  letterSpacing: 0.02,
-                  height: 1.2,
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 35),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
+                  "Amount: ${transactionService.getAmount()}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    fontSize: 32,
+                    letterSpacing: 0.02,
+                    height: 1.2,
+                  ),
                 ),
-              ),
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: IconButton(
-                      icon: Image.asset('assets/img/qr_code.png'),
-                      iconSize: 300,
-                      onPressed: () {
-                        _onQrCodeSelected();
-                      },
-                    ),
-                  ),
-                  const Positioned(
-                    bottom: 45,
-                    child: Text(
-                      "Pay by check",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        fontSize: 25,
-                        letterSpacing: 0.02,
-                        height: 1.2,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Stack(
+                Stack(
                   clipBehavior: Clip.none,
                   alignment: Alignment.center,
                   children: <Widget>[
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
                       child: IconButton(
-                        icon: Image.asset('assets/img/nfc.png'),
+                        icon: Image.asset('assets/img/qr_code.png'),
                         iconSize: 300,
                         onPressed: () {
-                          _onNfcSelected();
+                          _onQrCodeSelected();
                         },
                       ),
                     ),
                     const Positioned(
                       bottom: 45,
                       child: Text(
-                        "Pay by NFC",
+                        "Pay by check",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
@@ -130,11 +101,56 @@ class _PaymentScreenStatefulWidgetState
                         ),
                       ),
                     ),
-                  ]),
-            ],
+                  ],
+                ),
+                Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: IconButton(
+                          icon: Image.asset('assets/img/nfc.png'),
+                          iconSize: 300,
+                          onPressed: () {
+                            _onNfcSelected();
+                          },
+                        ),
+                      ),
+                      const Positioned(
+                        bottom: 45,
+                        child: Text(
+                          "Pay by NFC",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            fontSize: 25,
+                            letterSpacing: 0.02,
+                            height: 1.2,
+                          ),
+                        ),
+                      ),
+                    ]),
+              ],
+            ),
           ),
         ),
       ),
-    ));
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          onTransactionCanceled();
+        },
+        shape: const CircleBorder(
+          side: BorderSide.none,
+        ),
+        backgroundColor: Colors.white,
+        child: IconButton(
+            onPressed: onTransactionCanceled,
+            color: Colors.white,
+            icon: Image.asset("assets/img/cross-button.png")),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+    );
   }
 }

@@ -109,6 +109,10 @@ class TransactionService with ChangeNotifier {
       _token = Token.fromJson(jsonDecode(response.body)).token;
       setStatus("Connected to server.");
       await _connectWebSocket();
+    } else if (response.statusCode == 403) {
+      setStatus("Waiting for device whitelist.");
+    } else if (response.statusCode == 401) {
+      setStatus("Bad credentials.");
     } else {
       _fullRegister();
       setStatus("Connexion to server failed.");
@@ -118,14 +122,14 @@ class TransactionService with ChangeNotifier {
   }
 
   Future<void> _fullRegister() async {
-    final response =
-        await http.post(Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/register"),
-            headers: {
-              "Content-Type": "application/json",
-              // ignore: unnecessary_string_interpolations
-              "$REGISTER_HEADER": "$REGISTER_KEY"
-            },
-            body: jsonEncode({"androidId": _androidId}));
+    final response = await http.post(
+        Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/register"),
+        headers: {
+          "Content-Type": "application/json",
+          // ignore: unnecessary_string_interpolations
+          "$REGISTER_HEADER": "$REGISTER_KEY"
+        },
+        body: jsonEncode({"androidId": _androidId}));
     if (response.statusCode == 200 || response.statusCode == 409) {
       password = jsonDecode(response.body)['password'];
       setStatus('Register successfull. Please wait for Device whitelist.');
@@ -145,7 +149,8 @@ class TransactionService with ChangeNotifier {
 
   StompConfig getClientConfig() {
     return StompConfig.SockJS(
-      url: "$API_HTTP_PROTOCOL://$_baseUrl/websocket-manager/secured/tpe/socket",
+      url:
+          "$API_HTTP_PROTOCOL://$_baseUrl/websocket-manager/secured/tpe/socket",
       onConnect: _onConnectCallback,
       onWebSocketError: (dynamic error) => print(error.toString()),
       stompConnectHeaders: {'Authorization': "Bearer $_token"},
@@ -196,6 +201,11 @@ class TransactionService with ChangeNotifier {
     if (!_client.isActive) return;
     _client.deactivate();
     notifyListeners();
+  }
+
+  Future<void> sendKillTransaction() async {
+    _client.send(destination: '/websocket-manager/tpe/cancel-transaction');
+    return Future.value();
   }
 
   Future<void> _synchronizeTpe() async {
