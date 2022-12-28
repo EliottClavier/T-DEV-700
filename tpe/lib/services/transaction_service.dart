@@ -12,6 +12,7 @@ import 'package:tpe/config/security/android_id.dart';
 import 'package:tpe/utils/amount.dart';
 import 'package:tpe/utils/enums/transaction_type.dart';
 import 'package:tpe/config/router/navigator.dart';
+import 'package:tpe/utils/auth_modal.dart';
 
 class TransactionService with ChangeNotifier {
   static final TransactionService _transactionService =
@@ -28,7 +29,7 @@ class TransactionService with ChangeNotifier {
   String _paymentId = "";
 
   String _sessionId = "";
-  String password = "LgLIAArWIW8P";
+  String password = "";
   String _status = "Disconnected.";
 
   void setStatus(status) {
@@ -49,6 +50,10 @@ class TransactionService with ChangeNotifier {
 
   String getAmount() {
     return getAmountString(_amount);
+  }
+
+  void setPassword(password) {
+    this.password = password;
   }
 
   Future<void> killTransaction() async {
@@ -89,8 +94,7 @@ class TransactionService with ChangeNotifier {
   Future<void> init(context) async {
     _androidId = await getAndroidId();
     _context = context;
-    await _connect();
-    return Future.value();
+    showAuthModal();
   }
 
   Future<void> restart(context) async {
@@ -113,6 +117,7 @@ class TransactionService with ChangeNotifier {
       setStatus("Waiting for device whitelist.");
     } else if (response.statusCode == 401) {
       setStatus("Bad credentials.");
+      showAuthModal();
     } else {
       _fullRegister();
       setStatus("Connexion to server failed.");
