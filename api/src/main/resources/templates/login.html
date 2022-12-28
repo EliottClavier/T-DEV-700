@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Admin Panel</title>
+        <link rel="stylesheet" th:href="@{/css/main.css}">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="form">
+                <form>
+                    <label><input id="username" type="text" placeholder="Username" required></label>
+                    <label><input id="password" type="password" placeholder="Password" required></label>
+                </form>
+                <button class="button" id="submit">Submit</button>
+            </div>
+        </div>
+    </body>
+    <script th:src="@{/js/login.js}"></script>
+</html>
