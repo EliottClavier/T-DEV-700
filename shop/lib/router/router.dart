@@ -4,7 +4,6 @@ import 'package:shop/screens/listArticles.dart';
 import 'package:shop/screens/shop.dart';
 import 'package:shop/screens/payment.dart';
 import 'package:shop/screens/validation.dart';
-import 'package:shop/widgets/navBar.dart';
 
 class RouterShop extends StatelessWidget {
 

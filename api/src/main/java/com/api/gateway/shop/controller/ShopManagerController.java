@@ -2,6 +2,7 @@ package com.api.gateway.shop.controller;
 
 import com.api.gateway.shop.service.ShopManagerService;
 import com.api.gateway.data.DestinationGenerator;
+import com.api.gateway.tpe.model.TpeManager;
 import com.api.gateway.tpe.service.TpeManagerService;
 import com.api.gateway.transaction.model.*;
 import com.api.gateway.transaction.service.TransactionRequestService;
@@ -105,6 +106,38 @@ public class ShopManagerController {
                     user.getName(),
                     destinationGenerator.getShopTransactionStatusDest(sessionId),
                     new Message("Error while processing transaction.", WebSocketStatus.TRANSACTION_ERROR)
+            );
+        }
+    }
+
+    @MessageMapping("/shop/cancel-transaction")
+    public void cancelTransaction(
+            Principal user,
+            @Header("simpSessionId") String sessionId
+    ) {
+        TransactionRequest transactionRequest = shopManagerService.retrieveTransactionRequestByShopSessionId(sessionId);
+        if (transactionRequest != null) {
+            // Send message to TPE
+            Message message = tpeManagerService.addTpeRedis(new TpeManager(user.getName(), sessionId));
+            smt.convertAndSendToUser(
+                    transactionRequest.getTpeSessionId(),
+                    destinationGenerator.getTpeSynchronizationStatusDest(sessionId),
+                    new MessageCancelTpe(
+                            "Transaction cancelled.", WebSocketStatus.TRANSACTION_CANCELLED, message.getType()
+                    )
+            );
+
+            // Send message to Shop
+            smt.convertAndSendToUser(
+                    transactionRequest.getShopUsername(),
+                    destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
+                    new Message("Transaction cancelled.", WebSocketStatus.TRANSACTION_CANCELLED)
+            );
+        } else {
+            smt.convertAndSendToUser(
+                    user.getName(),
+                    destinationGenerator.getTpeTransactionStatusDest(sessionId),
+                    new Message("Shop not involved in any transaction.", WebSocketStatus.NOT_INVOLVED)
             );
         }
     }

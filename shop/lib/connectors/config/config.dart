@@ -1,8 +1,8 @@
-import 'package:shop/util/env.dart';
+import 'package:shop/config/index.dart';
 
 class Token {
   String token = "";
-  static const String ip = API_URL;
+  static const String url = API_URL;
 
   Token({required this.token});
 

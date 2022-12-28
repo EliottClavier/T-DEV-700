@@ -66,7 +66,7 @@ class _PaymentSuccessScreenStatefulWidgetState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const <Widget>[
                     Text(
-                      "Payment successful",
+                      "Payment successful.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
@@ -77,7 +77,7 @@ class _PaymentSuccessScreenStatefulWidgetState
                       ),
                     ),
                     Text(
-                      "Payment has been successfully processed",
+                      "Payment has been successfully processed.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.w300,
