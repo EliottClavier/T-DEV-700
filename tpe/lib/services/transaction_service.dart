@@ -102,7 +102,7 @@ class TransactionService with ChangeNotifier {
 
   Future<void> _connect() async {
     final response = await http.post(
-        Uri.parse("https://$_baseUrl/auth/tpe/login"),
+        Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"androidId": _androidId, "password": password}));
     if (response.statusCode == 200) {
@@ -120,7 +120,7 @@ class TransactionService with ChangeNotifier {
 
   Future<void> _fullRegister() async {
     final response =
-        await http.post(Uri.parse("https://$_baseUrl/auth/tpe/register"),
+        await http.post(Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/register"),
             headers: {
               "Content-Type": "application/json",
               // ignore: unnecessary_string_interpolations
@@ -146,7 +146,7 @@ class TransactionService with ChangeNotifier {
 
   StompConfig getClientConfig() {
     return StompConfig.SockJS(
-      url: "https://$_baseUrl/websocket-manager/secured/tpe/socket",
+      url: "$API_HTTP_PROTOCOL://$_baseUrl/websocket-manager/secured/tpe/socket",
       onConnect: _onConnectCallback,
       onWebSocketError: (dynamic error) => print(error.toString()),
       stompConnectHeaders: {'Authorization': "Bearer $_token"},
@@ -182,10 +182,13 @@ class TransactionService with ChangeNotifier {
   Future<void> _activateWebSocket() async {
     _client.activate();
     String url = _client.config.url;
-    url = url.replaceAll(
-        "ws://$_baseUrl/websocket-manager/secured/tpe/socket", "");
-    url = url.replaceAll("/websocket", "");
-    _sessionId = url.replaceAll("r/^[0-9]+\//", "").split('/')[2];
+    RegExp regex = RegExp(r'\/(\w+)\/websocket');
+    var match = regex.firstMatch(url);
+    if (match != null) {
+      _sessionId = match.group(1)!;
+    } else {
+      _client.deactivate();
+    }
     notifyListeners();
     return Future.value();
   }

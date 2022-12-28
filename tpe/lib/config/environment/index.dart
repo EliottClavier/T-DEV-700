@@ -4,6 +4,8 @@ import 'package:tpe/config/environment/prod/config.dart';
 
 const String ENV = String.fromEnvironment('ENV', defaultValue: 'prod');
 
+const String API_HTTP_PROTOCOL = ENV == "local" ? LOCAL_HTTP_PROTOCOL : PROD_HTTP_PROTOCOL;
+
 const String API_URL = ENV == 'local'
     ? LOCAL_API_URL
     : ENV == 'prod'

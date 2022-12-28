@@ -12,11 +12,11 @@ import 'package:shop/widgets/snackBar.dart';
 import 'package:shop/screens/shop.dart';
 import 'package:shop/screens/validation.dart';
 import 'config/config.dart';
-import 'package:shop/util/env.dart';
+import 'package:shop/config/index.dart';
 
 class RequestsClass {
   static String token = "";
-  static final String _ip = Token.ip;
+  static final String _url = Token.url;
   static double totalAmount = 0.0;
   static bool paymentValidate = false;
   static late StompClient _client;
@@ -25,7 +25,7 @@ class RequestsClass {
 
   static connect(double amount, BuildContext context) async {
     try {
-      final response = await http.post(Uri.parse("$_ip/auth/shop/login"),
+      final response = await http.post(Uri.parse("$HTTP_PROTOCOL://$_url/auth/shop/login"),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({"name": SHOP_USERNAME, "password": SHOP_PASSWORD}));
       print(response);
@@ -50,7 +50,7 @@ class RequestsClass {
       if (token.isNotEmpty) {
         _client = StompClient(
           config: StompConfig.SockJS(
-            url: "$_ip/websocket-manager/secured/shop/socket",
+            url: "$HTTP_PROTOCOL://$_url/websocket-manager/secured/shop/socket",
             onConnect: onConnectCallback,
             onWebSocketError: (dynamic error) => print(error.toString()),
             stompConnectHeaders: {'Authorization': "Bearer $token"},
@@ -68,13 +68,16 @@ class RequestsClass {
     }
   }
 
-  static void activateWebSocket() {
+  static void activateWebSocket() async {
     _client.activate();
     String url = _client.config.url;
-    url = url.replaceAll(
-        "ws://$WS_URL/websocket-manager/secured/shop/socket", "");
-    url = url.replaceAll("/websocket", "");
-    _sessionId = url.replaceAll("r/^[0-9]+\//", "").split('/')[2];
+    RegExp regex = RegExp(r'\/(\w+)\/websocket');
+    var match = regex.firstMatch(url);
+    if (match != null) {
+      _sessionId = match.group(1)!;
+    } else {
+      _client.deactivate();
+    }
   }
 
   static void pay() {
