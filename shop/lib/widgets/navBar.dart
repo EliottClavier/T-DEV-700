@@ -9,8 +9,7 @@ import 'package:shop/router/router.dart';
 class NavBar extends StatefulWidget {
   final BuildContext parentContext;
   final String? total;
-  late int selectedPage;
-  
+  late int selectedPage = 0;
 
   NavBar({super.key, required this.parentContext, required this.total});
 
@@ -27,7 +26,6 @@ class NavBar extends StatefulWidget {
 }
 
 class NavBarState extends State<NavBar> {
-
   @override
   Widget build(BuildContext context) {
     widget.selectPage();

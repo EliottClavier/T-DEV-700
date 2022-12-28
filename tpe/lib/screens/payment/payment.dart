@@ -1,24 +1,17 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-
-import 'package:tpe/screens/payment_success.dart';
-import 'package:tpe/screens/payment_error.dart';
-import 'package:tpe/screens/nfc_reader.dart';
-import 'package:tpe/screens/qr_code_reader.dart';
+import 'package:go_router/go_router.dart';
+import 'package:tpe/services/transaction_service.dart';
 
 class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key, required this.price});
+  const PaymentScreen({super.key});
 
-  final String price;
   static const String _title = 'Payment method';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: PaymentScreenStatefulWidget(
-        price: price,
-      ),
+      home: const PaymentScreenStatefulWidget(),
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF03045F),
           primarySwatch: Colors.blue,
@@ -28,9 +21,7 @@ class PaymentScreen extends StatelessWidget {
 }
 
 class PaymentScreenStatefulWidget extends StatefulWidget {
-  const PaymentScreenStatefulWidget({super.key, required this.price});
-
-  final String price;
+  const PaymentScreenStatefulWidget({super.key});
 
   @override
   State<PaymentScreenStatefulWidget> createState() =>
@@ -39,6 +30,8 @@ class PaymentScreenStatefulWidget extends StatefulWidget {
 
 class _PaymentScreenStatefulWidgetState
     extends State<PaymentScreenStatefulWidget> {
+  TransactionService transactionService = TransactionService();
+
   @override
   void initState() {
     super.initState();
@@ -49,35 +42,12 @@ class _PaymentScreenStatefulWidgetState
     super.dispose();
   }
 
-  void _onPaymentSent() {
-    dispose();
-    Random random = Random();
-    StatelessWidget screen = random.nextBool()
-        ? PaymentSuccessScreen(
-            price: widget.price,
-          )
-        : const PaymentErrorScreen();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => screen,
-      ),
-    );
-  }
-
   void _onNfcSelected() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => NfcReaderScreen(price: widget.price),
-      ),
-    );
+    context.go("/scan/nfc");
   }
 
   void _onQrCodeSelected() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => QrCodeReaderScreen(price: widget.price),
-      ),
-    );
+    context.go("/scan/qr-code");
   }
 
   @override
@@ -92,7 +62,7 @@ class _PaymentScreenStatefulWidgetState
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Text(
-                "Montant: ${widget.price}",
+                "Amount: ${transactionService.getAmount()}",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
@@ -119,7 +89,7 @@ class _PaymentScreenStatefulWidgetState
                   const Positioned(
                     bottom: 45,
                     child: Text(
-                      "Payer par chèque",
+                      "Pay by check",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
@@ -149,7 +119,7 @@ class _PaymentScreenStatefulWidgetState
                     const Positioned(
                       bottom: 45,
                       child: Text(
-                        "Payer par NFC",
+                        "Pay by NFC",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,

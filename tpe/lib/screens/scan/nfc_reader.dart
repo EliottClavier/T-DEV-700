@@ -1,35 +1,32 @@
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
-import 'package:tpe/screens/payment.dart';
-import 'package:tpe/screens/payment_sending.dart';
+import 'package:tpe/screens/payment/payment.dart';
+import 'package:tpe/services/transaction_service.dart';
 import 'package:tpe/utils/snackbar.dart';
 
 class NfcReaderScreen extends StatelessWidget {
-  const NfcReaderScreen({super.key, required this.price});
-
-  final String price;
+  const NfcReaderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NFC Reader',
-      home: NfcReaderScreenWidget(price: price),
+      title: "NFC Reader",
+      home: NfcReaderScreenWidget(),
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFF03045F),
-        primarySwatch: Colors.blue,
-        fontFamily: "Montserrat",
-      ),
+          scaffoldBackgroundColor: const Color(0xFF03045F),
+          primarySwatch: Colors.blue,
+          fontFamily: "Montserrat"),
     );
   }
 }
 
 class NfcReaderScreenWidget extends StatefulWidget {
-  NfcReaderScreenWidget({super.key, required this.price});
+  NfcReaderScreenWidget({super.key});
 
   final NfcManager nfcManager = NfcManager.instance;
-  final String price;
 
   @override
   State<NfcReaderScreenWidget> createState() => NfcReaderScreenWidgetState();
@@ -37,6 +34,7 @@ class NfcReaderScreenWidget extends StatefulWidget {
 
 class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
   String nfcDataString = "";
+  TransactionService transactionService = TransactionService();
 
   @override
   void initState() {
@@ -69,6 +67,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
   }
 
   void setNfcData(Map<String, dynamic> nfcData) {
+    transactionService = transactionService.getInstance();
     List<int> identifier = [];
     nfcData.forEach((key, value) {
       if (key == "isodep" && value["identifier"] is List<int>) {
@@ -77,34 +76,29 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     });
     nfcDataString = getFormatedDataFromNfcData(identifier);
     var snackBarMessage =
-        nfcDataString.isNotEmpty ? "Scan NFC réussi" : "Erreur de scan";
-    showSnackBar(context, snackBarMessage, "success", 2);
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      dispose();
-      sendPayment(nfcDataString);
+        nfcDataString.isNotEmpty ? "Successful NFC scan." : "Scan error.";
+    showSnackBar(context, snackBarMessage, "success", 1);
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      transactionService.payWithNfc(nfcDataString);
     });
   }
 
-  void sendPayment(String nfcDataString) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PaymentSendingScreen(
-          price: widget.price,
-          paymentData: nfcDataString,
-          paymentMethod: "nfc",
-        ),
-      ),
-    );
+  void onNfcDiscovered(NfcTag tag) {
+    setNfcData(tag.data);
   }
 
   void _initNfc() async {
     try {
       await widget.nfcManager.startSession(onDiscovered: (NfcTag tag) {
         setNfcData(tag.data);
-        return Future<void>.value();
+        return Future.value();
       });
     } on PlatformException catch (e) {
-      print('Error: $e');
+      showSnackBar(context, "NFC not available for device", "error", 2);
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        _disposeNfc();
+        context.go("/payment");
+      });
     }
   }
 
@@ -116,9 +110,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     dispose();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => PaymentScreen(
-          price: widget.price,
-        ),
+        builder: (context) => const PaymentScreen(),
       ),
     );
   }
@@ -133,7 +125,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
           children: <Widget>[
             Image.asset("assets/gif/animation_nfc.gif"),
             const Text(
-              "Veuillez scanner votre carte",
+              "Please, scan your card.",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,

@@ -10,6 +10,9 @@ redis-data
 ### APKS volume ###
 apks
 
+### Mail volume ###
+mail-data
+
 ### .env (except examples) ###
 .env
 env/*

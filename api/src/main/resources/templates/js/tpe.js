@@ -16,6 +16,21 @@ function refreshTpeList() {
         console.log(error);
     }); */
 
+    const url = "http://localhost:5080/api/bank/tpe";
+    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNYW5hZ2VyIENvbm5lY3Rpb24iLCJpZGVudGlmaWVyIjoiYWRtaW4iLCJpc3MiOiJDYXNoIE1hbmFnZXIiLCJpYXQiOjE2NzIyNTIyMDF9.39jDpTfXPimn8b6v0ZFPF0THGHpb6RT40VwgmqdkN9w";
+    $.ajax({
+      type: "GET",
+      Headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      url: url,
+      contentType: "application/json; charset=utf-8",
+      success: function (response) {
+          result = response;
+      },
+    })
+
     var list = [{id: 1, name: "TPE 1"}, {id: 2, name: "TPE 2"}, {id: 3, name: "TPE 3"}];
     updateList(list);
     console.log("List refreshed");

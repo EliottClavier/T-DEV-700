@@ -1,8 +1,8 @@
-
+import 'package:shop/config/index.dart';
 
 class Token {
   String token = "";
-  static const String ip = "10.29.125.158:8080/api";
+  static const String url = API_URL;
 
   Token({required this.token});
 

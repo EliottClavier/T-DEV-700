@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class Separation extends StatelessWidget {
   const Separation({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return Container(

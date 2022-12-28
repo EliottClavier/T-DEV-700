@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -12,7 +11,6 @@ import 'package:shop/widgets/separation.dart';
 import 'package:shop/router/router.dart';
 import 'package:shop/widgets/snackBar.dart';
 
-
 class Shop extends StatefulWidget {
   static const String pageName = '/shop';
   static late BuildContext contextShop;
@@ -25,7 +23,6 @@ class Shop extends StatefulWidget {
 }
 
 class ShopState extends State<Shop> {
-
   List articlesInShop = shop_articles;
 
   @override
@@ -55,18 +52,25 @@ class ShopState extends State<Shop> {
         child: Center(
           child: Column(
             children: <Widget>[
-              FlipInX(
-                child: const Image(
-                  image: AssetImage('images/logo_cash_manager.png'),
-                  width: 200,
-                  height: 200,
+              SizedBox(
+                height: 150,
+                child: FlipInX(
+                  child: const Image(
+                    image: AssetImage('images/logo_cash_manager.png'),
+                    width: 200,
+                    height: 200,
+                  ),
                 ),
               ),
+              const Padding(padding: EdgeInsets.all(5)),
               Expanded(
                 child: ListView.builder(
                   itemCount: articlesInShop.length,
                   itemBuilder: (context, index) {
-                    return ShopCard(article: articlesInShop[index], onQuantityChanged: updateTotal, onRemove: removeArticle);
+                    return ShopCard(
+                        article: articlesInShop[index],
+                        onQuantityChanged: updateTotal,
+                        onRemove: removeArticle);
                   },
                 ),
               ),
@@ -86,8 +90,17 @@ class ShopState extends State<Shop> {
                   ),
                   TextButton(
                     onPressed: () {
-                      RequestsClass.connect(double.parse(widget.total!), context);
-                      Navigator.pushNamed(context, Payment.pageName);
+                      if (widget.total == '0.0') {
+                        showSnackBar(
+                            context,
+                            "Vous n'avez pas d'articles dans votre panier",
+                            "error",
+                            3);
+                      } else {
+                        RequestsClass.connect(
+                            double.parse(widget.total!), context);
+                        Navigator.pushNamed(context, Payment.pageName);
+                      }
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
@@ -105,7 +118,10 @@ class ShopState extends State<Shop> {
                 ],
               ),
               const SizedBox(height: 20),
-              NavBar(parentContext: context, total: widget.totalOfArticles,),
+              NavBar(
+                parentContext: context,
+                total: widget.totalOfArticles,
+              ),
             ],
           ),
         ),

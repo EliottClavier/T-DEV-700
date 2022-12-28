@@ -2,6 +2,23 @@
 
 A new Flutter project.
 
+CLI run :
+
+flutter run --dart-define=ENV=local
+
+VS Code run :
+    .vscode/launch.json:
+
+    add this line to "configurations"
+    "configurations": [
+        {
+            ...
+            "args": [
+                "--dart-define=ENV=local",
+            ]
+        }
+    ]
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

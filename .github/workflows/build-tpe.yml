@@ -1,0 +1,37 @@
+name: Build and publish APKs
+
+on:
+  workflow_call:
+
+jobs:
+  build_apk:
+    name: Build APK    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+      
+      - name: Get dependencies
+        run: flutter pub get
+        working-directory: ./tpe
+      
+      - name: Build APK
+        run: flutter build apk --release 
+          --dart-define=API_URL='${{ secrets.API_URL }}' 
+          --dart-define=TPE_REGISTER_SECRET_HEADER='${{ secrets.TPE_REGISTER_SECRET_HEADER }}'
+          --dart-define=TPE_REGISTER_SECRET_KEY='${{ secrets.TPE_REGISTER_SECRET_KEY }}'
+        working-directory: ./tpe
+      
+      - name: Create .tar artifact
+        run: mv app-release.apk tpe.apk && tar -cvf tpe.tar tpe.apk
+        working-directory: ./tpe/build/app/outputs/flutter-apk/
+
+      - name: Upload .tar APK artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: tpe.tar
+          artifact_format: tar
+          path: ./tpe/build/app/outputs/flutter-apk/tpe.tar

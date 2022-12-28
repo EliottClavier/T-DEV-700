@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-
 List shop_articles = [];
-
 
 totalPrice() {
   var total = 0.0;
