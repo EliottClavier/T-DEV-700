@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:shop/screens/shop.dart';
 import 'package:shop/widgets/snackBar.dart';
+import 'package:shop/connectors/requests.dart';
 
 import '../util/shop.dart';
 import '../widgets/separation.dart';
@@ -43,9 +44,7 @@ class Payment extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, Shop.pageName);
-                      showSnackBar(
-                          context, "La transaction a été annulée", "error", 3);
+                      RequestsClass.cancelPayment();
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
