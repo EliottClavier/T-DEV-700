@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tpe/config/environment/index.dart';
 import 'package:tpe/services/transaction_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -68,6 +67,7 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
                     width: 300, height: 300),
               ],
             ),
+            const Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
             Text(
               status,
               style: const TextStyle(

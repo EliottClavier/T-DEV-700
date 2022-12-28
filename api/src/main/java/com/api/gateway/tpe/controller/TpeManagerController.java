@@ -150,10 +150,13 @@ public class TpeManagerController {
             TransactionRequest transactionRequest = tpeManagerService.retrieveTransactionRequestByTpeSessionId(sessionId);
             if (transactionRequest != null) {
                 // Send message to TPE
+                Message message = tpeManagerService.addTpeRedis(new TpeManager(user.getName(), sessionId));
                 smt.convertAndSendToUser(
                         user.getName(),
                         destinationGenerator.getTpeSynchronizationStatusDest(sessionId),
-                        tpeManagerService.addTpeRedis(new TpeManager(user.getName(), sessionId))
+                        new MessageCancelTpe(
+                                "Transaction cancelled.", WebSocketStatus.TRANSACTION_CANCELLED, message.getType()
+                        )
                 );
 
                 // Send message to Shop

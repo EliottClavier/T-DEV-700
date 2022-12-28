@@ -76,7 +76,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
     });
     nfcDataString = getFormatedDataFromNfcData(identifier);
     var snackBarMessage =
-        nfcDataString.isNotEmpty ? "Scan NFC réussi" : "Erreur de scan";
+        nfcDataString.isNotEmpty ? "Successful NFC scan." : "Scan error.";
     showSnackBar(context, snackBarMessage, "success", 1);
     Future.delayed(const Duration(milliseconds: 1000), () {
       transactionService.payWithNfc(nfcDataString);
@@ -125,7 +125,7 @@ class NfcReaderScreenWidgetState extends State<NfcReaderScreenWidget> {
           children: <Widget>[
             Image.asset("assets/gif/animation_nfc.gif"),
             const Text(
-              "Veuillez scanner votre carte",
+              "Please, scan your card.",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,

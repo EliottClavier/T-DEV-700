@@ -62,7 +62,7 @@ class _PaymentScreenStatefulWidgetState
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Text(
-                "Montant: ${transactionService.getAmount()}",
+                "Amount: ${transactionService.getAmount()}",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
@@ -89,7 +89,7 @@ class _PaymentScreenStatefulWidgetState
                   const Positioned(
                     bottom: 45,
                     child: Text(
-                      "Payer par chèque",
+                      "Pay by check",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
@@ -119,7 +119,7 @@ class _PaymentScreenStatefulWidgetState
                     const Positioned(
                       bottom: 45,
                       child: Text(
-                        "Payer par NFC",
+                        "Pay by NFC",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,

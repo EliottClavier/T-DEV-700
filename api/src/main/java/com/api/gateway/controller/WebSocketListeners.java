@@ -3,10 +3,7 @@ package com.api.gateway.controller;
 import com.api.gateway.data.DestinationGenerator;
 import com.api.gateway.tpe.model.TpeManager;
 import com.api.gateway.tpe.service.TpeManagerService;
-import com.api.gateway.transaction.model.Message;
-import com.api.gateway.transaction.model.WebSocketStatus;
-import com.api.gateway.transaction.model.Session;
-import com.api.gateway.transaction.model.SessionOrigin;
+import com.api.gateway.transaction.model.*;
 import com.api.gateway.transaction.service.TransactionRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -54,9 +51,9 @@ public class WebSocketListeners {
                 smt.convertAndSendToUser(
                         session.getUsername(),
                         destinationGenerator.getTpeSynchronizationStatusDest(session.getSessionId()),
-                        new Message(
-                                "Lost connection with Shop. TPE's status after synchronising again: " + message.toString(),
-                                WebSocketStatus.LOST_CONNECTION
+                        new MessageCancelTpe(
+                                "Transaction cancelled after losing connection with Shop.",
+                                WebSocketStatus.LOST_CONNECTION, message.getType()
                         )
                 );
             }
