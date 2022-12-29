@@ -65,7 +65,6 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             // Endpoints
             .antMatchers("/auth/**").permitAll()
             .antMatchers("/bank/**").hasRole("MANAGER")
-            .antMatchers("/tpe-manager/**").hasRole("TPE")
             .antMatchers("/qr-code/**").hasRole("MANAGER")
             // Endpoints to get Redis data
             .antMatchers("/tpe-manager-redis/**").hasRole("MANAGER")
@@ -77,17 +76,11 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             .antMatchers("/download/tpe.apk").permitAll()
             .antMatchers("/download/shop.apk").permitAll()
             // Interfaces for Admin
-<<<<<<< HEAD
-            .antMatchers("/admin/auth/login/**").permitAll()
-            .antMatchers("/admin/tpe/**").permitAll()
-            .antMatchers("/admin/**").hasRole("MANAGER")
-            .anyRequest().hasRole("MANAGER")
-=======
             .antMatchers("/admin/login").permitAll()
             .antMatchers("/admin/dashboard").permitAll()
             .antMatchers("/admin/qr-code/**").permitAll()
+            .antMatchers("/admin/whitelist/**").permitAll()
             //.anyRequest().hasRole("MANAGER")
->>>>>>> develop
             .and()
             .authenticationManager(authenticationManager)
             .exceptionHandling()
