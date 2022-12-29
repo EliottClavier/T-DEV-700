@@ -45,7 +45,8 @@ class _PaymentErrorScreenStatefulWidgetState
   }
 
   void initStatus() {
-    status = Provider.of<TransactionService>(context, listen: true).getStatus();
+    status =
+        Provider.of<TransactionService>(context, listen: false).getStatus();
   }
 
   @override
