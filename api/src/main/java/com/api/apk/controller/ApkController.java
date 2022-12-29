@@ -40,18 +40,26 @@ public class ApkController {
 
     @RequestMapping(path = "/shop.apk", method = RequestMethod.GET, produces = "application/apk")
     public ResponseEntity<InputStreamResource> getShopApk() throws IOException {
-        File file = getApkFile("/apks/shop.apk");
-        InputStreamResource isResource = new InputStreamResource(new FileInputStream(file));
-        HttpHeaders headers = setHeadersApkRoute(file, "shop");
-        return new ResponseEntity<>(isResource, headers, HttpStatus.OK);
+        try {
+            File file = getApkFile("/apks/shop.apk");
+            InputStreamResource isResource = new InputStreamResource(new FileInputStream(file));
+            HttpHeaders headers = setHeadersApkRoute(file, "shop");
+            return new ResponseEntity<>(isResource, headers, HttpStatus.OK);
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException("File not found.");
+        }
     }
 
     @RequestMapping(path = "/tpe.apk", method = RequestMethod.GET, produces = "application/apk")
     public ResponseEntity<InputStreamResource> getTpeApk() throws IOException {
-        File file = getApkFile("/apks/tpe.apk");
-        InputStreamResource isResource = new InputStreamResource(new FileInputStream(file));
-        HttpHeaders headers = setHeadersApkRoute(file, "tpe");
-        return new ResponseEntity<>(isResource, headers, HttpStatus.OK);
+        try {
+            File file = getApkFile("/apks/tpe.apk");
+            InputStreamResource isResource = new InputStreamResource(new FileInputStream(file));
+            HttpHeaders headers = setHeadersApkRoute(file, "tpe");
+            return new ResponseEntity<>(isResource, headers, HttpStatus.OK);
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException("File not found.");
+        }
     }
 
 }

@@ -19,6 +19,7 @@ services:
     volumes:
       - ./api:/api
       - ./apks:/apks
+      - ./qr-code:/qr-code
     networks:
       - back-net
     depends_on:
@@ -73,6 +74,7 @@ volumes:
   redis-data:
   api:
   apks:
+  qr-code:
   mail-data:
   mailhog.auth:
 

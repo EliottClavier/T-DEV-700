@@ -10,6 +10,9 @@ redis-data
 ### APKS volume ###
 apks
 
+### QR Codes volume ###
+qr-code
+
 ### Mail volume ###
 mail-data
 
