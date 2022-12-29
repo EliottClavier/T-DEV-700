@@ -19,6 +19,7 @@ services:
     volumes:
       - ./api:/api
       - ./apks:/apks
+      - ./qr-code:/qr-code
     networks:
       - back-net
     depends_on:
