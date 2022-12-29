@@ -33,6 +33,7 @@ class Shop extends StatefulWidget {
 class ShopState extends State<Shop> {
   // List of articles in the shop
   List articlesInShop = shop_articles;
+  final RequestsClass requestsClass = RequestsClass();
 
   // Method that initializes the state of the ShopState object
   @override
@@ -110,7 +111,7 @@ class ShopState extends State<Shop> {
                             "error",
                             3);
                       } else {
-                        RequestsClass.connect(
+                        requestsClass.connect(
                             double.parse(widget.total!), context);
                         Navigator.pushNamed(context, Payment.pageName);
                       }

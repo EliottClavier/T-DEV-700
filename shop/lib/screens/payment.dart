@@ -17,6 +17,8 @@ class Payment extends StatelessWidget {
   // Static late BuildContext variable for the context of the payment page
   static late BuildContext contextPayment;
 
+  final RequestsClass requestsClass = RequestsClass();
+
   // Constructor for the Payment class that takes in a required key
   Payment({super.key});
 
@@ -50,7 +52,7 @@ class Payment extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      RequestsClass.cancelPayment();
+                      requestsClass.cancelPayment();
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
