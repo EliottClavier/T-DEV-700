@@ -17,15 +17,14 @@ class RequestsClass {
   static String token = "";
   static final String _url = Token.url;
   static double totalAmount = 0.0;
-  static bool paymentSended = false;
+  static bool paymentValidate = false;
   static late StompClient _client;
   static late BuildContext parentContext;
   static String _sessionId = "";
 
   static connect(double amount, BuildContext context) async {
     try {
-      final response = await http.post(
-          Uri.parse("$HTTP_PROTOCOL://$_url/auth/shop/login"),
+      final response = await http.post(Uri.parse("$HTTP_PROTOCOL://$_url/auth/shop/login"),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({"name": SHOP_USERNAME, "password": SHOP_PASSWORD}));
       if (response.statusCode == 200) {
@@ -34,23 +33,7 @@ class RequestsClass {
         totalAmount = amount;
         parentContext = context;
       } else {
-        if (response.statusCode == 403) {
-          print("Error : ${response.statusCode} - ${response.body}");
-          Navigator.pushNamed(context, Shop.pageName);
-          showSnackBar(
-              context,
-              "L'application n'a pas les bon identifiants pour se connecter au serveur",
-              "error",
-              3);
-        } else {
-          print("Error : ${response.statusCode} - ${response.body}");
-          Navigator.pushNamed(context, Shop.pageName);
-          showSnackBar(
-              parentContext,
-              "L'application a rencontré une erreur lors de la connexion au serveur",
-              "error",
-              3);
-        }
+        print("Error : ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
       print(e);
@@ -98,40 +81,34 @@ class RequestsClass {
         destination: '/websocket-manager/shop/pay', body: jsonEncode(json));
   }
 
-  static void cancelPayment() {
-    _client.send(destination: '/websocket-manager/tpe/cancel-transaction');
-  }
-
   static void onConnectCallback(StompFrame connectFrame) {
     dynamic transactionStatus = _client.subscribe(
         destination: '/user/queue/shop/transaction-status/$_sessionId',
         callback: (frame) {
           var response = Response.fromJson(jsonDecode(frame.body!));
-          print(response.type);
-          print(response.message);
           switch (response.type) {
             case "TRANSACTION_DONE":
-              paymentSended = true;
+              paymentValidate = true;
               _client.deactivate();
               shop_articles = [];
               Navigator.pushNamed(parentContext, Validation.pageName);
               break;
             case "TRANSACTION_ERROR":
-              paymentSended = true;
+              paymentValidate = true;
               _client.deactivate();
               Navigator.pushNamed(parentContext, Shop.pageName);
               showSnackBar(
                   parentContext, "Erreur lors de la transaction", "error", 3);
               break;
             case "NO_TPE_FOUND":
-              paymentSended = true;
+              paymentValidate = true;
               _client.deactivate();
               Navigator.pushNamed(parentContext, Shop.pageName);
               showSnackBar(parentContext, "Aucun TPE disponible pour le moment",
                   "error", 3);
               break;
             case "NO_TPE_SELECTED":
-              paymentSended = true;
+              paymentValidate = true;
               _client.deactivate();
               Navigator.pushNamed(parentContext, Shop.pageName);
               showSnackBar(
@@ -141,29 +118,22 @@ class RequestsClass {
                   3);
               break;
             case "TRANSACTION_OPENED":
-              paymentSended = true;
+              paymentValidate = true;
               showSnackBar(parentContext,
                   "Le paiement est disponible sur un TPE", "success", 3);
               break;
             case "NOT_FOUND":
-              paymentSended = true;
+              paymentValidate = true;
               _client.deactivate();
               Navigator.pushNamed(parentContext, Shop.pageName);
               showSnackBar(parentContext,
                   "Erreur lors de la connexion avec la banque", "error", 3);
               break;
             case "TRANSACTION_TIMED_OUT":
-              paymentSended = true;
+              paymentValidate = true;
               _client.deactivate();
               Navigator.pushNamed(parentContext, Shop.pageName);
               showSnackBar(parentContext, "Transaction timed out", "error", 3);
-              break;
-            case "TRANSACTION_CANCELLED":
-              paymentSended = true;
-              _client.deactivate();
-              Navigator.pushNamed(parentContext, Shop.pageName);
-              showSnackBar(
-                  parentContext, "La transaction a été annulée", "error", 3);
               break;
             default:
               Navigator.pushNamed(parentContext, Shop.pageName);
@@ -172,7 +142,7 @@ class RequestsClass {
               break;
           }
         });
-    if (!paymentSended) {
+    if (!paymentValidate) {
       pay();
     }
   }
