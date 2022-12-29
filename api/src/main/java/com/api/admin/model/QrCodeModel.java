@@ -1,4 +1,4 @@
-package com.api.admin.qrcode.model;
+package com.api.admin.model;
 
 import lombok.Getter;
 import lombok.Setter;

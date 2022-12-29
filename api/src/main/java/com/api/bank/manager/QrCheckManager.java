@@ -46,7 +46,7 @@ public class QrCheckManager implements IQrCheckManager {
     @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
     public TransactionResult createQrCheck(QrCheckTransactionModel transaction) throws BankTransactionException {
 
-        var qrCheck = new QrCheck(transaction.getAmount(), transaction.getToken());
+        var qrCheck = new QrCheck(transaction.getAmount(), Integer.parseInt(transaction.getToken()));
         if (!this.checkService.add(qrCheck).isValid()) {
             throw new BankTransactionException(TransactionStatus.FAILED, transaction.getOperationId(), "QrCheck creation failed");
         }

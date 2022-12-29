@@ -10,6 +10,12 @@ redis-data
 ### APKS volume ###
 apks
 
+<<<<<<< HEAD
+=======
+### QR Codes volume ###
+qr-code
+
+>>>>>>> develop
 ### Mail volume ###
 mail-data
 
