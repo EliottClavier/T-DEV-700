@@ -87,45 +87,16 @@ public class QrCodeController {
     }
 
     //Return the qrCode in the navigator
-    @RequestMapping(path = "/{qrCodeUuid}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
-    public byte[] getImageWithMediaType(
+    @RequestMapping(path = "/{qrCodeUuid}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getImageWithMediaType(
             @PathVariable String qrCodeUuid
     ) throws IOException {
         InputStream in = new FileInputStream("/qr-code/" + qrCodeUuid + ".jpg");
-        return IOUtils.toByteArray(in);
-    }
+        var image = IOUtils.toByteArray(in);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        headers.setContentLength(image.length);
 
-//    private HttpHeaders setHeadersQrCodeRoute(File file, String filename) throws IOException {
-//        FileSystemResource fileSystemResource = new FileSystemResource(file);
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.valueOf(MediaType.IMAGE_JPEG_VALUE));
-//        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-//        headers.add("Pragma", "no-cache");
-//        headers.add("Expires", "0");
-//        headers.setContentLength(fileSystemResource.contentLength());
-//        headers.setContentDispositionFormData("attachment", filename + ".jpg");
-//        return headers;
-//    }
-//
-//    public File getQrCodeFile(String path) throws FileNotFoundException {
-//        File file = new File(path);
-//        if (!file.exists()) {
-//            throw new FileNotFoundException("File not found.");
-//        }
-//        return file;
-//    }
-//
-//    @RequestMapping(path = "/{qrCodeUuid}", method = RequestMethod.GET, produces = "application/apk")
-//    public ResponseEntity<InputStreamResource> getShopApk(
-//            @PathVariable String qrCodeUuid
-//    ) throws IOException {
-//        try {
-//            File file = getQrCodeFile("/qr-code/qr-code-" + qrCodeUuid + ".jpg");
-//            InputStreamResource isResource = new InputStreamResource(new FileInputStream(file));
-//            HttpHeaders headers = setHeadersQrCodeRoute(file, "qr-code-" + qrCodeUuid);
-//            return new ResponseEntity<>(isResource, headers, HttpStatus.OK);
-//        } catch (FileNotFoundException e) {
-//            throw new FileNotFoundException("File not found.");
-//        }
-//    }
+        return new ResponseEntity<>(image, headers, HttpStatus.OK);
+    }
 }

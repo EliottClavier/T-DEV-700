@@ -1,32 +1,39 @@
-$(document).ready(async function () {
+$(document).ready(function () {
 
     if (!localStorage.getItem("token")) {
         location.replace(window.location.origin + "/" + window.location.pathname.split('/')[1] + "/login");
     }
 
-    let url = "/qr-code/" + $(location).attr("href").split('/').pop();
+    let qrCodeName = $(location).attr("href").split('/').pop();
 
-    console.log("stp")
-    await $.ajax({
+    let url = "/qr-code/" + qrCodeName;
+
+    $.ajax({
         type: "GET",
         url: url,
         headers: {
             "Authorization": "Bearer " + localStorage.getItem("token"),
-            "Content-Type": "image/jpeg",
         },
-        success: async function (response) {
-            console.log(response)
+        contentType: "image/jpeg",
+        cache:false,
+        xhrFields:{
+            responseType: 'blob'
+        },
+        success: function (response) {
             const blob = new Blob([response], {type: 'image/jpeg'});
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
+            let url = URL.createObjectURL(blob);
+
+            $("#qr-code").attr("src", url);
+
+            let a = document.createElement('a');
             a.href = url;
-            a.download = 'image.jpg';
+            a.download = `${qrCodeName}.jpg`;
             document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
         },
         error: function (response) {
-            console.log(response)
+            location.replace(window.location.origin + "/" + window.location.pathname.split('/')[1] + "/qr-code/generate");
         }
     });
-    console.log("stp")
 });
