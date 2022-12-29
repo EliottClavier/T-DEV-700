@@ -7,7 +7,6 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Getter
@@ -16,7 +15,6 @@ public class QrCheck extends Base {
 
     @Column(nullable = false, unique = true)
     private String checkToken;
-
     private double soldAmount;
 
     @Column(nullable = false)
@@ -30,10 +28,17 @@ public class QrCheck extends Base {
         init();
     }
 
-    public QrCheck(double amount, String token) {
+    public QrCheck(double soldAmount, String checkToken) {
         super();
-        this.soldAmount = amount;
-        this.checkToken = token;
+        this.soldAmount = soldAmount;
+        this.checkToken = checkToken;
+        init();
+    }
+
+    public QrCheck(double soldAmount, int nbDayOfValidity) {
+        super();
+        this.soldAmount = soldAmount;
+        this.nbDayOfValidity = nbDayOfValidity;
         init();
     }
 

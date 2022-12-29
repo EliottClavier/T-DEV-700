@@ -18,6 +18,7 @@ services:
       LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
     volumes:
       - /app-data/cash-manager/apks:/apks
+      - /app-data/cash-manager/qr-code:/qr-code
     expose:
       - "${API_PORT}"
     networks:
@@ -76,6 +77,7 @@ volumes:
   database-data:
   redis-data:
   apks:
+  qr-code:
   mail-data:
   mailhog.auth:
   

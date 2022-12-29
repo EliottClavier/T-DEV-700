@@ -4,9 +4,9 @@ import 'package:tpe/config/router/navigator.dart';
 import 'package:go_router/go_router.dart';
 
 void snackbarThenNavigate(BuildContext context, message, status, route) {
-  showSnackBar(context, message, status, 3);
+  showSnackBar(context, message, status, 1);
   if (route == null) return;
-  Future.delayed(const Duration(seconds: 3), () {
+  Future.delayed(const Duration(seconds: 1), () {
     navigatorKey.currentContext!.go(route ?? '/');
   });
 }

@@ -1,0 +1,7 @@
+* {
+    overflow-x: hidden;
+}
+
+.card-title {
+    overflow: hidden !important;
+}
