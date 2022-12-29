@@ -105,24 +105,34 @@ class TransactionService with ChangeNotifier {
   }
 
   Future<void> _connect() async {
-    final response = await http.post(
-        Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/login"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"androidId": _androidId, "password": password}));
-    if (response.statusCode == 200) {
-      _token = Token.fromJson(jsonDecode(response.body)).token;
-      setStatus("Connected to server.");
-      await _connectWebSocket();
-    } else if (response.statusCode == 403) {
-      setStatus("Waiting for device whitelist.");
-    } else if (response.statusCode == 401) {
-      setStatus("Bad credentials.");
-      showAuthModal();
-    } else {
-      _fullRegister();
-      setStatus("Connexion to server failed.");
+    try {
+      final response = await http.post(
+          Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/login"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({"androidId": _androidId, "password": password}));
+      if (response.statusCode == 200) {
+        _token = Token.fromJson(jsonDecode(response.body)).token;
+        setStatus("Connected to server.");
+        await _connectWebSocket();
+      } else if (response.statusCode == 403) {
+        setStatus("Waiting for device whitelist.");
+      } else if (response.statusCode == 401) {
+        setStatus("Bad credentials.");
+        if (password != "") {
+          showAuthModal();
+        } else {
+          _fullRegister();
+        }
+      } else {
+        _fullRegister();
+        setStatus("Connexion to server failed.");
+      }
+      notifyListeners();
+    } catch (e) {
+      setStatus(
+          "Failed to contact server. Please check your internet connection.");
+      await Future.delayed(const Duration(seconds: 5));
     }
-    notifyListeners();
     return Future.value();
   }
 
@@ -140,15 +150,15 @@ class TransactionService with ChangeNotifier {
       setStatus('Register successfull. Please wait for Device whitelist.');
     } else {
       onFullRegisterError();
-      setStatus("Register to server failed. New attempt in 5 seconds.");
+      setStatus("Register to server failed.");
     }
     notifyListeners();
     return Future.value();
   }
 
   Future<void> onFullRegisterError() async {
-    await Future.delayed(const Duration(seconds: 5));
-    await _connect();
+    await Future.delayed(const Duration(seconds: 2));
+    showAuthModal();
     return Future.value();
   }
 
