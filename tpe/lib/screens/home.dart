@@ -55,8 +55,11 @@ class _HomeScreenStatefulWidgetState extends State<HomeScreenStatefulWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            top: MediaQuery.of(context).viewInsets.top),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
