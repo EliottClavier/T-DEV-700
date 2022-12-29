@@ -65,7 +65,6 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             // Endpoints
             .antMatchers("/auth/**").permitAll()
             .antMatchers("/bank/**").hasRole("MANAGER")
-            .antMatchers("/tpe-manager/**").hasRole("TPE")
             .antMatchers("/qr-code/**").hasRole("MANAGER")
             // Endpoints to get Redis data
             .antMatchers("/tpe-manager-redis/**").hasRole("MANAGER")
@@ -80,6 +79,7 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
             .antMatchers("/admin/login").permitAll()
             .antMatchers("/admin/dashboard").permitAll()
             .antMatchers("/admin/qr-code/**").permitAll()
+            .antMatchers("/admin/whitelist/**").permitAll()
             //.anyRequest().hasRole("MANAGER")
             .and()
             .authenticationManager(authenticationManager)
