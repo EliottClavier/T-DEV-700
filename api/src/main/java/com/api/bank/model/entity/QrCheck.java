@@ -23,7 +23,17 @@ public class QrCheck extends Base {
     @OneToMany(mappedBy = "qrCheck", cascade= CascadeType.ALL)
     private List<Operation> operations;
 
-    public QrCheck() {}
+    public QrCheck() {
+        super();
+        init();
+    }
+
+    public QrCheck(double soldAmount, String checkToken) {
+        super();
+        this.soldAmount = soldAmount;
+        this.checkToken = checkToken;
+        init();
+    }
 
     public QrCheck(double soldAmount, int nbDayOfValidity) {
         super();
