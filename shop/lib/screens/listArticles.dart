@@ -6,34 +6,40 @@ import 'package:shop/widgets/article_card.dart';
 import 'package:shop/widgets/navBar.dart';
 import 'package:shop/widgets/category_card.dart';
 
+// Class representing a list of articles
 class ListArticles extends StatefulWidget {
-  
+  // Static constant for the route name of the page
   static const String pageName = '/listeArticles';
+  // Variable for the total number of articles in the shop
   String? total = totalArticles();
+  // List to store the articles that are displayed in the widget
   List listArticles = [];
 
+  // Constructor for the ListArticles class that takes in a required key
   ListArticles({super.key});
 
+  // Method to create and return the state of the ListArticles widget
   @override
   State<ListArticles> createState() => ListArticlesState();
-
-  
 }
 
+// Class representing the state of the ListArticles widget
 class ListArticlesState extends State<ListArticles> {
-
+  // Method that is called when the ListArticles widget is initialized
   @override
   void initState() {
     super.initState();
     updateListArticles();
   }
 
+  // Method to update the total number of articles in the shop
   void updateTotal() {
     setState(() {
       widget.total = totalArticles();
     });
   }
 
+  // Method to return the name of the currently selected category
   String selectedCategory() {
     for (var category in categories) {
       if (category.selected == true) {
@@ -43,13 +49,17 @@ class ListArticlesState extends State<ListArticles> {
     return '';
   }
 
+  // Method to update the list of articles displayed in the widget based on the currently selected category
   updateListArticles() {
     String categoryName = selectedCategory();
     setState(() {
-      widget.listArticles = articles.where((article) => article['category'] == categoryName).toList();
+      widget.listArticles = articles
+          .where((article) => article['category'] == categoryName)
+          .toList();
     });
   }
 
+  // Method to build and return the widget tree for the ListArticles widget
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -79,7 +89,8 @@ class ListArticlesState extends State<ListArticles> {
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: false,
                 children: categories.map((test) {
-                  return CategoryCard(category: test, onCategoryChanged: updateListArticles);
+                  return CategoryCard(
+                      category: test, onCategoryChanged: updateListArticles);
                 }).toList(),
               ),
             ),
@@ -87,7 +98,9 @@ class ListArticlesState extends State<ListArticles> {
               child: GridView.count(
                 crossAxisCount: 2,
                 children: List.generate(widget.listArticles.length, (index) {
-                  return ArticleCard(article: widget.listArticles[index], onQuantityChanged: updateTotal);
+                  return ArticleCard(
+                      article: widget.listArticles[index],
+                      onQuantityChanged: updateTotal);
                 }),
               ),
             ),

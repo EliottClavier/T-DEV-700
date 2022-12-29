@@ -7,12 +7,17 @@ import 'package:shop/util/shop.dart';
 import 'package:shop/router/router.dart';
 
 class NavBar extends StatefulWidget {
+  // BuildContext of the parent widget
   final BuildContext parentContext;
+  // Total quantity of items in the shopping cart
   final String? total;
+  // Index of the currently selected page
   late int selectedPage = 0;
 
+  // Constructor for NavBar, which takes in a required parent context and a required total
   NavBar({super.key, required this.parentContext, required this.total});
 
+  // Function to determine the selected page based on the parent context
   void selectPage() {
     if (parentContext.toString().contains('ListArticles') == true) {
       selectedPage = 0;
@@ -21,6 +26,7 @@ class NavBar extends StatefulWidget {
     }
   }
 
+  // Create the state for the NavBar widget
   @override
   State<NavBar> createState() => NavBarState();
 }
