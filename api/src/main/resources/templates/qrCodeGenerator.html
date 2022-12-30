@@ -16,11 +16,15 @@
                             <h3 class="card-title">Generate</h3>
                             <form>
                                 <div class="form-group mt-4">
-                                    <input id="soldAmount" name="soldAmount" class="form-control" type="number" placeholder="Sold" min="10" required>
+                                    <input id="amount" name="amount" class="form-control" type="number" placeholder="Amount" min="10" required>
                                 </div>
                                 <div class="form-group mt-4">
-                                    <input id="nbDayBeforeExpiration" name="nbDayBeforeExpiration" class="form-control" type="number" placeholder="Days" min="10" required>
+                                    <!-- Select client field -->
+                                    <select id="client" name="client" class="form-control" required>
+                                        <option value="" selected disabled>Select client</option>
+                                    </select>
                                 </div>
+                                <div id="error" style="display: none" class="form-group alert alert-danger my-4">Test</div>
                                 <div class="form-group my-4">
                                     <button id="generate-qr-code" class="btn btn-primary w-100" type="button">
                                         Generate

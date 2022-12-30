@@ -189,6 +189,7 @@ public class BankTransactionManager {
         if (account == null) {
             throw new BankTransactionException(TransactionStatus.ACCOUNT_ERROR, transaction.getOperationId(), "Account not found");
         }
+
         if (opType == OperationType.WITHDRAW && isCheckPayment(transaction) && !account.getClient().getOrganisationName().equals(BankConstants.BANK_NAME)) {
             throw new BankTransactionException(TransactionStatus.BANK_ERROR, transaction.getOperationId(), "Bank not found");
         }

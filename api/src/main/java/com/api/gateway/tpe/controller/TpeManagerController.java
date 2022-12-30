@@ -24,15 +24,20 @@ import java.security.Principal;
 public class TpeManagerController {
 
     private final DestinationGenerator destinationGenerator = new DestinationGenerator();
+    private final SimpMessagingTemplate smt;
+    private final TpeManagerService tpeManagerService;
+    private final IBankManager bankManager;
 
     @Autowired
-    private SimpMessagingTemplate smt;
-
-    @Autowired
-    private TpeManagerService tpeManagerService;
-
-    @Autowired
-    private IBankManager bankManager;
+    public TpeManagerController(
+            SimpMessagingTemplate smt,
+            TpeManagerService tpeManagerService,
+            IBankManager bankManager
+    ) {
+        this.smt = smt;
+        this.tpeManagerService = tpeManagerService;
+        this.bankManager = bankManager;
+    }
 
     @MessageMapping("/tpe/synchronize")
     public void synchronizeTpeRedis(

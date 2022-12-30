@@ -42,7 +42,7 @@ public class ShopController {
 
     @RequestMapping(path = "/{uuid}", method = RequestMethod.DELETE)
     public ResponseEntity<ObjectResponse> deleteShop(@PathVariable("uuid") String uuid) {
-        ObjectResponse response = shopService.deleteByUUID(uuid);
+        ObjectResponse response = shopService.deleteShopStackByUUID(uuid);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
