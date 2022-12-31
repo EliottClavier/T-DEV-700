@@ -113,6 +113,11 @@ public class BankManager implements IBankManager {
 
                     var bankTransaction = createBankTransactionFrom(qrCheckTransaction);
                     qrCheckManager.checkToken(qrCheckTransaction);
+                    System.out.println(bankTransaction.getWithdrawalAccount().getClient().getOrganisationName());
+                    System.out.println(bankTransaction.getDepositAccount().getClient().getOrganisationName());
+                    System.out.println(bankTransaction.getAmount());
+                    System.out.println(bankTransaction.getQrCheck());
+                    System.out.println(bankTransaction.getBankTransactionType());
                     bankTransactionManager.executeTransaction(bankTransaction);
 
                     return qrCheckManager.createQrCheck(qrCheckTransaction);
