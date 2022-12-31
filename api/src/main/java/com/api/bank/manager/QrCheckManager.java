@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-
+/**
+ * Class that manage the QrCheck
+ */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class QrCheckManager implements IQrCheckManager {
@@ -26,23 +28,12 @@ public class QrCheckManager implements IQrCheckManager {
         this.checkService = new CheckService(qrCheckRepository);
     }
 
-    @Override
-    @Transactional(rollbackFor= {BankTransactionException.class, Exception.class}, propagation = Propagation.REQUIRED  )
-    public TransactionResult buyQrCheck(QrCheckTransactionModel transaction) {
-        try {
-
-            checkToken(transaction);
-            createQrCheck(transaction);
-
-            return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "QrCheck successfully created");
-
-        } catch (BankTransactionException e) {
-            return new TransactionResult(e.getTransactionStatus(), transaction.getOperationId(), e.getMessage());
-
-        } catch (Exception e) {
-            return new TransactionResult(TransactionStatus.FAILED, transaction.getOperationId(), e.getMessage());
-        }
-    }
+    /**
+     * Method that create a QrCheck
+     * @param transaction   Transaction data
+     * @return the result of the transaction
+     * @throws BankTransactionException if the creation is not valid
+     */
     @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
     public TransactionResult createQrCheck(QrCheckTransactionModel transaction) throws BankTransactionException {
 
@@ -53,6 +44,11 @@ public class QrCheckManager implements IQrCheckManager {
         return new TransactionResult(TransactionStatus.SUCCESS, transaction.getOperationId(), "QrCheck successfully created");
     }
 
+    /**
+     * Method that checks if the token of the QrCheck is valid and exists
+     * @param transaction  Transaction data
+     * @throws BankTransactionException if the token is not valid or does not exist
+     */
     @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
     public void checkToken(QrCheckTransactionModel transaction) throws BankTransactionException {
         if (transaction.getToken().isEmpty()) {
@@ -63,16 +59,31 @@ public class QrCheckManager implements IQrCheckManager {
         }
     }
 
+    /**
+     * Method that return the information of a QrCheck
+     * @param qrCheck  qrCheck data
+     */
     @Override
-    public boolean checkQrCheck(QrCheck qrCheck) {
+    public boolean infoQrCheck(QrCheck qrCheck) {
+        // Not implemented
         return false;
     }
 
+    /**
+     * Method that delete a QrCheck
+     * @param qrCheck  qrCheck data
+     */
     @Override
     public boolean deleteQrCheck(QrCheck qrCheck) {
+        // Not implemented
         return false;
     }
 
+    /**
+     * Method that update a QrCheck
+     * @param transaction  transaction data
+     * @throws BankTransactionException if the update is not valid
+     */
     @Override
     @Transactional(rollbackFor = {BankTransactionException.class, Exception.class}, propagation = Propagation.REQUIRED)
     public void updateQrCheck(BankTransactionModel transaction) throws BankTransactionException {
