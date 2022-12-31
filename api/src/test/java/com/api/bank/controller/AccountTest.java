@@ -9,29 +9,30 @@ import com.api.bank.model.enums.SocialReasonStatus;
 import com.api.bank.repository.AccountRepository;
 import com.api.bank.service.AccountService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.stereotype.Component;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest()
+
 public class AccountTest {
 
-
-    private final AccountService accountService;
-
     @Autowired
-    public AccountTest(AccountRepository accountRepository) {
-        accountService = new AccountService(accountRepository);
-    }
+    private  AccountRepository accountRepository;
+
+    private  AccountService accountService;
+
 
 
     @Test
     void testCreate() {
+        accountService = new AccountService(accountRepository);
+
         //Arrange
         ObjectResponse res1 = null;
         ObjectResponse res2 = null;
