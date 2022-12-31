@@ -25,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ *  Class that manage all the bank transactions
+ */
 @Component()
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class BankTransactionManager {
@@ -41,11 +44,13 @@ public class BankTransactionManager {
     }
 
     /**
-     * Handle a transaction between two accounts
+     * Handle a transaction between two accounts and throws exception if something goes wrong
      *
      * @param transaction Represents the transaction to be processed
-     * @return The transaction status by the TransactionResult Object
+     * @throws BankTransactionException If the transaction is not valid
+     * @throws RuntimeException If a runtime problem occurs
      */
+
     @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
     public void executeTransaction(BankTransactionModel transaction) throws BankTransactionException, RuntimeException {
 
@@ -69,11 +74,21 @@ public class BankTransactionManager {
         }
    }
 
+    /**
+     * Update the QrCheck status when the transaction used a check method payment
+     * @param transaction
+     * @throws BankTransactionException If the transaction is not valid
+     */
     private void updateQrCheck(BankTransactionModel transaction) throws BankTransactionException {
        qrCheckManager.updateQrCheck(transaction);
     }
 
 
+    /**
+     * Check if the transaction is not empty
+     * @param transaction Represents the transaction to be processed
+     * @throws BankTransactionException If the transaction is not valid
+     */
     private void checkTransaction(BankTransactionModel transaction) throws BankTransactionException {
         if(transaction == null){
             throw new BankTransactionException(TransactionStatus.EMPTY_TRANSACTION_ERROR,"","Transaction is Empty" );

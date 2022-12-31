@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.concurrent.*;
 
 /**
- * This class is responsible for managing the bank transactions
+ * This class is responsible for managing the bank transactions in a specific thread
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
