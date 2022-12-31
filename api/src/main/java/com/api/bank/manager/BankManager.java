@@ -23,16 +23,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.*;
 
+/**
+ * This class is responsible for managing the bank transactions
+ */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class BankManager implements IBankManager {
     private final BankTransactionManager bankTransactionManager;
     private final QrCheckManager qrCheckManager;
-    private final ExecutorService executor;
+    private final ExecutorService executor; // Thread for handling transactions in queue
     private final AccountService accountService;
     private final ClientService clientService;
     private final CheckService checkService;
-
 
     @Autowired
     public BankManager(BankTransactionManager bankTransactionManager,
@@ -44,12 +46,26 @@ public class BankManager implements IBankManager {
         this.checkService = checkService;
         this.qrCheckManager = qrCheckManager;
 
+        // Single Thread for handling transactions in queue
         executor = Executors.newSingleThreadExecutor();
     }
 
+    /**
+     * This method is responsible for managing the shop transactions.
+     * It adds a new Callable to the queue of the executor thread by the Submit method and wait for the result.
+     * @param shoppingTransaction   The transaction to be managed
+     */
     @Override
     public TransactionResult shoppingTransaction(ShoppingTransactionModel shoppingTransaction) {
         Future<TransactionResult> result = executor.submit(new Callable<TransactionResult>() {
+
+            /**
+             * This method call the bankTransactionManager to handle the transaction.
+             * Before it, it transforms the ShoppingTransaction into a BankTransaction.
+             * @return  The result of the transaction
+             * @throws InterruptedException   If the thread is interrupted by a BankTransactionException for example
+             */
+            @Override
             @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRES_NEW)
             public TransactionResult call() throws InterruptedException {
                 try {
@@ -58,9 +74,11 @@ public class BankManager implements IBankManager {
 
                     return new TransactionResult(TransactionStatus.SUCCESS, bankTransaction.getOperationId(), "Payment has been validated");
 
-
                 } catch (BankTransactionException ex) {
                     throw new InterruptedException(ex.getTransactionStatus().toString());
+
+                }catch (Exception ex) {
+                    throw new InterruptedException(ex.getMessage());
                 }
             }
         });
@@ -73,9 +91,22 @@ public class BankManager implements IBankManager {
         }
     }
 
+    /**
+     * This method is responsible for managing transactions about the buying QR Check .
+     * It adds a new Callable to the queue of the executor thread by the Submit method and wait for the result.
+     * @param qrCheckTransaction    The transaction to be managed
+     */
     @Override
     public TransactionResult buyCheckTransaction(QrCheckTransactionModel qrCheckTransaction) {
         Future<TransactionResult> result = executor.submit(new Callable<TransactionResult>() {
+
+            /**
+             * This method call the bankTransactionManager and the qrCheckManager to handle the transaction.
+             * Before it, it transforms the QrCheckTransaction into a BankTransaction.
+             * @return  The result of the transaction
+             * @throws InterruptedException   If the thread is interrupted by a BankTransactionException for example
+             */
+            @Override
             @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRES_NEW)
             public TransactionResult call() throws InterruptedException {
                 try {
@@ -100,6 +131,11 @@ public class BankManager implements IBankManager {
         }
     }
 
+    /**
+     * This method is responsible for transforming a QrCheckTransaction into a BankTransaction.
+     * @param qrCheckTransaction    The transaction to be managed
+     * @return The BankTransaction
+     */
     private BankTransactionModel createBankTransactionFrom(QrCheckTransactionModel qrCheckTransaction) {
 
         var bankTransaction = new BankTransactionModel(qrCheckTransaction);
@@ -111,6 +147,11 @@ public class BankManager implements IBankManager {
         return bankTransaction;
     }
 
+    /**
+     * This method is responsible for transforming a ShoppingTransaction into a BankTransaction.
+     * @param shoppingTransaction    The transaction to be managed
+     * @return  The BankTransaction
+     */
     private BankTransactionModel createBankTransactionFrom(ShoppingTransactionModel shoppingTransaction) throws BankTransactionException {
 
         var bankTransaction = new BankTransactionModel(shoppingTransaction);
@@ -171,6 +212,10 @@ public class BankManager implements IBankManager {
         return transaction.getPaymentMethod() == PaymentMethod.CHECK;
     }
 
+    /**
+     * Supply account of the bank
+     * @return The bank account
+     */
     private Account getBankAccount() {
         return clientService.getClientByOrganisationName(BankConstants.BANK_NAME).getAccount();
     }
@@ -185,6 +230,11 @@ public class BankManager implements IBankManager {
         return checkService.getCheckByCheckToken(transaction.getMeansOfPaymentId());
     }
 
+    /**
+     * This method is responsible for transforming a string message into an TransactionStatus enum .
+     * @param value The value to be converted
+     * @return  A TransactionStatus enum value
+     */
     TransactionStatus getEnum(String value) {
         try {
             return TransactionStatus.valueOf(value);
@@ -193,6 +243,11 @@ public class BankManager implements IBankManager {
         }
     }
 
+    /**
+     * This method is responsible for supply from a TransactionStatus enum, a corresponding message.
+     * @param value The value to be converted
+     * @return  A message
+     */
     String getMessage(String value) {
         try {
             return switch (TransactionStatus.valueOf(value)) {
