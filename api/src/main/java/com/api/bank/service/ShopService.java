@@ -1,28 +1,34 @@
 package com.api.bank.service;
 
 import com.api.bank.model.ObjectResponse;
+import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.Shop;
+import com.api.bank.repository.AccountRepository;
+import com.api.bank.repository.ClientRepository;
 import com.api.bank.repository.ShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class ShopService extends GenericService<Shop> {
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final ShopRepository shopRepository;
+    private final AccountRepository accountRepository;
 
     @Autowired
-    public ShopService(ShopRepository shopRepository) {
+    public ShopService(
+            PasswordEncoder passwordEncoder,
+            ShopRepository shopRepository,
+            AccountRepository accountRepository
+    ) {
         super(shopRepository);
+        this.passwordEncoder = passwordEncoder;
         this.shopRepository = shopRepository;
+        this.accountRepository = accountRepository;
     }
 
 
@@ -63,6 +69,24 @@ public class ShopService extends GenericService<Shop> {
             return shopRepository.save(shop);
         }
         return null;
+    }
+
+    public ObjectResponse deleteShopStackByUUID(String id) {
+        try {
+            // Delete shop
+            shopRepository.deleteById(UUID.fromString(id));
+            shopRepository.flush();
+
+            // Delete account
+            Account account = accountRepository.findAccountByClient_Id(UUID.fromString(id));
+            accountRepository.deleteById(account.getId());
+            return new ObjectResponse("Success", HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            return new ObjectResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ObjectResponse(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 }
 

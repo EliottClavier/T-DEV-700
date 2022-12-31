@@ -2,6 +2,7 @@ package com.api.bank.model.entity;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -14,7 +15,7 @@ import javax.persistence.InheritanceType;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Tpe extends Base {
 
-    @NonNull
+    @Column(nullable = false, unique = true)
     private String androidId;
 
     @NonNull

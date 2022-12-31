@@ -23,6 +23,7 @@ public class QrCheckTransactionModel {
         this.amount = amount;
         this.clientId = clientId;
         this.paymentMethod = paymentMethod;
+        this.label = "CHECK";
         init();
     }
     public void init() {
