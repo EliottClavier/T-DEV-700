@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class ShopRunner implements ApplicationRunner {
@@ -28,11 +29,16 @@ public class ShopRunner implements ApplicationRunner {
     @Value("${default.shop.password}")
     private String password;
 
+    @Value("${default.shop.client.id}")
+    private String shopId;
+
+
     public void run(ApplicationArguments args) {
-        Shop shop = new Shop(username, password);
+        Shop shop = new Shop(shopId, username, password);
         Shop shopRegisterResponse = shopService.registerShop(shop);
 
-        if (shopRegisterResponse != null) {
+        Account accountSearch = accountService.getAccountByClientId(UUID.fromString(shopId));
+        if (accountSearch == null) {
             Client client = new Client(shop.getId(), shop.getName(), SocialReasonStatus.COMPANY);
             Account account = new Account(0, client);
             accountService.add(account);

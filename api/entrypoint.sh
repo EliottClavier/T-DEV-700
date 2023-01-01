@@ -1,3 +1,4 @@
 #!/bin/bash
 
-gradle bootRun --no-watch-fs --console=plain
+gradle test --no-watch-fs --console=plain
+#gradle bootRun --no-watch-fs --console=plain

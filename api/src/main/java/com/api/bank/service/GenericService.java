@@ -46,7 +46,7 @@ public class GenericService<T extends Base> {
         try {
             repository.delete(entity);
             repository.flush();
-            return new ObjectResponse("Success", HttpStatus.NO_CONTENT);
+            return new ObjectResponse("Success",null,true, HttpStatus.NO_CONTENT);
         } catch (IllegalArgumentException e) {
             return new ObjectResponse(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {

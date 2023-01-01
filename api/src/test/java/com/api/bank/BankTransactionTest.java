@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +32,7 @@ import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest()
 public class BankTransactionTest implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
     public static boolean started = false;
 

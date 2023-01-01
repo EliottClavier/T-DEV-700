@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import java.util.UUID;
 
 
 @Entity
@@ -27,6 +28,12 @@ public class Shop extends Base {
 
     public Shop(String name, String password) {
         super();
+        this.name = name;
+        this.password = password;
+        this.whitelisted = false;
+    }
+    public Shop(String id, String name, String password) {
+        super(UUID.fromString(id));
         this.name = name;
         this.password = password;
         this.whitelisted = false;

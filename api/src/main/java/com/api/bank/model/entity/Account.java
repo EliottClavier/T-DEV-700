@@ -37,6 +37,12 @@ public class Account extends Base {
         this.sold = sold;
 
     }
+    public Account(UUID id, double sold, Client client, Card card) {
+        super(id);
+        this.client = client;
+        this.sold = sold;
+        this.card = card;
+    }
     public Account(UUID id, double sold, Client client) {
         super(id);
         this.client = client;
