@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -35,6 +36,11 @@ public class Account extends Base {
         this.client = client;
         this.sold = sold;
 
+    }
+    public Account(UUID id, double sold, Client client) {
+        super(id);
+        this.client = client;
+        this.sold = sold;
     }
     public Account(double sold, Client client, Card card) {
         super();

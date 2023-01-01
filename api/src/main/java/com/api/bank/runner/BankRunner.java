@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+import static com.api.bank.model.BankConstants.BANK_ID;
 import static com.api.bank.model.BankConstants.BANK_NAME;
 
 @Component
@@ -29,7 +30,8 @@ public class BankRunner implements ApplicationRunner {
         Account accountSearch = accountService.getAccountByOwnerName(BANK_NAME);
         if (accountSearch == null) {
             Client client = new Client(UUID.randomUUID(), BANK_NAME, SocialReasonStatus.BANK);
-            Account account = new Account(100000000, client);
+            Account account = new Account(UUID.fromString(BANK_ID), 100000000, client);
+
             accountService.add(account);
         }
     }

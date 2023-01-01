@@ -31,7 +31,7 @@ public class IndividualRunner implements ApplicationRunner {
         Account accountSearch = accountService.getAccountByClientId(id);
         if (accountSearch == null) {
             Client client = new Client(id, "Ivain", "Lamarche", SocialReasonStatus.INDIVIDUAL);
-            Card card = new Card("1234567890123456"); //TODO get the real card number
+            Card card = new Card("001-043-191-039");
             Account account = new Account(5000, client, card);
 
             accountService.add(account);

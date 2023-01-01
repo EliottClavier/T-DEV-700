@@ -101,4 +101,12 @@ public class GenericService<T extends Base> {
             return new ObjectResponse(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
+
+    public boolean exist(String id){
+        try {
+            return repository.existsById(UUID.fromString(id));
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
