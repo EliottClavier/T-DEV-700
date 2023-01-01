@@ -3,9 +3,9 @@ package com.api.bank.manager;
 import com.api.bank.model.BankConstants;
 import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.QrCheck;
+import com.api.bank.model.enums.BankTransactionType;
 import com.api.bank.model.enums.PaymentMethod;
 import com.api.bank.model.enums.TransactionStatus;
-import com.api.bank.model.enums.BankTransactionType;
 import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.BankTransactionModel;
 import com.api.bank.model.transaction.QrCheckTransactionModel;
@@ -53,7 +53,8 @@ public class BankManager implements IBankManager {
     /**
      * This method is responsible for managing the shop transactions.
      * It adds a new Callable to the queue of the executor thread by the Submit method and wait for the result.
-     * @param shoppingTransaction   The transaction to be managed
+     *
+     * @param shoppingTransaction The transaction to be managed
      */
     @Override
     public TransactionResult shoppingTransaction(ShoppingTransactionModel shoppingTransaction) {
@@ -62,7 +63,7 @@ public class BankManager implements IBankManager {
             /**
              * This method call the bankTransactionManager to handle the transaction.
              * Before it, it transforms the ShoppingTransaction into a BankTransaction.
-             * @return  The result of the transaction
+             * @return The result of the transaction
              * @throws InterruptedException   If the thread is interrupted by a BankTransactionException for example
              */
             @Override
@@ -70,14 +71,14 @@ public class BankManager implements IBankManager {
             public TransactionResult call() throws InterruptedException {
                 try {
                     var bankTransaction = createBankTransactionFrom(shoppingTransaction);
-                     bankTransactionManager.executeTransaction(bankTransaction);
+                    bankTransactionManager.executeTransaction(bankTransaction);
 
                     return new TransactionResult(TransactionStatus.SUCCESS, bankTransaction.getOperationId(), "Payment has been validated");
 
                 } catch (BankTransactionException ex) {
                     throw new InterruptedException(ex.getTransactionStatus().toString());
 
-                }catch (Exception ex) {
+                } catch (Exception ex) {
                     throw new InterruptedException(ex.getMessage());
                 }
             }
@@ -94,7 +95,8 @@ public class BankManager implements IBankManager {
     /**
      * This method is responsible for managing transactions about the buying QR Check .
      * It adds a new Callable to the queue of the executor thread by the Submit method and wait for the result.
-     * @param qrCheckTransaction    The transaction to be managed
+     *
+     * @param qrCheckTransaction The transaction to be managed
      */
     @Override
     public TransactionResult buyCheckTransaction(QrCheckTransactionModel qrCheckTransaction) {
@@ -103,7 +105,7 @@ public class BankManager implements IBankManager {
             /**
              * This method call the bankTransactionManager and the qrCheckManager to handle the transaction.
              * Before it, it transforms the QrCheckTransaction into a BankTransaction.
-             * @return  The result of the transaction
+             * @return The result of the transaction
              * @throws InterruptedException   If the thread is interrupted by a BankTransactionException for example
              */
             @Override
@@ -113,11 +115,6 @@ public class BankManager implements IBankManager {
 
                     var bankTransaction = createBankTransactionFrom(qrCheckTransaction);
                     qrCheckManager.checkToken(qrCheckTransaction);
-                    System.out.println(bankTransaction.getWithdrawalAccount().getClient().getOrganisationName());
-                    System.out.println(bankTransaction.getDepositAccount().getClient().getOrganisationName());
-                    System.out.println(bankTransaction.getAmount());
-                    System.out.println(bankTransaction.getQrCheck());
-                    System.out.println(bankTransaction.getBankTransactionType());
                     bankTransactionManager.executeTransaction(bankTransaction);
 
                     return qrCheckManager.createQrCheck(qrCheckTransaction);
@@ -138,10 +135,13 @@ public class BankManager implements IBankManager {
 
     /**
      * This method is responsible for transforming a QrCheckTransaction into a BankTransaction.
-     * @param qrCheckTransaction    The transaction to be managed
+     *
+     * @param qrCheckTransaction The transaction to be managed
      * @return The BankTransaction
      */
     private BankTransactionModel createBankTransactionFrom(QrCheckTransactionModel qrCheckTransaction) {
+
+        if (qrCheckTransaction == null) return null;
 
         var bankTransaction = new BankTransactionModel(qrCheckTransaction);
 
@@ -154,10 +154,13 @@ public class BankManager implements IBankManager {
 
     /**
      * This method is responsible for transforming a ShoppingTransaction into a BankTransaction.
-     * @param shoppingTransaction    The transaction to be managed
-     * @return  The BankTransaction
+     *
+     * @param shoppingTransaction The transaction to be managed
+     * @return The BankTransaction
      */
     private BankTransactionModel createBankTransactionFrom(ShoppingTransactionModel shoppingTransaction) throws BankTransactionException {
+
+        if (shoppingTransaction == null) return null;
 
         var bankTransaction = new BankTransactionModel(shoppingTransaction);
 
@@ -188,6 +191,9 @@ public class BankManager implements IBankManager {
     private Account getWithdrawAccountBy(ShoppingTransactionModel transaction, BankTransactionType bankTransactionType) throws BankTransactionException {
 
         if (isCardPayment(transaction)) {
+            if ( transaction.getMeansOfPaymentId() == null || transaction.getMeansOfPaymentId().isBlank() ||  transaction.getMeansOfPaymentId().isEmpty()) {
+                throw new BankTransactionException( TransactionStatus.CARD_ERROR, transaction.getOperationId(), "The card is not valid");
+            }
             return accountService.getAccountByCardId(transaction.getMeansOfPaymentId());
 
         } else if (isCheckPayment(transaction)) {
@@ -219,6 +225,7 @@ public class BankManager implements IBankManager {
 
     /**
      * Supply account of the bank
+     *
      * @return The bank account
      */
     private Account getBankAccount() {
@@ -237,8 +244,9 @@ public class BankManager implements IBankManager {
 
     /**
      * This method is responsible for transforming a string message into an TransactionStatus enum .
+     *
      * @param value The value to be converted
-     * @return  A TransactionStatus enum value
+     * @return A TransactionStatus enum value
      */
     TransactionStatus getEnum(String value) {
         try {
@@ -250,8 +258,9 @@ public class BankManager implements IBankManager {
 
     /**
      * This method is responsible for supply from a TransactionStatus enum, a corresponding message.
+     *
      * @param value The value to be converted
-     * @return  A message
+     * @return A message
      */
     String getMessage(String value) {
         try {

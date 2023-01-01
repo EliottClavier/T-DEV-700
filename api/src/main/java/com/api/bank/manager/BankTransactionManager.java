@@ -7,7 +7,6 @@ import com.api.bank.model.entity.QrCheck;
 import com.api.bank.model.enums.*;
 import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.BankTransactionModel;
-import com.api.bank.model.transaction.TransactionResult;
 import com.api.bank.repository.AccountRepository;
 import com.api.bank.repository.OperationRepository;
 import com.api.bank.service.AccountService;
@@ -76,7 +75,7 @@ public class BankTransactionManager {
 
     /**
      * Update the QrCheck status when the transaction used a check method payment
-     * @param transaction
+     * @param transaction   Represents the transaction to be processed
      * @throws BankTransactionException If the transaction is not valid
      */
     private void updateQrCheck(BankTransactionModel transaction) throws BankTransactionException {
@@ -216,7 +215,7 @@ public class BankTransactionManager {
      * @param transaction Represents the transaction to be processed
      * @return true if the transaction is a card payment
      */
-    private boolean isCardPayment(BankTransactionModel transaction) throws BankTransactionException {
+    private boolean isCardPayment(BankTransactionModel transaction)  {
         return transaction.getPaymentMethod() == PaymentMethod.CARD;
     }
 
@@ -226,7 +225,7 @@ public class BankTransactionManager {
      * @param transaction Represents the transaction to be processed
      * @return true if the transaction is a check payment
      */
-    private boolean isCheckPayment(BankTransactionModel transaction) throws BankTransactionException {
+    private boolean isCheckPayment(BankTransactionModel transaction) {
         return transaction.getPaymentMethod() == PaymentMethod.CHECK;
     }
 
