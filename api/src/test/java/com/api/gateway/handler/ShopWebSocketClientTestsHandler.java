@@ -28,7 +28,7 @@ public class ShopWebSocketClientTestsHandler extends WebSocketClientTestsHandler
         );
 
         session.subscribe(
-                "/user" + destinationGenerator.getServerStatusDest(),
+                destinationGenerator.getServerStatusDest(),
                 new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {

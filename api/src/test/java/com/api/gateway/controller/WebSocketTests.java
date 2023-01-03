@@ -13,6 +13,7 @@ import com.api.bank.repository.*;
 import com.api.gateway.handler.ShopWebSocketClientTestsHandler;
 import com.api.gateway.handler.TpeWebSocketClientTestsHandler;
 import com.api.gateway.handler.WebSocketClientTestsHandler;
+import com.api.gateway.runner.WebSocketRunner;
 import com.api.gateway.transaction.model.*;
 import com.api.gateway.transaction.service.TransactionRequestService;
 import com.google.gson.Gson;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,10 +34,7 @@ import org.springframework.util.MimeType;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -52,6 +51,9 @@ public class WebSocketTests {
 
     @Autowired
     private RedisTemplate<String, String> customRedisTemplate;
+
+    @Autowired
+    private WebSocketRunner webSocketRunner;
 
     private final WebSocketStompClient stompClient;
     private TestRestTemplate testRestTemplate;
@@ -335,6 +337,14 @@ public class WebSocketTests {
         // Clear handlers
         tpeHandler.clear();
         shopHandler.clear();
+
+        // Clear sessions
+        if (tpeStompSession.isConnected()) {
+            tpeStompSession.disconnect();
+        }
+        if (shopStompSession.isConnected()) {
+            shopStompSession.disconnect();
+        }
     }
 
     @AfterAll
@@ -579,8 +589,6 @@ public class WebSocketTests {
         sendSynchronizeMessage();
         Thread.sleep(2000);
 
-        System.out.println(tpeHandler.getMessage().getMessage());
-
         // Send a cancel message
         sendCancelMessageFromTpe();
         Thread.sleep(2000);
@@ -796,7 +804,7 @@ public class WebSocketTests {
 
         // Assert that the transaction is removed from the Redis
         assertNull(customRedisTemplate.opsForValue().get(HASH_KEY_NAME_TRANSACTION + ":"));
-        assertEquals(customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size(), 0);
+        assertEquals(0, customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size());
     }
 
     /**
@@ -838,6 +846,72 @@ public class WebSocketTests {
 
         // Assert that the transaction is removed from the Redis
         assertNull(customRedisTemplate.opsForValue().get(HASH_KEY_NAME_TRANSACTION + ":"));
-        assertEquals(customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size(), 0);
+        assertEquals(0, customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size());
+    }
+
+    @Test
+    public void testServerRestartsDuringTransaction() throws InterruptedException {
+        // Add a transaction request to the Redis
+        putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
+        Thread.sleep(2000);
+
+        // Restart the server
+        webSocketRunner.run(new ApplicationArguments() {
+            @Override
+            public String[] getSourceArgs() {
+                return new String[0];
+            }
+
+            @Override
+            public Set<String> getOptionNames() {
+                return null;
+            }
+
+            @Override
+            public boolean containsOption(String name) {
+                return false;
+            }
+
+            @Override
+            public List<String> getOptionValues(String name) {
+                return null;
+            }
+
+            @Override
+            public List<String> getNonOptionArgs() {
+                return null;
+            }
+        });
+        Thread.sleep(2000);
+
+        // Tpe get the message
+        assertEquals(
+                "Server has restarted.",
+                tpeHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.SERVER_RESTARTED,
+                WebSocketStatus.valueOf((String) tpeHandler.getMessage().getType())
+        );
+
+        // Shop get the message
+        assertEquals(
+                "Server has restarted.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.SERVER_RESTARTED,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
+        );
+
+        // In consequence of the SERVER_RESTARTED messages, client must disconnect
+        tpeStompSession.disconnect();
+        shopStompSession.disconnect();
+        Thread.sleep(2000);
+
+        // It means transactions are killed
+        // Assert that the transaction is removed from the Redis
+        assertNull(customRedisTemplate.opsForValue().get(HASH_KEY_NAME_TRANSACTION + ":"));
+        assertEquals(0, customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size());
     }
 }
