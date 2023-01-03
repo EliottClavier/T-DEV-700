@@ -35,13 +35,6 @@ public class QrCheck extends Base {
         init();
     }
 
-    public QrCheck(double soldAmount, int nbDayOfValidity) {
-        super();
-        this.soldAmount = soldAmount;
-        this.nbDayOfValidity = nbDayOfValidity;
-        init();
-    }
-
     private void init() {
         if (nbDayOfValidity == 0) {
             nbDayOfValidity = 365;

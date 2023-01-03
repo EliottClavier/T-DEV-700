@@ -19,20 +19,24 @@ import java.util.List;
 
 @Controller
 public class ShopManagerController {
-
-    @Autowired
-    private SimpMessagingTemplate smt;
-
-    @Autowired
-    private ShopManagerService shopManagerService;
-
-    @Autowired
-    private TpeManagerService tpeManagerService;
-
-    @Autowired
-    private TransactionRequestService transactionRequestService;
-
+    private final SimpMessagingTemplate smt;
+    private final ShopManagerService shopManagerService;
+    private final TpeManagerService tpeManagerService;
+    private final TransactionRequestService transactionRequestService;
     private final DestinationGenerator destinationGenerator = new DestinationGenerator();
+
+    @Autowired
+    public ShopManagerController(
+            SimpMessagingTemplate smt,
+            ShopManagerService shopManagerService,
+            TpeManagerService tpeManagerService,
+            TransactionRequestService transactionRequestService
+    ) {
+        this.smt = smt;
+        this.shopManagerService = shopManagerService;
+        this.tpeManagerService = tpeManagerService;
+        this.transactionRequestService = transactionRequestService;
+    }
 
     /* Shop */
     @MessageMapping("/shop/pay")
