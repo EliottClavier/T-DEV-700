@@ -8,7 +8,7 @@
 
 ---------------------------------------------------------------
 
-### Project installation
+#### Shop
 
 - Make sure you have Git installed. You can check if it's installed by typing : `git --version` in the terminal. If it's not installed, you can download it from the official website: https://git-scm.com/.
 
