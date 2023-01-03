@@ -3,6 +3,7 @@ import 'package:tpe/config/router/navigator.dart';
 
 import 'package:go_router/go_router.dart';
 
+// Navigates to the given route and shows a snackbar with the given message and status
 void snackbarThenNavigate(BuildContext context, message, status, route) {
   showSnackBar(context, message, status, 1);
   if (route == null) return;
@@ -11,12 +12,14 @@ void snackbarThenNavigate(BuildContext context, message, status, route) {
   });
 }
 
+// Shows a snackbar with the given message and status
 void showSnackBar(
     BuildContext context, String message, String status, int duration) {
   ScaffoldMessenger.of(context)
       .showSnackBar(getSnackBar(message, status, duration));
 }
 
+// Returns a snackbar with the given message and status
 SnackBar getSnackBar(String message, String status, int duration) {
   Color backgroundColor = getBackgroundColor(status);
 
@@ -38,6 +41,7 @@ SnackBar getSnackBar(String message, String status, int duration) {
   );
 }
 
+// Returns the background color of the snackbar based on the status
 Color getBackgroundColor(String status) {
   if (status == "success") {
     return Colors.green;

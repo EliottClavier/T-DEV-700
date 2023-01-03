@@ -76,12 +76,14 @@ class TransactionService with ChangeNotifier {
     return _client;
   }
 
+  // Called when the user cancels the transaction. Resets the transaction and navigates to the home screen.
   Future<void> killTransaction() async {
     await killWebSocket();
     resetAttributes();
     return Future.value();
   }
 
+  // Resets all relevant attributes to their default values.
   void resetAttributes() {
     _status = "Disconnected.";
     _amount = 0.0;
@@ -90,6 +92,7 @@ class TransactionService with ChangeNotifier {
     _sessionId = "";
   }
 
+  // Cancels the current transaction and resets all relevant attributes.
   void reset() {
     handleTransactionStatus(_context, {
       "type": "RESET",
@@ -97,6 +100,7 @@ class TransactionService with ChangeNotifier {
     });
   }
 
+  // Pays for the current transaction using NFC
   Future<void> payWithNfc(paymentId) async {
     navigate("/payment/sending");
     _transactionType = TransactionType.NFC;
@@ -104,6 +108,7 @@ class TransactionService with ChangeNotifier {
     await completeTransaction();
   }
 
+  // Pays for the current transaction using QR Code
   Future<void> payWithQrCode(paymentId) async {
     navigate("/payment/sending");
     _transactionType = TransactionType.QR_CODE;
@@ -111,12 +116,14 @@ class TransactionService with ChangeNotifier {
     await completeTransaction();
   }
 
+  // Initializes the TransactionService instance and sets the current build context. This is called on app start up.
   Future<void> init(context) async {
     _androidId = await getAndroidId();
     _context = context;
     showAuthModal();
   }
 
+  // Restarts the transaction service and sets the current build context. This is called when the app is resumed after being in the background.
   Future<void> restart(context) async {
     _androidId = await getAndroidId();
     _context = context;
@@ -124,6 +131,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Connects to the WebSocket server.
   Future<void> connect() async {
     try {
       final response = await http.post(
@@ -156,6 +164,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Register to the bank server (http)
   Future<void> _fullRegister() async {
     final response = await http.post(
         Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/register"),
@@ -176,12 +185,14 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Handles the error when the full register fails.
   Future<void> onFullRegisterError() async {
     await Future.delayed(const Duration(seconds: 2));
     showAuthModal();
     return Future.value();
   }
 
+  // Return the StompConfig
   StompConfig getClientConfig() {
     return StompConfig.SockJS(
       url:
@@ -197,10 +208,12 @@ class TransactionService with ChangeNotifier {
     );
   }
 
+  // Creates a StompClient instance
   StompClient createClient() {
     return StompClient(config: getClientConfig());
   }
 
+  // Connects to the WebSocket server.
   Future<void> connectWebSocket() async {
     _client = createClient();
     if (_token.isNotEmpty) {
@@ -218,6 +231,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Synchronizes the TPE with the server.
   Future<void> _activateWebSocket() async {
     _client.activate();
     String url = _client.config.url;
@@ -232,17 +246,20 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Closes the WebSocket connection.
   Future<void> killWebSocket() async {
     if (!_client.isActive) return;
     _client.deactivate();
     notifyListeners();
   }
 
+  // Sends a kill transaction request to the server.
   Future<void> sendKillTransaction() async {
     _client.send(destination: '/websocket-manager/tpe/cancel-transaction');
     return Future.value();
   }
 
+  // Sends a synchronize request to the server.
   Future<void> _synchronizeTpe() async {
     await Future.delayed(const Duration(seconds: 1), () async {
       _client.send(destination: '/websocket-manager/tpe/synchronize');
@@ -250,6 +267,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Sends a transaction request to the server.
   Future<void> completeTransaction() async {
     String transactionType =
         _transactionType == TransactionType.NFC ? "CARD" : "CHECK";
@@ -259,6 +277,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Handles the connection callbacks to the WebSocket server.
   Future<void> _onConnectCallback(StompFrame frame) {
     // ignore: unused_local_variable
     dynamic synchronizationStatus = _client.subscribe(
@@ -277,6 +296,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Handles the transaction status with notyfying all listeners across the app.
   void callListeners() {
     notifyListeners();
   }
