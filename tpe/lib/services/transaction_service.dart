@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
@@ -17,7 +18,6 @@ import 'package:tpe/utils/auth_modal.dart';
 class TransactionService with ChangeNotifier {
   static final TransactionService _transactionService =
       TransactionService._internal();
-
   String _token = "";
   final String _baseUrl = API_URL;
   String _androidId = "";
@@ -54,6 +54,26 @@ class TransactionService with ChangeNotifier {
 
   void setPassword(password) {
     this.password = password;
+  }
+
+  String getSessionId() {
+    return _sessionId;
+  }
+
+  String getTransactionType() {
+    return _transactionType.toString();
+  }
+
+  String getPaymentId() {
+    return _paymentId;
+  }
+
+  void setClient(client) {
+    _client = client;
+  }
+
+  StompClient getClient() {
+    return _client;
   }
 
   Future<void> killTransaction() async {
@@ -100,11 +120,11 @@ class TransactionService with ChangeNotifier {
   Future<void> restart(context) async {
     _androidId = await getAndroidId();
     _context = context;
-    await _connect();
+    await connect();
     return Future.value();
   }
 
-  Future<void> _connect() async {
+  Future<void> connect() async {
     try {
       final response = await http.post(
           Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/login"),
@@ -113,7 +133,7 @@ class TransactionService with ChangeNotifier {
       if (response.statusCode == 200) {
         _token = Token.fromJson(jsonDecode(response.body)).token;
         setStatus("Connected to server.");
-        await _connectWebSocket();
+        await connectWebSocket();
       } else if (response.statusCode == 403) {
         setStatus("Waiting for device whitelist.");
       } else if (response.statusCode == 401) {
@@ -181,7 +201,7 @@ class TransactionService with ChangeNotifier {
     return StompClient(config: getClientConfig());
   }
 
-  Future<void> _connectWebSocket() async {
+  Future<void> connectWebSocket() async {
     _client = createClient();
     if (_token.isNotEmpty) {
       await Future.delayed(const Duration(seconds: 1), () async {
