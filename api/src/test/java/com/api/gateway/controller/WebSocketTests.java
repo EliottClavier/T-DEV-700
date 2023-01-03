@@ -448,7 +448,8 @@ public class WebSocketTests {
     public void testCompleteTransactionTpeStillAvailable() throws InterruptedException {
         // Synchronise the TPE to mark it available for transaction
         sendSynchronizeMessage();
-
+        Thread.sleep(2000);
+        
         // Send a synchronization message
         sendCompleteMessage(paymentId, PaymentMethod.CARD.toString());
         Thread.sleep(2000);
