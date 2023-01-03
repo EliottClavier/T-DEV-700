@@ -13,10 +13,7 @@ import com.api.bank.repository.*;
 import com.api.gateway.handler.ShopWebSocketClientTestsHandler;
 import com.api.gateway.handler.TpeWebSocketClientTestsHandler;
 import com.api.gateway.handler.WebSocketClientTestsHandler;
-import com.api.gateway.transaction.model.Message;
-import com.api.gateway.transaction.model.TransactionRequest;
-import com.api.gateway.transaction.model.TransactionRequestTpe;
-import com.api.gateway.transaction.model.WebSocketStatus;
+import com.api.gateway.transaction.model.*;
 import com.api.gateway.transaction.service.TransactionRequestService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
@@ -44,7 +41,7 @@ import java.util.concurrent.TimeoutException;
 
 import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TPE;
 import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TRANSACTION;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
@@ -112,6 +109,9 @@ public class WebSocketTests {
         this.accountRepository = accountRepository;
     }
 
+    /**
+     * Create a TPE and a Shop
+     */
     private void initTpe() {
         // Register a fake TPE to the TPE Manager
         Optional<Tpe> tpeOptional = tpeRepository.findByAndroidId(tpeAndroidId);
@@ -145,6 +145,9 @@ public class WebSocketTests {
         shopToken = jwtUtil.generateToken(shopName, "Shop Connection");
     }
 
+    /**
+     * Set client with account and card
+     */
     private void initClient() {
         if (accountRepository.findAccountByCard_CardId(paymentId) == null) {
             Client client = new Client(UUID.randomUUID(), clientName, clientName, SocialReasonStatus.INDIVIDUAL);
@@ -160,6 +163,9 @@ public class WebSocketTests {
         }
     }
 
+    /**
+     * Init stomp session (used for TPE and SHOP)
+     */
     private StompSession initStompSession(String token, String type, WebSocketClientTestsHandler handler)
             throws ExecutionException, InterruptedException, TimeoutException {
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
@@ -178,6 +184,9 @@ public class WebSocketTests {
         ).get(1, java.util.concurrent.TimeUnit.SECONDS);
     }
 
+    /**
+     * Set client sold
+     */
     private void setClientSold(int sold, String clientName) {
         try {
             accountRepository.findAccountByClient_Lastname(clientName).setSold(sold);
@@ -186,6 +195,9 @@ public class WebSocketTests {
         }
     }
 
+    /**
+     * Set bank and shop sold
+     */
     private void setOrganisationSold(int sold, String organisationName) {
         try {
             accountRepository.findAccountByClient_OrganisationName(organisationName).setSold(sold);
@@ -194,6 +206,9 @@ public class WebSocketTests {
         }
     }
 
+    /**
+     * Create transaction request for Redis
+     */
     private void putTransactionRequest(String paymentId, String paymentMethod) {
         // Add a transaction request to the Redis
         TransactionRequest transactionRequest = new TransactionRequest(
@@ -208,6 +223,74 @@ public class WebSocketTests {
         transactionRequestService.updateTransactionRequestRedis(transactionRequest);
     }
 
+    /**
+     * Send sync message from TPE
+     */
+    public void sendSynchronizeMessage() {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/websocket-manager/tpe/synchronize");
+        stompHeaders.setContentType(MimeType.valueOf("application/json"));
+
+        Message message = new Message("", "");
+        String jsonMessage = new Gson().toJson(message);
+        tpeStompSession.send(stompHeaders, jsonMessage);
+    }
+
+    /**
+     * Send complete transaction message from TPE
+     */
+    public void sendCompleteMessage(String paymentId, String paymentMethod) {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/websocket-manager/tpe/complete-transaction");
+        stompHeaders.setContentType(MimeType.valueOf("application/json"));
+
+        TransactionRequestTpe message = new TransactionRequestTpe(paymentId, paymentMethod);
+        String jsonMessage = new Gson().toJson(message);
+        tpeStompSession.send(stompHeaders, jsonMessage);
+    }
+
+    /**
+     * Send cancel transaction message from TPE
+     */
+    public void sendCancelMessageFromTpe() {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/websocket-manager/tpe/cancel-transaction");
+        stompHeaders.setContentType(MimeType.valueOf("application/json"));
+
+        Message message = new Message("", "");
+        String jsonMessage = new Gson().toJson(message);
+        tpeStompSession.send(stompHeaders, jsonMessage);
+    }
+
+    /**
+     * Send pay message from Shop
+     */
+    public void sendPayMessage(float amount) {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/websocket-manager/shop/pay");
+        stompHeaders.setContentType(MimeType.valueOf("application/json"));
+
+        TransactionRequestShop transactionRequestShop = new TransactionRequestShop(amount);
+        String jsonMessage = new Gson().toJson(transactionRequestShop);
+        shopStompSession.send(stompHeaders, jsonMessage);
+    }
+
+    /**
+     * Send cancel transaction message from Shop
+     */
+    public void sendCancelMessageFromShop() {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/websocket-manager/shop/cancel-transaction");
+        stompHeaders.setContentType(MimeType.valueOf("application/json"));
+
+        Message message = new Message("", "");
+        String jsonMessage = new Gson().toJson(message);
+        shopStompSession.send(stompHeaders, jsonMessage);
+    }
+
+    /**
+     * Before All, Before Each, After All, After Each
+     */
     @BeforeAll
     public void beforeAll() {
         // Init TPE
@@ -259,35 +342,11 @@ public class WebSocketTests {
         tpeOptional.ifPresent(tpeRepository::delete);
     }
 
-    public void sendSynchronizeMessage() {
-        StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/websocket-manager/tpe/synchronize");
-        stompHeaders.setContentType(MimeType.valueOf("application/json"));
-
-        Message message = new Message("", "");
-        String jsonMessage = new Gson().toJson(message);
-        tpeStompSession.send(stompHeaders, jsonMessage);
-    }
-
-    public void sendCompleteMessage(String paymentId, String paymentMethod) {
-        StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/websocket-manager/tpe/complete-transaction");
-        stompHeaders.setContentType(MimeType.valueOf("application/json"));
-
-        TransactionRequestTpe message = new TransactionRequestTpe(paymentId, paymentMethod);
-        String jsonMessage = new Gson().toJson(message);
-        tpeStompSession.send(stompHeaders, jsonMessage);
-    }
-
-    public void sendCancelMessageFromTpe() {
-        StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/websocket-manager/tpe/cancel-transaction");
-        stompHeaders.setContentType(MimeType.valueOf("application/json"));
-
-        Message message = new Message("", "");
-        String jsonMessage = new Gson().toJson(message);
-        tpeStompSession.send(stompHeaders, jsonMessage);
-    }
+    /**
+     *
+     * FROM TPE TESTS
+     *
+     */
 
     @Test
     public void testSynchronizeTpe() throws InterruptedException {
@@ -449,7 +508,7 @@ public class WebSocketTests {
         // Synchronise the TPE to mark it available for transaction
         sendSynchronizeMessage();
         Thread.sleep(2000);
-        
+
         // Send a synchronization message
         sendCompleteMessage(paymentId, PaymentMethod.CARD.toString());
         Thread.sleep(2000);
@@ -535,4 +594,206 @@ public class WebSocketTests {
         );
     }
 
+    @Test
+    public void testDisconnectTpe() throws InterruptedException {
+        // Send a synchronization message
+        sendSynchronizeMessage();
+        Thread.sleep(2000);
+
+        // Add a transaction request to the Redis
+        putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
+        Thread.sleep(2000);
+
+        // Kill TPE Session
+        tpeStompSession.disconnect();
+        Thread.sleep(2000);
+
+        // Shop get the message
+        assertEquals(
+                "Transaction cancelled after losing connection with TPE.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.LOST_CONNECTION,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
+        );
+
+        // Assert that the transaction is removed from the Redis
+        assertNull(customRedisTemplate.opsForValue().get(HASH_KEY_NAME_TRANSACTION + ":"));
+        assertEquals(customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size(), 0);
+
+        // Assert that the TPE is removed from the Redis
+        assertFalse(customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME_TPE, tpeAndroidId));
+    }
+
+    /**
+     *
+     * FROM SHOP TESTS
+     *
+     */
+
+    @Test
+    public void testPayShop() throws InterruptedException {
+        // Send a synchronization message
+        sendSynchronizeMessage();
+        Thread.sleep(2000);
+
+        // Send a cancel message
+        sendPayMessage(50);
+        Thread.sleep(2000);
+
+        // TPE get the message
+        assertEquals(
+                "Transaction opened.",
+                tpeHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.TRANSACTION_OPENED,
+                WebSocketStatus.valueOf((String) tpeHandler.getMessage().getType())
+        );
+
+        // Shop get the message
+        assertEquals(
+                "Transaction opened.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.TRANSACTION_OPENED,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
+        );
+    }
+
+    @Test
+    public void testPayShopWithoutTpeAvailable() throws InterruptedException {
+        // Send a cancel message
+        sendPayMessage(50);
+        Thread.sleep(2000);
+
+        // Shop get the message
+        assertEquals(
+                "No TPE available.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.NO_TPE_FOUND,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
+        );
+    }
+
+    @Test
+    public void testPayShopWhileAlreadyInTransaction() throws InterruptedException {
+        // Sync the TPE
+        sendSynchronizeMessage();
+        Thread.sleep(2000);
+
+        // Send a cancel message
+        sendPayMessage(50);
+        Thread.sleep(2000);
+
+        // TPE get the message
+        assertEquals(
+                "Transaction opened.",
+                tpeHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.TRANSACTION_OPENED,
+                WebSocketStatus.valueOf((String) tpeHandler.getMessage().getType())
+        );
+
+        // Shop get the message
+        assertEquals(
+                "Transaction opened.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.TRANSACTION_OPENED,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
+        );
+
+        // Send a cancel message
+        sendPayMessage(50);
+        Thread.sleep(2000);
+
+        // Shop get the message
+        assertEquals(
+                "Shop already in a transaction.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.ALREADY_IN_TRANSACTION,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
+        );
+    }
+
+    @Test
+    public void testCancelTransactionShop() throws InterruptedException {
+        // Add a transaction request to the Redis
+        putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
+
+        // Send a cancel message
+        sendCancelMessageFromShop();
+        Thread.sleep(2000);
+
+        // TPE get the message
+        assertEquals(
+                "Transaction cancelled.",
+                tpeHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.TRANSACTION_CANCELLED,
+                WebSocketStatus.valueOf((String) tpeHandler.getMessage().getType())
+        );
+
+        // Shop get the message
+        assertEquals(
+                "Transaction cancelled.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.TRANSACTION_CANCELLED,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
+        );
+    }
+
+    @Test
+    public void testCancelTransactionShopNotInvolved() throws InterruptedException {
+        // Send a cancel message
+        sendCancelMessageFromShop();
+        Thread.sleep(2000);
+
+        // Shop get the message
+        assertEquals(
+                "Shop not involved in any transaction.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.NOT_INVOLVED,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
+        );
+    }
+
+    @Test
+    public void testDisconnectShop() throws InterruptedException {
+        // Add a transaction request to the Redis
+        putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
+        Thread.sleep(2000);
+
+        // Kill Shop Session
+        shopStompSession.disconnect();
+        Thread.sleep(2000);
+
+        // Shop get the message
+        assertEquals(
+                "Transaction cancelled after losing connection with Shop.",
+                tpeHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.LOST_CONNECTION,
+                WebSocketStatus.valueOf((String) tpeHandler.getMessage().getType())
+        );
+
+        // Assert that the transaction is removed from the Redis
+        assertNull(customRedisTemplate.opsForValue().get(HASH_KEY_NAME_TRANSACTION + ":"));
+        assertEquals(customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size(), 0);
+    }
 }

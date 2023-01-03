@@ -14,4 +14,7 @@ public class MessageClient {
 
     @JsonProperty("type")
     private Object type;
+
+    @JsonProperty("amount")
+    private Object amount;
 }
