@@ -12,8 +12,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class WebSocketClientTestsHandler implements StompSessionHandler {
+public class TpeWebSocketClientTestsHandler implements StompSessionHandler {
     private final AtomicReference<MessageClient> messageClient = new AtomicReference<>();
+    private final AtomicReference<String> sessionId = new AtomicReference<>();
     private final DestinationGenerator destinationGenerator = new DestinationGenerator();
 
     @Override
@@ -41,6 +42,8 @@ public class WebSocketClientTestsHandler implements StompSessionHandler {
         if (StringUtils.isBlank(sockjsSessionId)) {
             throw new IllegalStateException("couldn't extract sock.js session id");
         }
+
+        sessionId.set(sockjsSessionId);
 
         session.subscribe(
                 "/user" + destinationGenerator.getTpeSynchronizationStatusDest(sockjsSessionId),
@@ -81,5 +84,9 @@ public class WebSocketClientTestsHandler implements StompSessionHandler {
 
     public MessageClient getMessage() {
         return messageClient.get();
+    }
+
+    public String getSessionId() {
+        return sessionId.get();
     }
 }
