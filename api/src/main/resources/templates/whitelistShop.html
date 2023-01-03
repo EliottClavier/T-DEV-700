@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Whitelist Shop</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container-fluid p-0 m-0 justify-content-center" style="min-height: 100vh;">
+            <div class="row justify-content-center" style="min-height: inherit">
+                <div class="col-9">
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4">Shop list</h3>
+                            <div class="form-group mb-4">
+                                <button id="redirect-dashboard" class="btn btn-primary w-100" type="button">
+                                    Go back to dashboard
+                                </button>
+                            </div>
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th class="text-center" scope="col">Name</th>
+                                    <th class="text-center" scope="col">Whitelisted</th>
+                                    <th class="text-center" scope="col"></th>
+                                </tr>
+                                </thead>
+                                <tbody id="list">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script th:src="@{/js/verifyToken.js}"></script>
+    <script th:src="@{/js/redirects.js}"></script>
+    <script th:src="@{/js/whitelist.js}"></script>
+    <script th:src="@{/js/whitelistShop.js}"></script>
+</html>

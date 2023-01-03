@@ -30,4 +30,14 @@ public class AdminController {
         return "qrCodeViewer";
     }
 
+    @RequestMapping( path = "/whitelist/tpe", method = RequestMethod.GET)
+    public String getWhitelistTpeTemplate() {
+        return "whitelistTpe";
+    }
+
+    @RequestMapping( path = "/whitelist/shop", method = RequestMethod.GET)
+    public String getWhitelistShopTemplate() {
+        return "whitelistShop";
+    }
+
 }

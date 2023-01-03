@@ -6,6 +6,7 @@ import 'package:tpe/config/transaction/transaction_reset.dart';
 
 TransactionService transactionService = TransactionService();
 
+// Handle websocket transaction status messages
 String handleTransactionStatus(
     BuildContext context, Map<String, dynamic> body) {
   transactionService = TransactionService();
@@ -14,7 +15,8 @@ String handleTransactionStatus(
   switch (status) {
     case "TRANSACTION_OPENED":
       transactionService.setAmount(body['amount']);
-      snackbarThenNavigate(context, message, "success", "/payment");
+      showSnackBar(context, message, "context", 1);
+      navigate("/payment");
       break;
     case "TRANSACTION_DONE":
       transactionService.setStatus(message);
@@ -47,7 +49,7 @@ String handleTransactionStatus(
       onTransactionResetWithError(message);
       break;
     case "LOST_CONNECTION":
-      transactionService.setStatus("Lost server connection. Try again.");
+      transactionService.setStatus("Lost server connection.");
       onTransactionResetWithError(message);
       break;
     case "TRANSACTION_TIMED_OUT":

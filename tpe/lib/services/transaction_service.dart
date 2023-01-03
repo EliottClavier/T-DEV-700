@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
@@ -12,11 +13,11 @@ import 'package:tpe/config/security/android_id.dart';
 import 'package:tpe/utils/amount.dart';
 import 'package:tpe/utils/enums/transaction_type.dart';
 import 'package:tpe/config/router/navigator.dart';
+import 'package:tpe/utils/auth_modal.dart';
 
 class TransactionService with ChangeNotifier {
   static final TransactionService _transactionService =
       TransactionService._internal();
-
   String _token = "";
   final String _baseUrl = API_URL;
   String _androidId = "";
@@ -28,7 +29,7 @@ class TransactionService with ChangeNotifier {
   String _paymentId = "";
 
   String _sessionId = "";
-  String password = "LgLIAArWIW8P";
+  String password = "";
   String _status = "Disconnected.";
 
   void setStatus(status) {
@@ -51,12 +52,38 @@ class TransactionService with ChangeNotifier {
     return getAmountString(_amount);
   }
 
+  void setPassword(password) {
+    this.password = password;
+  }
+
+  String getSessionId() {
+    return _sessionId;
+  }
+
+  String getTransactionType() {
+    return _transactionType.toString();
+  }
+
+  String getPaymentId() {
+    return _paymentId;
+  }
+
+  void setClient(client) {
+    _client = client;
+  }
+
+  StompClient getClient() {
+    return _client;
+  }
+
+  // Called when the user cancels the transaction. Resets the transaction and navigates to the home screen.
   Future<void> killTransaction() async {
     await killWebSocket();
     resetAttributes();
     return Future.value();
   }
 
+  // Resets all relevant attributes to their default values.
   void resetAttributes() {
     _status = "Disconnected.";
     _amount = 0.0;
@@ -65,6 +92,7 @@ class TransactionService with ChangeNotifier {
     _sessionId = "";
   }
 
+  // Cancels the current transaction and resets all relevant attributes.
   void reset() {
     handleTransactionStatus(_context, {
       "type": "RESET",
@@ -72,6 +100,7 @@ class TransactionService with ChangeNotifier {
     });
   }
 
+  // Pays for the current transaction using NFC
   Future<void> payWithNfc(paymentId) async {
     navigate("/payment/sending");
     _transactionType = TransactionType.NFC;
@@ -79,6 +108,7 @@ class TransactionService with ChangeNotifier {
     await completeTransaction();
   }
 
+  // Pays for the current transaction using QR Code
   Future<void> payWithQrCode(paymentId) async {
     navigate("/payment/sending");
     _transactionType = TransactionType.QR_CODE;
@@ -86,66 +116,87 @@ class TransactionService with ChangeNotifier {
     await completeTransaction();
   }
 
+  // Initializes the TransactionService instance and sets the current build context. This is called on app start up.
   Future<void> init(context) async {
     _androidId = await getAndroidId();
     _context = context;
-    await _connect();
-    return Future.value();
+    showAuthModal();
   }
 
+  // Restarts the transaction service and sets the current build context. This is called when the app is resumed after being in the background.
   Future<void> restart(context) async {
     _androidId = await getAndroidId();
     _context = context;
-    await _connect();
+    await connect();
     return Future.value();
   }
 
-  Future<void> _connect() async {
-    final response = await http.post(
-        Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/login"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"androidId": _androidId, "password": password}));
-    if (response.statusCode == 200) {
-      _token = Token.fromJson(jsonDecode(response.body)).token;
-      setStatus("Connected to server.");
-      await _connectWebSocket();
-    } else {
-      _fullRegister();
-      setStatus("Connexion to server failed.");
+  // Connects to the WebSocket server.
+  Future<void> connect() async {
+    try {
+      final response = await http.post(
+          Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/login"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({"androidId": _androidId, "password": password}));
+      if (response.statusCode == 200) {
+        _token = Token.fromJson(jsonDecode(response.body)).token;
+        setStatus("Connected to server.");
+        await connectWebSocket();
+      } else if (response.statusCode == 403) {
+        setStatus("Waiting for device whitelist.");
+      } else if (response.statusCode == 401) {
+        setStatus("Bad credentials.");
+        if (password != "") {
+          showAuthModal();
+        } else {
+          _fullRegister();
+        }
+      } else {
+        _fullRegister();
+        setStatus("Connexion to server failed.");
+      }
+      notifyListeners();
+    } catch (e) {
+      setStatus(
+          "Failed to contact server. Please check your internet connection.");
+      await Future.delayed(const Duration(seconds: 5));
     }
-    notifyListeners();
     return Future.value();
   }
 
+  // Register to the bank server (http)
   Future<void> _fullRegister() async {
-    final response =
-        await http.post(Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/register"),
-            headers: {
-              "Content-Type": "application/json",
-              // ignore: unnecessary_string_interpolations
-              "$REGISTER_HEADER": "$REGISTER_KEY"
-            },
-            body: jsonEncode({"androidId": _androidId}));
+    final response = await http.post(
+        Uri.parse("$API_HTTP_PROTOCOL://$_baseUrl/auth/tpe/register"),
+        headers: {
+          "Content-Type": "application/json",
+          // ignore: unnecessary_string_interpolations
+          "$REGISTER_HEADER": "$REGISTER_KEY"
+        },
+        body: jsonEncode({"androidId": _androidId}));
     if (response.statusCode == 200 || response.statusCode == 409) {
       password = jsonDecode(response.body)['password'];
       setStatus('Register successfull. Please wait for Device whitelist.');
     } else {
       onFullRegisterError();
-      setStatus("Register to server failed. New attempt in 5 seconds.");
+      setStatus("Register to server failed.");
     }
     notifyListeners();
     return Future.value();
   }
 
+  // Handles the error when the full register fails.
   Future<void> onFullRegisterError() async {
-    await Future.delayed(const Duration(seconds: 5));
-    await _connect();
+    await Future.delayed(const Duration(seconds: 2));
+    showAuthModal();
     return Future.value();
   }
 
+  // Return the StompConfig
   StompConfig getClientConfig() {
     return StompConfig.SockJS(
-      url: "$API_HTTP_PROTOCOL://$_baseUrl/websocket-manager/secured/tpe/socket",
+      url:
+          "$API_HTTP_PROTOCOL://$_baseUrl/websocket-manager/secured/tpe/socket",
       onConnect: _onConnectCallback,
       onWebSocketError: (dynamic error) => print(error.toString()),
       stompConnectHeaders: {'Authorization': "Bearer $_token"},
@@ -157,11 +208,13 @@ class TransactionService with ChangeNotifier {
     );
   }
 
+  // Creates a StompClient instance
   StompClient createClient() {
     return StompClient(config: getClientConfig());
   }
 
-  Future<void> _connectWebSocket() async {
+  // Connects to the WebSocket server.
+  Future<void> connectWebSocket() async {
     _client = createClient();
     if (_token.isNotEmpty) {
       await Future.delayed(const Duration(seconds: 1), () async {
@@ -178,6 +231,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Synchronizes the TPE with the server.
   Future<void> _activateWebSocket() async {
     _client.activate();
     String url = _client.config.url;
@@ -192,12 +246,20 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Closes the WebSocket connection.
   Future<void> killWebSocket() async {
     if (!_client.isActive) return;
     _client.deactivate();
     notifyListeners();
   }
 
+  // Sends a kill transaction request to the server.
+  Future<void> sendKillTransaction() async {
+    _client.send(destination: '/websocket-manager/tpe/cancel-transaction');
+    return Future.value();
+  }
+
+  // Sends a synchronize request to the server.
   Future<void> _synchronizeTpe() async {
     await Future.delayed(const Duration(seconds: 1), () async {
       _client.send(destination: '/websocket-manager/tpe/synchronize');
@@ -205,6 +267,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Sends a transaction request to the server.
   Future<void> completeTransaction() async {
     String transactionType =
         _transactionType == TransactionType.NFC ? "CARD" : "CHECK";
@@ -214,6 +277,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Handles the connection callbacks to the WebSocket server.
   Future<void> _onConnectCallback(StompFrame frame) {
     // ignore: unused_local_variable
     dynamic synchronizationStatus = _client.subscribe(
@@ -232,6 +296,7 @@ class TransactionService with ChangeNotifier {
     return Future.value();
   }
 
+  // Handles the transaction status with notyfying all listeners across the app.
   void callListeners() {
     notifyListeners();
   }

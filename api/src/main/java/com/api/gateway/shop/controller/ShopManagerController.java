@@ -19,20 +19,24 @@ import java.util.List;
 
 @Controller
 public class ShopManagerController {
-
-    @Autowired
-    private SimpMessagingTemplate smt;
-
-    @Autowired
-    private ShopManagerService shopManagerService;
-
-    @Autowired
-    private TpeManagerService tpeManagerService;
-
-    @Autowired
-    private TransactionRequestService transactionRequestService;
-
+    private final SimpMessagingTemplate smt;
+    private final ShopManagerService shopManagerService;
+    private final TpeManagerService tpeManagerService;
+    private final TransactionRequestService transactionRequestService;
     private final DestinationGenerator destinationGenerator = new DestinationGenerator();
+
+    @Autowired
+    public ShopManagerController(
+            SimpMessagingTemplate smt,
+            ShopManagerService shopManagerService,
+            TpeManagerService tpeManagerService,
+            TransactionRequestService transactionRequestService
+    ) {
+        this.smt = smt;
+        this.shopManagerService = shopManagerService;
+        this.tpeManagerService = tpeManagerService;
+        this.transactionRequestService = transactionRequestService;
+    }
 
     /* Shop */
     @MessageMapping("/shop/pay")
@@ -118,10 +122,12 @@ public class ShopManagerController {
         TransactionRequest transactionRequest = shopManagerService.retrieveTransactionRequestByShopSessionId(sessionId);
         if (transactionRequest != null) {
             // Send message to TPE
-            Message message = tpeManagerService.addTpeRedis(new TpeManager(user.getName(), sessionId));
+            Message message = tpeManagerService.addTpeRedis(
+                    new TpeManager(transactionRequest.getTpeUsername(), transactionRequest.getTpeSessionId())
+            );
             smt.convertAndSendToUser(
-                    transactionRequest.getTpeSessionId(),
-                    destinationGenerator.getTpeSynchronizationStatusDest(sessionId),
+                    transactionRequest.getTpeUsername(),
+                    destinationGenerator.getTpeSynchronizationStatusDest(transactionRequest.getTpeSessionId()),
                     new MessageCancelTpe(
                             "Transaction cancelled.", WebSocketStatus.TRANSACTION_CANCELLED, message.getType()
                     )
@@ -129,14 +135,14 @@ public class ShopManagerController {
 
             // Send message to Shop
             smt.convertAndSendToUser(
-                    transactionRequest.getShopUsername(),
-                    destinationGenerator.getShopTransactionStatusDest(transactionRequest.getShopSessionId()),
+                    user.getName(),
+                    destinationGenerator.getShopTransactionStatusDest(sessionId),
                     new Message("Transaction cancelled.", WebSocketStatus.TRANSACTION_CANCELLED)
             );
         } else {
             smt.convertAndSendToUser(
                     user.getName(),
-                    destinationGenerator.getTpeTransactionStatusDest(sessionId),
+                    destinationGenerator.getShopTransactionStatusDest(sessionId),
                     new Message("Shop not involved in any transaction.", WebSocketStatus.NOT_INVOLVED)
             );
         }

@@ -12,6 +12,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Payment Terminal',
       home: const Scaffold(
+        resizeToAvoidBottomInset: true,
         body: AppWidget(),
       ),
       theme: ThemeData(
