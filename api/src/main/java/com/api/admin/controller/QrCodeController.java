@@ -4,7 +4,11 @@ import com.api.admin.model.QrCodeModel;
 import com.api.bank.manager.IBankManager;
 import com.api.bank.manager.IQrCheckManager;
 import com.api.bank.model.enums.PaymentMethod;
+import com.api.bank.model.enums.TransactionStatus;
+import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.QrCheckTransactionModel;
+import com.api.bank.model.transaction.TransactionResult;
+import com.api.gateway.transaction.model.TransactionRequest;
 import com.api.tools.crypting.CryptingService;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -55,25 +59,33 @@ public class QrCodeController {
             // Create the QR code (the image)
             String token = qrCode.getAmount() + ":" + qrCode.getClientId() + ":" + new Date().getTime();
             String encryptedString = cryptingService.encrypt(token, key);
-            String qrCodeUuid = generateQrcode(encryptedString);
 
-            if (qrCodeUuid == null) {
-                throw new Exception("Error while generating the QR code");
-            } else {
-                // Execute the transaction between Bank and the client asking for the QR code
-                QrCheckTransactionModel qrCheckTransactionModel = new QrCheckTransactionModel(
-                        null, encryptedString, qrCode.getAmount(), qrCode.getClientId(), PaymentMethod.TRANSFER
-                );
-                bankManager.buyCheckTransaction(qrCheckTransactionModel);
+            // Execute the transaction between Bank and the client asking for the QR code
+            QrCheckTransactionModel qrCheckTransactionModel = new QrCheckTransactionModel(
+                    null, encryptedString, qrCode.getAmount(), qrCode.getClientId(), PaymentMethod.TRANSFER
+            );
 
-                // Build JSON Response with message and qrCodeUuid
-                Map<String, String> map = new HashMap<>();
-                map.put("message", "QrCode created");
-                map.put("uuid", qrCodeUuid);
-                return ResponseEntity.ok().body(map);
+            try {
+                TransactionResult transactionResult = bankManager.buyCheckTransaction(qrCheckTransactionModel);
+                if (transactionResult.getTransactionStatus() == TransactionStatus.SUCCESS) {
+                    String qrCodeUuid = generateQrcode(encryptedString);
+                    if (qrCodeUuid != null) {
+                        // Build JSON Response with message and qrCodeUuid
+                        Map<String, String> map = new HashMap<>();
+                        map.put("message", "QrCode created");
+                        map.put("uuid", qrCodeUuid);
+                        return ResponseEntity.ok().body(map);
+                    } else {
+                        throw new Exception("Error while generating the QR code");
+                    }
+                } else {
+                    throw new Exception(transactionResult.getMessage());
+                }
+            } catch (BankTransactionException e) {
+                throw new Exception("Error while creating the QR code");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(e);
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 

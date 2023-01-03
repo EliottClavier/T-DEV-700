@@ -4,6 +4,7 @@ import "package:tpe/services/transaction_service.dart";
 
 TransactionService transactionService = TransactionService();
 
+// Handle transaction reset event with error message
 void onTransactionResetWithError([String message = "Error"]) async {
   if (message.isNotEmpty) {
     transactionService.setStatus(message);
@@ -11,6 +12,7 @@ void onTransactionResetWithError([String message = "Error"]) async {
   navigate("/payment/error");
 }
 
+// Handle transaction reset event
 void resetTransaction() async {
   transactionService.killTransaction();
   navigate("/");
