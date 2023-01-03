@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tpe/app.dart';
 import 'package:tpe/services/transaction_service.dart';
 
+// This function is used to show the modal dialog
 void showAuthModal() {
   TransactionService transactionService = TransactionService();
   BuildContext appContext = getContext();

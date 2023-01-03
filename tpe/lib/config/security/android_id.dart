@@ -1,5 +1,6 @@
 import 'package:android_id/android_id.dart';
 
+// Get Android ID
 Future<String> getAndroidId() async {
   AndroidId androidIdPlugin = const AndroidId();
   String androidId;
