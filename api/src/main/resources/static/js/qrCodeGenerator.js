@@ -45,6 +45,10 @@ $("#generate-qr-code").click(function() {
                     '_blank'
                 ).focus();
             },
+            error: function (response) {
+                error.text(response.responseText);
+                error.show();
+            }
         });
     } else {
         error.text("Please fill all fields.");
