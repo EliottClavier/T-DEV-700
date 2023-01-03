@@ -7,12 +7,14 @@ import com.api.bank.model.entity.Tpe;
 import com.api.bank.repository.TpeRepository;
 import com.api.gateway.handler.WebSocketClientTestsHandler;
 import com.api.gateway.transaction.model.Message;
+import com.api.gateway.transaction.model.WebSocketStatus;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +28,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -36,13 +39,15 @@ public class TpeManagerTests {
 
     private final WebSocketStompClient stompClient;
     private TestRestTemplate testRestTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final PasswordEncoder passwordEncoder;
-    private final AuthService authService;
     private final TpeRepository tpeRepository;
+    private final AuthService authService;
     private final JWTUtil jwtUtil;
     private final TpeAuthenticationProvider tpeAuthenticationProvider;
 
     private String tpeToken;
+    private final String tpeAndroidId = "AndroidId";
     private StompSession stompSession;
     private final WebSocketClientTestsHandler webSocketClientTestsHandler = new WebSocketClientTestsHandler();
 
@@ -51,6 +56,7 @@ public class TpeManagerTests {
     public TpeManagerTests(
             WebSocketStompClient stompClient,
             TestRestTemplate testRestTemplate,
+            RedisTemplate redisTemplate,
             AuthService authService,
             PasswordEncoder passwordEncoder,
             TpeRepository tpeRepository,
@@ -59,6 +65,7 @@ public class TpeManagerTests {
     ) {
         this.stompClient = stompClient;
         this.testRestTemplate = testRestTemplate;
+        this.redisTemplate = redisTemplate;
         this.authService = authService;
         this.passwordEncoder = passwordEncoder;
         this.tpeRepository = tpeRepository;
@@ -69,7 +76,6 @@ public class TpeManagerTests {
     @BeforeAll
     public void beforeAll() {
         // Register a fake TPE to the TPE Manager
-        String tpeAndroidId = "AndroidId";
         Optional<Tpe> tpeOptional = tpeRepository.findByAndroidId(tpeAndroidId);
         tpeOptional.ifPresent(tpeRepository::delete);
 
@@ -100,22 +106,23 @@ public class TpeManagerTests {
                 headers,
                 stompHeaders,
                 webSocketClientTestsHandler
-        ).get();
+        ).get(1, java.util.concurrent.TimeUnit.SECONDS);
     }
 
-//    @AfterEach
-//    public void teardown() {
-//        stompSession.disconnect();
-//    }
-//
-//    @AfterAll
-//    public void afterAll() {
-//        // Delete the fake TPE from the TPE Manager
-//    }
+    @AfterEach
+    public void teardown() {
+        redisTemplate.opsForHash().delete(HASH_KEY_NAME_TPE, tpeAndroidId);
+        stompSession.disconnect();
+    }
 
-    @Test
-    public void testSynchronizeTpeRedis() throws InterruptedException {
-        Thread.sleep(2000);
+    @AfterAll
+    public void afterAll() {
+        // Delete the fake TPE from the TPE Manager
+        Optional<Tpe> tpeOptional = tpeRepository.findByAndroidId(tpeAndroidId);
+        tpeOptional.ifPresent(tpeRepository::delete);
+    }
+
+    public void sendSynchronizeMessage() {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.setDestination("/websocket-manager/tpe/synchronize");
         stompHeaders.setContentType(MimeType.valueOf("application/json"));
@@ -123,17 +130,53 @@ public class TpeManagerTests {
         Message message = new Message("", "");
         String jsonMessage = new Gson().toJson(message);
         stompSession.send(stompHeaders, jsonMessage);
+    }
 
+    @Test
+    public void testSynchronizeTpeRedis() throws InterruptedException {
+        // Send a synchronization message
+        sendSynchronizeMessage();
         Thread.sleep(2000);
 
+        // TPE should be in the Redis (synchronized)
         assertEquals(
                 "TPE available for transaction.",
                 webSocketClientTestsHandler.getMessage().getMessage()
         );
-
         assertEquals(
-                "SYNCHRONIZED",
-                webSocketClientTestsHandler.getMessage().getType()
+                WebSocketStatus.SYNCHRONIZED,
+                WebSocketStatus.valueOf((String) webSocketClientTestsHandler.getMessage().getType())
+        );
+    }
+
+    @Test
+    public void testAlreadySynchronizedTpeRedis() throws InterruptedException {
+        // Send a synchronization message
+        sendSynchronizeMessage();
+        Thread.sleep(2000);
+
+        // TPE should be in the Redis (synchronized)
+        assertEquals(
+                "TPE available for transaction.",
+                webSocketClientTestsHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.SYNCHRONIZED,
+                WebSocketStatus.valueOf((String) webSocketClientTestsHandler.getMessage().getType())
+        );
+
+        // Ask for synchronization message again
+        sendSynchronizeMessage();
+        Thread.sleep(2000);
+
+        // TPE is already synchronized
+        assertEquals(
+                "TPE already synchronised to Redis.",
+                webSocketClientTestsHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.ALREADY_SYNCHRONIZED,
+                WebSocketStatus.valueOf((String) webSocketClientTestsHandler.getMessage().getType())
         );
     }
 
