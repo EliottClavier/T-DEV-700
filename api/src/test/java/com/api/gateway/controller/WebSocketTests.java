@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TPE;
@@ -209,7 +210,7 @@ public class WebSocketTests {
     /**
      * Create transaction request for Redis
      */
-    private void putTransactionRequest(String paymentId, String paymentMethod) {
+    private TransactionRequest putTransactionRequest(String paymentId, String paymentMethod) {
         // Add a transaction request to the Redis
         TransactionRequest transactionRequest = new TransactionRequest(
                 tpeHandler.getSessionId(),
@@ -221,6 +222,7 @@ public class WebSocketTests {
                 paymentMethod
         );
         transactionRequestService.updateTransactionRequestRedis(transactionRequest);
+        return transactionRequest;
     }
 
     /**
@@ -782,7 +784,7 @@ public class WebSocketTests {
         shopStompSession.disconnect();
         Thread.sleep(2000);
 
-        // Shop get the message
+        // TPE get the message
         assertEquals(
                 "Transaction cancelled after losing connection with Shop.",
                 tpeHandler.getMessage().getMessage()
@@ -790,6 +792,48 @@ public class WebSocketTests {
         assertEquals(
                 WebSocketStatus.LOST_CONNECTION,
                 WebSocketStatus.valueOf((String) tpeHandler.getMessage().getType())
+        );
+
+        // Assert that the transaction is removed from the Redis
+        assertNull(customRedisTemplate.opsForValue().get(HASH_KEY_NAME_TRANSACTION + ":"));
+        assertEquals(customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size(), 0);
+    }
+
+    /**
+     *
+     * EXPIRATION TESTS
+     *
+     */
+    @Test
+    public void testTransactionExpiration() throws InterruptedException {
+        // Add a transaction request to the Redis
+        TransactionRequest transactionRequest = putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
+        Thread.sleep(2000);
+
+        // Change expiration time artificially (normally it is equal to HASH_KEY_TTL)
+        customRedisTemplate.expire(
+                HASH_KEY_NAME_TRANSACTION + ":" + transactionRequest.getId(), 1, TimeUnit.MILLISECONDS
+        );
+        Thread.sleep(2000);
+
+        // TPE get the message (message content is not entirely tested because it's not totally depending on expiration
+        // feature but also on synchronization feature)
+        assertTrue(
+                tpeHandler.getMessage().getMessage().toString().startsWith("Transaction timed out.")
+        );
+        assertEquals(
+                WebSocketStatus.TRANSACTION_TIMED_OUT,
+                WebSocketStatus.valueOf((String) tpeHandler.getMessage().getType())
+        );
+
+        // Shop get the message
+        assertEquals(
+                "Transaction timed out.",
+                shopHandler.getMessage().getMessage()
+        );
+        assertEquals(
+                WebSocketStatus.TRANSACTION_TIMED_OUT,
+                WebSocketStatus.valueOf((String) shopHandler.getMessage().getType())
         );
 
         // Assert that the transaction is removed from the Redis
