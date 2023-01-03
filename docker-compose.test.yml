@@ -7,7 +7,7 @@ services:
     build: 
       context: ./api
       dockerfile: Dockerfile.test
-    restart: unless-stopped
+    restart: "no"
     env_file:
       - ./env/database.env
       - ./env/redis.env
@@ -29,7 +29,7 @@ services:
   redis:
     container_name: redis
     image: redis:alpine
-    restart: unless-stopped
+    restart: "no"
     command: redis-server --save 20 1 --requirepass ${REDIS_PASSWORD}
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
@@ -39,7 +39,7 @@ services:
   database:
     container_name: database
     image: mariadb:latest
-    restart: unless-stopped
+    restart: "no"
     env_file:
       - ./env/database.env
     ports:
@@ -50,7 +50,7 @@ services:
   mailhog:
     container_name: mailhog
     image: mailhog/mailhog
-    restart: unless-stopped
+    restart: "no"
     environment:
       MH_AUTH_FILE: /mailhog.auth
     ports:
