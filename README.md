@@ -31,8 +31,23 @@ To get started with the project using `docker-compose`, you will need to set up 
 
 ### Shop and Payment Terminal applications
 
+#### Payment Terminal
+
+- Go to the Payment Terminal directory with the following command :   
+`cd ./T-DEV-700/tpe`
+
+- To run the app, type :   
+`flutter run --dart-define=ENV='' --dart-define=TPE_REGISTER_SECRET_KEY='' --dart-define=TPE_REGISTER_SECRET_HEADER=''`  
+
+Don't forget to fill in the variables (inside the quotes) according to your environment variables.  
+This will run the app on the emulator or on a physical device connected to your computer.
+
+##### Variables
+
+ENV = 'local' or 'prod'
 
 
+Note: If you want to run the app on a physical device, you must first enable USB debugging on your device and connect it to your computer with a USB cable.
 
 #### Flutter Documentation
 
