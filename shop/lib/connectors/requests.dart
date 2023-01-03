@@ -33,6 +33,9 @@ class RequestsClass {
   // Session ID of the websocket connection
   String _sessionId = "";
 
+  String get token => _token;
+  StompClient get client => _client;
+
   /* Connects to the server using a HTTP request and initiates the websocket connection
   If the connection is successful, the websocket connection is initiated and the total amount of the payment is set to the amount parameter 
   and the parent context is set to the context parameter of the function call */
@@ -42,6 +45,8 @@ class RequestsClass {
           Uri.parse("$HTTP_PROTOCOL://$_url/auth/shop/login"),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({"name": SHOP_USERNAME, "password": SHOP_PASSWORD}));
+      print(response.statusCode);
+      print(response.body);
       if (response.statusCode == 200) {
         _token = Token.fromJson(jsonDecode(response.body)).token;
         await _connectWebSocket();
@@ -154,14 +159,15 @@ class RequestsClass {
         destination: '/user/queue/shop/transaction-status/$_sessionId',
         callback: (frame) {
           var response = Response.fromJson(jsonDecode(frame.body!));
+          print(response.type);
           switch (response.type) {
-            case "TRANSACTION_DONE":
+            case "SUCCESS":
               paymentSended = true;
               resetAttributes();
               shop_articles = [];
               Navigator.pushNamed(parentContext, Validation.pageName);
               break;
-            case "TRANSACTION_ERROR":
+            case "FAILED":
               paymentSended = true;
               resetAttributes();
               Navigator.pushNamed(parentContext, Shop.pageName);
@@ -211,6 +217,7 @@ class RequestsClass {
                   parentContext, "La transaction a été annulée", "error", 3);
               break;
             default:
+              resetAttributes();
               Navigator.pushNamed(parentContext, Shop.pageName);
               showSnackBar(
                   parentContext, "Erreur lors de la transaction", "error", 3);
