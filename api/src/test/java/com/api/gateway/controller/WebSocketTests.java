@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -85,6 +84,8 @@ public class WebSocketTests {
     private StompSession shopStompSession;
     private final TpeWebSocketClientTestsHandler tpeHandler = new TpeWebSocketClientTestsHandler();
     private final ShopWebSocketClientTestsHandler shopHandler = new ShopWebSocketClientTestsHandler();
+
+    private Long timeToWaitWebSocket = 3L;
 
 
     @Autowired
@@ -293,6 +294,13 @@ public class WebSocketTests {
     }
 
     /**
+     * Wait
+     */
+    private void waitWebSocket() throws InterruptedException {
+        Thread.sleep(timeToWaitWebSocket * 1000);
+    }
+
+    /**
      * Before All, Before Each, After All, After Each
      */
     @BeforeAll
@@ -363,7 +371,7 @@ public class WebSocketTests {
     public void testSynchronizeTpe() throws InterruptedException {
         // Send a synchronization message
         sendSynchronizeMessage();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE should be in the Redis (synchronized)
         assertEquals(
@@ -380,7 +388,7 @@ public class WebSocketTests {
     public void testAlreadySynchronizedTpe() throws InterruptedException {
         // Send a synchronization message
         sendSynchronizeMessage();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE should be in the Redis (synchronized)
         assertEquals(
@@ -394,7 +402,7 @@ public class WebSocketTests {
 
         // Ask for synchronization message again
         sendSynchronizeMessage();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE is already synchronized
         assertEquals(
@@ -414,7 +422,7 @@ public class WebSocketTests {
 
         // Send a synchronization message
         sendCompleteMessage(paymentId, PaymentMethod.CARD.toString());
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the transaction result
         assertEquals(
@@ -444,7 +452,7 @@ public class WebSocketTests {
 
         // Send a synchronization message
         sendCompleteMessage("999-999-999-999", PaymentMethod.CARD.toString());
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the transaction result
         assertEquals(
@@ -474,7 +482,7 @@ public class WebSocketTests {
 
         // Send a synchronization message
         sendCompleteMessage(paymentId, "FAKE");
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the transaction result
         assertEquals(
@@ -501,7 +509,7 @@ public class WebSocketTests {
     public void testCompleteTransactionTpeNotInvolved() throws InterruptedException {
         // Send a synchronization message
         sendCompleteMessage(paymentId, PaymentMethod.CARD.toString());
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -518,11 +526,11 @@ public class WebSocketTests {
     public void testCompleteTransactionTpeStillAvailable() throws InterruptedException {
         // Synchronise the TPE to mark it available for transaction
         sendSynchronizeMessage();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Send a synchronization message
         sendCompleteMessage(paymentId, PaymentMethod.CARD.toString());
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -542,7 +550,7 @@ public class WebSocketTests {
 
         // Send a cancel message
         sendCancelMessageFromTpe();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -569,7 +577,7 @@ public class WebSocketTests {
     public void testCancelTransactionTpeNotInvolved() throws InterruptedException {
         // Send a cancel message
         sendCancelMessageFromTpe();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -586,11 +594,11 @@ public class WebSocketTests {
     public void testCancelTransactionTpeStillAvailable() throws InterruptedException {
         // Send a synchronization message
         sendSynchronizeMessage();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Send a cancel message
         sendCancelMessageFromTpe();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -612,15 +620,15 @@ public class WebSocketTests {
     public void testDisconnectTpe() throws InterruptedException {
         // Send a synchronization message
         sendSynchronizeMessage();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Add a transaction request to the Redis
         putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Kill TPE Session
         tpeStompSession.disconnect();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Shop get the message
         assertEquals(
@@ -649,11 +657,11 @@ public class WebSocketTests {
     public void testPayShop() throws InterruptedException {
         // Send a synchronization message
         sendSynchronizeMessage();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Send a cancel message
         sendPayMessage(50);
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -680,7 +688,7 @@ public class WebSocketTests {
     public void testPayShopWithoutTpeAvailable() throws InterruptedException {
         // Send a cancel message
         sendPayMessage(50);
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Shop get the message
         assertEquals(
@@ -697,11 +705,11 @@ public class WebSocketTests {
     public void testPayShopWhileAlreadyInTransaction() throws InterruptedException {
         // Sync the TPE
         sendSynchronizeMessage();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Send a cancel message
         sendPayMessage(50);
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -725,7 +733,7 @@ public class WebSocketTests {
 
         // Send a cancel message
         sendPayMessage(50);
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Shop get the message
         assertEquals(
@@ -745,7 +753,7 @@ public class WebSocketTests {
 
         // Send a cancel message
         sendCancelMessageFromShop();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -772,7 +780,7 @@ public class WebSocketTests {
     public void testCancelTransactionShopNotInvolved() throws InterruptedException {
         // Send a cancel message
         sendCancelMessageFromShop();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Shop get the message
         assertEquals(
@@ -794,11 +802,11 @@ public class WebSocketTests {
     public void testDisconnectShop() throws InterruptedException {
         // Add a transaction request to the Redis
         putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Kill Shop Session
         shopStompSession.disconnect();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message
         assertEquals(
@@ -824,13 +832,13 @@ public class WebSocketTests {
     public void testTransactionExpiration() throws InterruptedException {
         // Add a transaction request to the Redis
         TransactionRequest transactionRequest = putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Change expiration time artificially (normally it is equal to HASH_KEY_TTL)
         customRedisTemplate.expire(
                 HASH_KEY_NAME_TRANSACTION + ":" + transactionRequest.getId(), 1, TimeUnit.MILLISECONDS
         );
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // TPE get the message (message content is not entirely tested because it's not totally depending on expiration
         // feature but also on synchronization feature)
@@ -866,7 +874,7 @@ public class WebSocketTests {
     public void testServerRestartsDuringTransaction() throws InterruptedException {
         // Add a transaction request to the Redis
         putTransactionRequest(paymentId, PaymentMethod.CARD.toString());
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Restart the server
         webSocketRunner.run(new ApplicationArguments() {
@@ -895,7 +903,7 @@ public class WebSocketTests {
                 return null;
             }
         });
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // Tpe get the message
         assertEquals(
@@ -920,7 +928,7 @@ public class WebSocketTests {
         // In consequence of the SERVER_RESTARTED messages, client must disconnect
         tpeStompSession.disconnect();
         shopStompSession.disconnect();
-        Thread.sleep(2000);
+        waitWebSocket();
 
         // It means transactions are killed
         // Assert that the transaction is removed from the Redis

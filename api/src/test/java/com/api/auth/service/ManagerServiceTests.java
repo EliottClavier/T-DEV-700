@@ -2,10 +2,12 @@ package com.api.auth.service;
 
 import com.api.auth.entity.Manager;
 import com.api.auth.repository.ManagerRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,6 +25,7 @@ public class ManagerServiceTests {
     private final String username = "test";
     private final String password = "test";
 
+    @Autowired
     public ManagerServiceTests(
             ManagerService managerService,
             ManagerRepository managerRepository
@@ -35,6 +38,10 @@ public class ManagerServiceTests {
     public void setup() {
         if (!managerRepository.existsByUsername(username)) {
             managerRepository.save(new Manager(username, password));
+        }
+
+        if (managerRepository.existsByUsername("test2")) {
+            managerRepository.deleteByUsername("test2");
         }
     }
 
