@@ -222,6 +222,12 @@ flutter run --dart-define=API_URL='YOUR_LOCAL_IPV4:8080' --dart-define=ENV='loca
 
 - **TPE_REGISTER_SECRET_HEADER** and **TPE_REGISTER_SECRET_KEY** are both secret value, given by project's owners in production mode, and filled in `tpe.env` in local environment.
 
+#### Tests
+
+To run tests in Flutter, follow these steps:
+
+  - Open a terminal window and navigate to the root directory of your Flutter project.
+  - Run the flutter test command. This will automatically run all the tests in your project.
 
 #### Flutter Documentation
 
