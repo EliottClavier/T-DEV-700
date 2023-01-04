@@ -33,6 +33,13 @@ public class RedisExpirationListener implements MessageListener {
     }
 
 
+    /**
+     * This method is called when a key expires in Redis
+     * It sends a message to the Shop and TPE to notify them that the transaction has expired
+     * The message is sent on /user/queue/shop/transaction-status/{shopSessionId}
+     * and /user/queue/tpe/transaction-status/{tpeSessionId}
+     *
+     */
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String key = message.toString();

@@ -28,6 +28,8 @@ public class WebSocketRunner implements ApplicationRunner {
     }
 
     // At the start of the application, the web socket connections are cleared
+    // It asks for all connected users to kill their session and reconnect
+    // The message is sent on /queue/server/server-status
     public void run(ApplicationArguments args) {
         for (SimpUser user : userRegistry.getUsers()) {
             user.getSessions().forEach(session -> {

@@ -12,6 +12,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration extends AbstractSecurityWebSocketMessageBrokerConfigurer {
 
+    // This method is used to register the endpoint that will be used to connect to the WebSocket server
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         /* Endpoints for TPE */
@@ -22,6 +23,7 @@ public class WebSocketConfiguration extends AbstractSecurityWebSocketMessageBrok
                 .setAllowedOrigins("*").withSockJS().setHeartbeatTime(25000);
     }
 
+    // List of endpoints accessible by roles when user get a WebSocket session (see SecurityConfig.java)
     @Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
         messages.simpDestMatchers("/websocket-manager/tpe/**").hasRole("TPE")
@@ -37,6 +39,11 @@ public class WebSocketConfiguration extends AbstractSecurityWebSocketMessageBrok
         return true;
     }
 
+    // This method is used to configure the message broker
+    // /topic stands for the public channel
+    // /queue stands for the private channel
+    // All messages sent to WebSocket server from client must be prefixed with /websocket-manager
+    // All subscribed routes must be prefixed with /user
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config){
         config.enableSimpleBroker("/topic", "/queue");

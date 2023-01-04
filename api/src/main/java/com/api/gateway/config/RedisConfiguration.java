@@ -36,6 +36,10 @@ public class RedisConfiguration {
         return template;
     }
 
+    /**
+     * This bean add message listener to Redis when a Hash expires
+     * It is used when Transaction Requests expire in Redis
+     */
     @Bean
     RedisMessageListenerContainer container(
             RedisConnectionFactory connectionFactory,

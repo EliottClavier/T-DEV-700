@@ -1,5 +1,8 @@
 package com.api.gateway.transaction.model;
 
+/**
+ * All messages possibly sent by Websocket server to client
+ */
 public enum WebSocketStatus {
     TRANSACTION_OPENED,
     TRANSACTION_CANCELLED,

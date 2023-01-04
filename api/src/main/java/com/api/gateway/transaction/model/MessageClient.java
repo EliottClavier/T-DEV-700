@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * MessageClient class represents the data possibly received by client (TPE or Shop)
+ * It is only used in WebSocket tests to manipulate data received by client in subscription
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

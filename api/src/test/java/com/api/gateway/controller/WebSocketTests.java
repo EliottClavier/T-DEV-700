@@ -356,10 +356,9 @@ public class WebSocketTests {
 
     /**
      *
-     * FROM TPE TESTS
+     * FROM TPE TESTS: TpeManagerController tests (Synchronize, Confirm, Cancel, Disconnect)
      *
      */
-
     @Test
     public void testSynchronizeTpe() throws InterruptedException {
         // Send a synchronization message
@@ -604,6 +603,11 @@ public class WebSocketTests {
         );
     }
 
+    /**
+     *
+     * Disconnect test linked to TPE and located in WebSocketListeners controller
+     *
+     */
     @Test
     public void testDisconnectTpe() throws InterruptedException {
         // Send a synchronization message
@@ -638,10 +642,9 @@ public class WebSocketTests {
 
     /**
      *
-     * FROM SHOP TESTS
+     * FROM SHOP TESTS: ShopManagerController tests (Pay, Cancel, Disconnect)
      *
      */
-
     @Test
     public void testPayShop() throws InterruptedException {
         // Send a synchronization message
@@ -782,6 +785,11 @@ public class WebSocketTests {
         );
     }
 
+    /**
+     *
+     * Disconnect test linked to Shop and located in WebSocketListeners controller
+     *
+     */
     @Test
     public void testDisconnectShop() throws InterruptedException {
         // Add a transaction request to the Redis
@@ -809,7 +817,7 @@ public class WebSocketTests {
 
     /**
      *
-     * EXPIRATION TESTS
+     * EXPIRATION TESTS: Test for RedisExpirationListener controller
      *
      */
     @Test
@@ -849,6 +857,11 @@ public class WebSocketTests {
         assertEquals(0, customRedisTemplate.opsForHash().entries(HASH_KEY_NAME_TRANSACTION).size());
     }
 
+    /**
+     *
+     * SERVER RESTART TESTS: Test for WebSocketRunner
+     *
+     */
     @Test
     public void testServerRestartsDuringTransaction() throws InterruptedException {
         // Add a transaction request to the Redis
