@@ -71,7 +71,7 @@ public class TransactionRequestServiceTests {
     }
 
     @Test
-    public void testIsShopAlreadyInTransaction() {
+    public void testIsShopAlreadyInTransaction() throws InterruptedException {
         Session session = new Session(shopName, shopSessionId);
 
         // Assert there is no transaction belonging to the shop
@@ -79,12 +79,14 @@ public class TransactionRequestServiceTests {
 
         // Add a transaction request to the Redis
         putTransactionRequest("fakeShopSessionId");
+        Thread.sleep(1000);
 
         // Assert there is no transaction belonging to the shop again
         assertFalse(transactionRequestService.isShopAlreadyInTransaction(session));
 
         // Add a transaction request to the Redis that matches the shop session ID
         putTransactionRequest(shopSessionId);
+        Thread.sleep(1000);
 
         // Assert there is a transaction belonging to the shop
         assertTrue(transactionRequestService.isShopAlreadyInTransaction(session));
