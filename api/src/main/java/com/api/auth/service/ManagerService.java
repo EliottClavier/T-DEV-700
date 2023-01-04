@@ -21,7 +21,12 @@ public class ManagerService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Register manager
+    /**
+     * Create a new manager
+     *
+     * @param manager Manager to create
+     * @return Manager, or null if the manager already exists
+     */
     public Manager registerManager(Manager manager) {
         if (!managerRepository.existsByUsername(manager.getUsername())) {
             manager.setPassword(passwordEncoder.encode(manager.getPassword()));
