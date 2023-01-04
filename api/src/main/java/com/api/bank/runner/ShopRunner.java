@@ -28,6 +28,8 @@ public class ShopRunner implements ApplicationRunner {
     @Value("${default.shop.password}")
     private String password;
 
+    // Create a default shop account following environment variables
+    // This is basically the shop account that will be used by the Shop application
     public void run(ApplicationArguments args) {
         Shop shop = new Shop(username, password);
         Shop shopRegisterResponse = shopService.registerShop(shop);

@@ -39,6 +39,13 @@ public class TpeManagerController {
         this.bankManager = bankManager;
     }
 
+    /**
+     * Websocket endpoint for TPE manager synchronization
+     * It sends message back to the client on /user/queue/tpe/synchronization-status/{sessionId}
+     *
+     * @param user the TPE user that is connected and sending the message
+     * @param sessionId the session id of the TPE user sending the message
+     */
     @MessageMapping("/tpe/synchronize")
     public void synchronizeTpeRedis(
             Principal user,
@@ -51,6 +58,15 @@ public class TpeManagerController {
         );
     }
 
+    /**
+     * Websocket endpoint for TPE manager complete transaction action
+     * It sends message back to the client on /user/queue/tpe/transaction-status/{sessionId}
+     * It also sends message to related Shop on /user/queue/shop/transaction-status/{shopSessionId}
+     *
+     * @param transactionData the transaction data sent by the TPE user (paymentId and paymentMethod)
+     * @param user the TPE user that is connected and sending the message
+     * @param sessionId the session id of the TPE user sending the message
+     */
     @MessageMapping("/tpe/complete-transaction")
     public void completeTransaction(
             @Payload String transactionData,
@@ -146,6 +162,15 @@ public class TpeManagerController {
         }
     }
 
+    /**
+     * Websocket endpoint for TPE manager cancel transaction action
+     * On success, it sends message back to the client on /user/queue/tpe/synchronization-status/{sessionId}
+     * On failure, it sends message back to the client on /user/queue/tpe/transaction-status/{sessionId}
+     * It also sends message to related Shop on /user/queue/shop/transaction-status/{shopSessionId}
+     *
+     * @param user the TPE user that is connected and sending the message
+     * @param sessionId the session id of the TPE user sending the message
+     */
     @MessageMapping("/tpe/cancel-transaction")
     public void cancelTransaction(
             Principal user,

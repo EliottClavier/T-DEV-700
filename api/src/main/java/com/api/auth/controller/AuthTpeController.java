@@ -52,6 +52,14 @@ public class AuthTpeController {
         this.env = env;
     }
 
+    /**
+     * This method is used to register a new TPE.
+     * This route is blocked by the TpeRegisterSecuredRoute annotation (check annotation to learn more about it).
+     * It also sends an email on custom email server with TPE password newly registered.
+     *
+     * @param tpeRegisterCredentials the TPE to register
+     * @return the TPE registered, or an error message if TPE already exists
+     */
     @TpeRegisterSecuredRoute
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public ResponseEntity<Object> registerHandler(
@@ -80,6 +88,13 @@ public class AuthTpeController {
         return new ResponseEntity<>(Collections.singletonMap("message", "TPE already registered."), HttpStatus.CONFLICT);
     }
 
+    /**
+     * This method is used to authenticate the TPE
+     *
+     * @param body contains the androidId and password of the TPE
+     * @return ResponseEntity with the token if the authentication is successful, otherwise it returns a 401 status code
+     * It can also return a 403 status code if the TPE is not whitelisted
+     */
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public ResponseEntity loginHandler(@RequestBody TpeLoginCredentials body) {
         try {

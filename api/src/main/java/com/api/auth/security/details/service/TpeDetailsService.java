@@ -18,6 +18,7 @@ public class TpeDetailsService implements UserDetailsService {
     @Autowired
     private TpeRepository tpeRepository;
 
+    // Process to check if TPE exists in database, is whitelisted and give it the role of TPE
     @Override
     public UserDetails loadUserByUsername(String androidId) throws UsernameNotFoundException, AccessDeniedException {
         Optional<Tpe> tpeRes = tpeRepository.findByAndroidId(androidId);

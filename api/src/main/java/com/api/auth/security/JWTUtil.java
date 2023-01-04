@@ -17,6 +17,12 @@ public class JWTUtil {
     @Value("${jwt.secret}")
     private String secret;
 
+    /**
+     * Create a JWT token
+     * @param identifier The identifier of the user (ex: username)
+     * @param subject The subject of the token (ex: Manager Connection)
+     * @return The JWT token as string
+     */
     public String generateToken(String identifier, String subject) throws IllegalArgumentException, JWTCreationException {
         return JWT.create()
                 .withSubject(subject)
@@ -26,6 +32,11 @@ public class JWTUtil {
                 .sign(Algorithm.HMAC256(secret));
     }
 
+    /**
+     * Retrieve the subject of the token
+     *
+     * @param token The JWT token
+     */
     public String getSubjectFromToken(String token) throws JWTVerificationException {
         DecodedJWT jwt = JWT.require(Algorithm.HMAC256(secret))
                 .build()
@@ -33,6 +44,13 @@ public class JWTUtil {
         return jwt.getSubject();
     }
 
+    /**
+     * Verify the token (with correct subject also) and retrieve the identifier
+     *
+     * @param token The JWT token
+     * @param subject The subject of the token
+     * @return The identifier of the user
+     */
     public String validateTokenAndRetrieveSubject(String token, String subject) throws JWTVerificationException {
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
                 .withSubject(subject)

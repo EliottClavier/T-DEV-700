@@ -36,6 +36,13 @@ public class AuthShopController {
     @Autowired
     private ShopService shopService;
 
+    /**
+     * This method is used to register a new shop.
+     * It also creates a new account for the shop.
+     *
+     * @param shop the shop to register
+     * @return the shop registered, or an error message if shop already exists
+     */
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public ResponseEntity registerHandler(@RequestBody Shop shop){
         Shop shopRegisterResponse = shopService.registerShop(shop);
@@ -51,6 +58,13 @@ public class AuthShopController {
         }
     }
 
+    /**
+     * This method is used to authenticate the Shop
+     *
+     * @param body contains the name and password of the shop
+     * @return ResponseEntity with the token if the authentication is successful, otherwise it returns a 401 status code
+     * It can also return a 403 status code if the shop is not whitelisted
+     */
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public ResponseEntity loginHandler(@RequestBody ShopLoginCredentials body){
         try {

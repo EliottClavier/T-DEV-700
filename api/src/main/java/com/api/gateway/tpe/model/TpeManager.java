@@ -7,6 +7,9 @@ import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.Id;
 
+/**
+ * TpeManager class used to work with TPE and its data stored in Redis
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * TransactionRequestTpe class used to receive transaction request infos from TPE
+ */
 @Data
 @AllArgsConstructor
 public class TransactionRequestTpe implements Serializable {

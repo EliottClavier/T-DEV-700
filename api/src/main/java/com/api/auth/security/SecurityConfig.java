@@ -29,10 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@
-
-
-        EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan(value = "com.api.auth")
 public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 
@@ -55,6 +52,12 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Main security filter chain, with restricted access to all endpoints except for
+     * /auth and /download, but also admin interfaces (permission is checked manually by javascript).
+     *
+     * @param authenticationManager uses the ProviderManager to authenticate the user; declared below
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, ProviderManager authenticationManager) throws Exception {
         http.csrf().disable()
@@ -96,6 +99,11 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 
         return http.build();
     }
+
+    /**
+     * Gathers all the authentication providers
+     * @return ProviderManager which manages all the authentication providers
+     */
     @Bean
     public ProviderManager authenticationManager() {
         return new ProviderManager(
@@ -105,6 +113,10 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
         );
     }
 
+    /**
+     * Manager Authentication Provider, manages how Manager is authenticated
+     * @return ManagerAuthenticationProvider
+     */
     @Bean
     public ManagerAuthenticationProvider managerAuthenticationProvider() {
         ManagerAuthenticationProvider managerAuthenticationProvider = new ManagerAuthenticationProvider();
@@ -113,6 +125,10 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
         return managerAuthenticationProvider;
     }
 
+    /**
+     * Tpe Authentication Provider, manages how Tpe is authenticated
+     * @return TpeAuthenticationProvider
+     */
     @Bean
     public TpeAuthenticationProvider tpeAuthenticationProvider() {
         TpeAuthenticationProvider tpeAuthenticationProvider = new TpeAuthenticationProvider();
@@ -121,6 +137,10 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
         return tpeAuthenticationProvider;
     }
 
+    /**
+     * Shop Authentication Provider, manages how Shop is authenticated
+     * @return ShopAuthenticationProvider
+     */
     @Bean
     public ShopAuthenticationProvider shopAuthenticationProvider() {
         ShopAuthenticationProvider shopAuthenticationProvider = new ShopAuthenticationProvider();

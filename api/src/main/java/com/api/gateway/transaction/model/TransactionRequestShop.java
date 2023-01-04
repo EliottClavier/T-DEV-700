@@ -6,6 +6,9 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
 
+/**
+ * TransactionRequestShop class used to receive transaction request from shop
+ */
 @Data
 @AllArgsConstructor
 public class TransactionRequestShop implements Serializable {

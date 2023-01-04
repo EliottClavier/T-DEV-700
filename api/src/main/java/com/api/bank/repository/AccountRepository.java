@@ -5,6 +5,7 @@ import com.api.bank.model.entity.Client;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -15,5 +16,6 @@ public interface AccountRepository extends GenericRepository<Account> {
 
     Account findAccountByClient_Id(UUID clientId);
     Account findAccountByClient_OrganisationName(String ownerName);
+    Account findAccountByClient_Lastname(String lastName);
 
 }

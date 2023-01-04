@@ -45,15 +45,13 @@ class RequestsClass {
           Uri.parse("$HTTP_PROTOCOL://$_url/auth/shop/login"),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({"name": SHOP_USERNAME, "password": SHOP_PASSWORD}));
-      print(response.statusCode);
-      print(response.body);
       if (response.statusCode == 200) {
         _token = Token.fromJson(jsonDecode(response.body)).token;
         await _connectWebSocket();
         totalAmount = amount;
         parentContext = context;
       } else {
-        if (response.statusCode == 403) {
+        if (response.statusCode == 401) {
           print("Error : ${response.statusCode} - ${response.body}");
           Navigator.pushNamed(context, Shop.pageName);
           showSnackBar(
@@ -124,7 +122,11 @@ class RequestsClass {
     return StompConfig.SockJS(
       url: "$HTTP_PROTOCOL://$_url/websocket-manager/secured/shop/socket",
       onConnect: onConnectCallback,
-      onWebSocketError: (dynamic error) => print(error.toString()),
+      onWebSocketError: (dynamic error) {
+        resetAttributes();
+        Navigator.pushNamed(parentContext, Shop.pageName);
+        showSnackBar(parentContext, "Le serveur a été redémarré", "error", 3);
+      },
       stompConnectHeaders: {'Authorization': "Bearer $_token"},
       webSocketConnectHeaders: {
         'Authorization': "Bearer $_token",
@@ -159,7 +161,6 @@ class RequestsClass {
         destination: '/user/queue/shop/transaction-status/$_sessionId',
         callback: (frame) {
           var response = Response.fromJson(jsonDecode(frame.body!));
-          print(response.type);
           switch (response.type) {
             case "SUCCESS":
               paymentSended = true;

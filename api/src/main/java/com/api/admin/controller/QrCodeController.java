@@ -53,6 +53,12 @@ public class QrCodeController {
         this.bankManager = bankManager;
     }
 
+    /**
+     * Route to generate a Qr-code (image and database entry)
+     *
+     * @param qrCode data to generate the Qr-code
+     * @return ResponseEntity with headers and .png file, or error message in case of exception
+     */
     @RequestMapping(value = {"/", ""}, method = RequestMethod.POST)
     public ResponseEntity createQrcode(@RequestBody QrCodeModel qrCode) {
         try {
@@ -89,6 +95,12 @@ public class QrCodeController {
         }
     }
 
+    /**
+     * Method which calls QR Code generator and prepare it to be placed in the file system
+     *
+     * @param check
+     * @return
+     */
     public String generateQrcode(String check) {
         try {
             UUID uuid = UUID.randomUUID();
@@ -105,13 +117,30 @@ public class QrCodeController {
         }
     }
 
+    /**
+     * Method which generates the QR Code
+     *
+     * @param data the text to be encoded
+     * @param path the path where the QR Code will be saved
+     * @param charset the charset to be used
+     * @param h the height of the QR Code
+     * @param w the width of the QR Code
+     * @throws WriterException
+     * @throws IOException
+     */
     public static void qrcode(String data, String path, String charset, int h, int w) throws WriterException, IOException
     {
         BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset), BarcodeFormat.QR_CODE, w, h);
         MatrixToImageWriter.writeToFile(matrix, path.substring(path.lastIndexOf('.') + 1), new File(path));
     }
 
-    //Return the qrCode in the navigator
+    /**
+     * Return the Qr-code image
+     *
+     * @param qrCodeUuid the uuid of the Qr-code
+     * @return ResponseEntity with headers and .png file, or error message in case of exception
+     * @throws IOException
+     */
     @RequestMapping(path = "/{qrCodeUuid}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getImageWithMediaType(
             @PathVariable String qrCodeUuid

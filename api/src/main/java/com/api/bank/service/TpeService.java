@@ -20,6 +20,11 @@ public class TpeService extends GenericService<Tpe> {
         this.tpeRepository = tpeRepository;
     }
 
+    /**
+     * Get Tpe by id (UUID)
+     * @param id Tpe UUID
+     * @return the Tpe if found, exception otherwise
+     */
     public ObjectResponse getTpeById(String id) {
         try {
             Tpe tpe = tpeRepository.findById(UUID.fromString(id)).get();
@@ -31,6 +36,12 @@ public class TpeService extends GenericService<Tpe> {
         }
     }
 
+    /**
+     * Update Tpe status by id (UUID)
+     * @param id Tpe UUID
+     * @param whitelisted Tpe new status (whitelist or blacklist)
+     * @return the Tpe with its new status if found and not already with the asked status, exception otherwise
+     */
     public ObjectResponse updateTpeStatus(String id, Boolean whitelisted) {
         try {
             Tpe tpe = tpeRepository.findById(UUID.fromString(id)).get();
@@ -49,6 +60,11 @@ public class TpeService extends GenericService<Tpe> {
         }
     }
 
+    /**
+     * Test if TPE exists
+     * @param androidId TPE UUID
+     * @return the TPE if found, false otherwise
+     */
     public boolean existsByAndroidId(String androidId) {
         try {
             return tpeRepository.existsByAndroidId(androidId);

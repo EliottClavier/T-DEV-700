@@ -2,6 +2,10 @@ package com.api.gateway.data;
 
 public class DestinationGenerator {
 
+    /**
+     * Generate the destination of messages for Shop, TPE or Server (both Shop and TPE)
+     */
+
     public static final String MESSAGE_PREFIX_SHOP = "/queue/shop";
     public static final String MESSAGE_PREFIX_TPE = "/queue/tpe";
 

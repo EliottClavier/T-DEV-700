@@ -32,6 +32,11 @@ public class ShopService extends GenericService<Shop> {
     }
 
 
+    /**
+     * Get Shop by id (UUID)
+     * @param id Shop UUID
+     * @return the Shop if found, exception otherwise
+     */
     public ObjectResponse getShopById(String id) {
         try {
             Shop shop = shopRepository.findById(UUID.fromString(id)).get();
@@ -43,6 +48,12 @@ public class ShopService extends GenericService<Shop> {
         }
     }
 
+    /**
+     * Update Shop status by id (UUID)
+     * @param id Shop UUID
+     * @param whitelisted Shop new status (whitelist or blacklist)
+     * @return the Shop with its new status if found and not already with the asked status, exception otherwise
+     */
     public ObjectResponse updateShopStatus(String id, Boolean whitelisted) {
         try {
             Shop shop = shopRepository.findById(UUID.fromString(id)).get();
@@ -61,6 +72,11 @@ public class ShopService extends GenericService<Shop> {
         }
     }
 
+    /**
+     * Register Shop
+     * @param shop Shop data
+     * @return the Shop if registered, null otherwise
+     */
     public Shop registerShop(Shop shop) {
         if (!shopRepository.existsByName(shop.getName())) {
             String encodedPass = passwordEncoder.encode(shop.getPassword());
@@ -71,6 +87,11 @@ public class ShopService extends GenericService<Shop> {
         return null;
     }
 
+    /**
+     * Delete Shop from database, including Account and Client linked to it
+     * @param id Shop UUID
+     * @return a success message if deleted, exception otherwise
+     */
     public ObjectResponse deleteShopStackByUUID(String id) {
         try {
             // Delete shop

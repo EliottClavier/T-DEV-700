@@ -2,6 +2,9 @@ package com.api.auth.model;
 
 import lombok.*;
 
+/**
+ * Tpe register credentials model
+ */
 @Getter
 @Setter
 @AllArgsConstructor
