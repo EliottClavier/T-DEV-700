@@ -56,11 +56,10 @@ public class WebSocketTests {
     private WebSocketRunner webSocketRunner;
 
     private final WebSocketStompClient stompClient;
-    private TestRestTemplate testRestTemplate;
     private final PasswordEncoder passwordEncoder;
     private final TpeRepository tpeRepository;
     private final ShopRepository shopRepository;
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
     private final TransactionRequestService transactionRequestService;
     private final AuthService authService;
     private final JWTUtil jwtUtil;
@@ -77,6 +76,9 @@ public class WebSocketTests {
     @Value("${default.shop.password}")
     private String shopPassword;
 
+    @Value("${server.port}")
+    private String serverPort;
+
     private final String paymentId = "000-000-000-000";
     private final String clientName = "ClientName";
     private StompSession tpeStompSession;
@@ -88,7 +90,6 @@ public class WebSocketTests {
     @Autowired
     public WebSocketTests(
             WebSocketStompClient stompClient,
-            TestRestTemplate testRestTemplate,
             TransactionRequestService transactionRequestService,
             AuthService authService,
             JWTUtil jwtUtil,
@@ -100,7 +101,6 @@ public class WebSocketTests {
             AccountRepository accountRepository
     ) {
         this.stompClient = stompClient;
-        this.testRestTemplate = testRestTemplate;
         this.transactionRequestService = transactionRequestService;
         this.authService = authService;
         this.passwordEncoder = passwordEncoder;
@@ -180,7 +180,7 @@ public class WebSocketTests {
         stompHeaders.add("Authorization", "Bearer " + token);
 
         return stompClient.connect(
-                "http://localhost:5080/websocket-manager/secured/" + type + "/socket",
+                "http://localhost:" + serverPort + "/websocket-manager/secured/" + type + "/socket",
                 headers,
                 stompHeaders,
                 handler
