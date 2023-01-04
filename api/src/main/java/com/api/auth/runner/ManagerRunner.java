@@ -22,6 +22,7 @@ public class ManagerRunner implements ApplicationRunner {
     @Value("${default.manager.password}")
     private String password;
 
+    // Create default manager from environment variables
     public void run(ApplicationArguments args) {
         Manager manager = new Manager(username, password);
         managerService.registerManager(manager);

@@ -20,6 +20,8 @@ public class BankRunner implements ApplicationRunner {
     @Autowired
     private AccountService accountService;
 
+    // Create a default bank account
+    // This is basically the bank account that will be used for all operations
     public void run(ApplicationArguments args) {
         Account accountSearch = accountService.getAccountByOwnerName(BANK_NAME);
         if (accountSearch == null) {

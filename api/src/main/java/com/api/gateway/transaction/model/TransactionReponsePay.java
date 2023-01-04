@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * TransactionResponsePay used to send transaction data useful for payment by TPE
+ */
 @Data
 @Getter
 @AllArgsConstructor

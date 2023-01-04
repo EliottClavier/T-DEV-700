@@ -11,6 +11,5 @@ WORKDIR $HOME
 
 RUN gradle --no-daemon --warning-mode all --console=plain getDeps
 
-EXPOSE 8080
 RUN dos2unix entrypoint.sh
 CMD bash entrypoint.sh

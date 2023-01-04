@@ -38,7 +38,15 @@ public class ShopManagerController {
         this.transactionRequestService = transactionRequestService;
     }
 
-    /* Shop */
+    /**
+     * Websocket endpoint for Shop pay action
+     * It sends message back to the client on /user/queue/shop/transaction-status/{sessionId}
+     * It also sends message to related TPE on /user/queue/tpe/transaction-status/{tpeSessionId}
+     *
+     * @param transactionData the transaction data sent by the Shop (amount)
+     * @param user the Shop user that is connected and sending the message
+     * @param sessionId the session id of the Shop user sending the message
+     */
     @MessageMapping("/shop/pay")
     public void pay(
             @Payload String transactionData,
@@ -114,6 +122,14 @@ public class ShopManagerController {
         }
     }
 
+    /**
+     * Websocket endpoint for Shop cancel transaction action
+     * It sends message back to the client on /user/queue/shop/transaction-status/{sessionId}
+     * It also sends message to related TPE on /user/queue/tpe/synchronization-status/{tpeSessionId}
+     *
+     * @param user the Shop user that is connected and sending the message
+     * @param sessionId the session id of the Shop user sending the message
+     */
     @MessageMapping("/shop/cancel-transaction")
     public void cancelTransaction(
             Principal user,

@@ -22,6 +22,12 @@ public class AuthManagerController {
     @Autowired
     private ManagerAuthenticationProvider managerAuthenticationProvider;
 
+    /**
+     * This method is used to authenticate the manager
+     *
+     * @param body contains the username and password of the manager
+     * @return ResponseEntity with the token if the authentication is successful, otherwise it returns a 401 status code
+     */
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public ResponseEntity loginHandler(@RequestBody ManagerLoginCredentials body){
         try {

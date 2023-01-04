@@ -31,6 +31,13 @@ public class ShopManagerService {
     @Autowired
     private ShopRepository shopRepository;
 
+    /**
+     * Used to set the transaction request in redis with Shop infos and random selected TPE infos
+     *
+     * @param transactionRequest the transaction request containing shop infos and amount of transaction
+     * @param tpeUsername the random selected TPE username
+     * @return the transaction request on which we set the TPE infos
+     */
     public TransactionRequest prepareTransactionRequestFromShop(TransactionRequest transactionRequest, String tpeUsername) {
         Object randomSessionId = tpeManagerService.getTpeRedisSessionIdByUsername(tpeUsername);
         TpeManager tpeManager = new TpeManager(tpeUsername, randomSessionId.toString());
@@ -43,11 +50,23 @@ public class ShopManagerService {
         return transactionRequest;
     }
 
+    /**
+     * Method to determine if shop is valid (present in database and whitelisted)
+     *
+     * @param shopName name of the shop
+     * @return true if shop is valid, false otherwise
+     */
     public Boolean isShopValid(String shopName) {
         Optional<Shop> shopOptional = shopRepository.findByName(shopName);
         return shopOptional.isPresent() && shopOptional.get().getWhitelisted();
     }
 
+    /**
+     * Used to retrieve a transaction request from redis by Shop session id
+     *
+     * @param sessionId the session ID of the Shop
+     * @return the transaction request, null if no transaction request found
+     */
     public TransactionRequest retrieveTransactionRequestByShopSessionId(String sessionId) {
         // For each transaction return value
         for (String key : customRedisTemplate.keys(HASH_KEY_NAME_TRANSACTION + ":*")) {
