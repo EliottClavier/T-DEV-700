@@ -50,11 +50,26 @@ To get started with the project using `docker-compose`, you will need to set up 
 `cd ./T-DEV-700/shop`
 
 - To run the app, type :   
-`flutter run --dart-define=SHOP_USERNAME='' --dart-define=SHOP_PASSWORD='' --dart-define=API_URL=''`  
+`flutter run --dart-define=ENV='' --dart-define=SHOP_USERNAME='' --dart-define=SHOP_PASSWORD='' --dart-define=API_URL=''`  
 Don't forget to fill in the variables (inside the quotes) according to your environment variables.  
 This will run the app on the emulator or on a physical device connected to your computer.
 
 Note: If you want to run the app on a physical device, you must first enable USB debugging on your device and connect it to your computer with a USB cable.
+
+##### Variables
+
+ENV = 'local' or 'prod'
+
+Note: For 'local' use, you must add the API_URL variable in run command.
+This able the app to interact with server run on your computer on local use, on a same network. Your computer local IPv4 is usually like 192.168.x.x.
+
+API_URL = '[YOUR_LOCAL_IPV4]:8080'
+
+Run it like this :
+
+`flutter run --dart-define=ENV='local' --dart-define=SHOP_USERNAME='' --dart-define=SHOP_PASSWORD='' --dart-define=API_URL='YOUR_LOCAL_IPV4:8080'`  
+
+SHOP_USERNAME and SHOP_PASSWORD are both either secret value, given by project's owners.
 
 #### Payment Terminal
 
