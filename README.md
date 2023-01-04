@@ -26,6 +26,7 @@ This project is a course project for Epitech school and is a complete system for
     - [Flutter documentation](#flutter-documentation)
 - [Tests](#tests)
   - [Launch server application and services tests](#launch-server-application-and-services-tests)
+  - [Launch flutter applications tests](#launch-flutter-applications-tests)
 
 ---------------------------------------------------------------
 
@@ -234,13 +235,6 @@ flutter run --dart-define=API_URL='YOUR_LOCAL_IPV4:8080' --dart-define=ENV='loca
 
 - **TPE_REGISTER_SECRET_HEADER** and **TPE_REGISTER_SECRET_KEY** are both secret value, given by project's owners in production mode, and filled in `tpe.env` in local environment.
 
-#### Tests
-
-To run tests in Flutter, follow these steps:
-
-  - Open a terminal window and navigate to the root directory of your Flutter project.
-  - Run the flutter test command. This will automatically run all the tests in your project.
-
 #### Flutter Documentation
 
 The mobile shop application and payment terminal are built with Flutter, an open-source mobile application development framework created by Google. 
@@ -270,3 +264,10 @@ Once the server has finished to run test, you will be able to find the results i
 ```
 
 Once inside this folder, you can open the `index.html` file which gives a visual interface indicating which tests are successful or not.
+
+### Launch flutter applications tests
+
+To run tests in Flutter, follow these steps:
+
+  - Open a terminal window and navigate to the root directory of your Flutter project.
+  - Run the flutter test command. This will automatically run all the tests in your project.
