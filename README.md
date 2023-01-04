@@ -19,6 +19,10 @@ This project is a course project for Epitech school and is a complete system for
       - [Generate mailhog.auth](#generate-mailhogauth)
       - [Launch `docker-compose`](#launch-docker-compose)
   - [Shop and Payment Terminal applications](#shop-and-payment-terminal-applications)
+    - [Flutter installation](#flutter-installation)
+    - [Shop](#shop)
+    - [Payment Terminal](#payment-terminal)
+    - [Flutter documentation](#flutter-documentation)
 - [Tests](#tests)
   - [Launch server application and services tests](#launch-server-application-and-services-tests)
 
@@ -87,7 +91,13 @@ __For evalutation purposes, you will be able to use the NFC scan feature using t
 
 ### Launch your own environment
 
-Notice that you will need to have Docker installed on your machine in order to launch your own environment. If you are not familiar with Docker,
+Make sure you have Git installed. You can check if it's installed by typing : `git --version` in the terminal. If it's not installed, you can download it from the official website: https://git-scm.com/.
+
+Clone the repository to your local machine, open a terminal at the place where you want to install the project and typing :  
+`git clone https://github.com/EpitechMscProPromo2024/T-DEV-700-NAN_5.git`
+
+
+Notice that you will also need to have Docker installed on your machine in order to launch your own environment. If you are not familiar with Docker,
 we invite you to read the official docs, which helps to install everything you will need for this project:
 - [Docker documentation](https://docs.docker.com)
 
@@ -149,20 +159,36 @@ Notice that the `api` service is designed to restart its `Tomcat server` when Sp
 
 ##### Shop
 
-- Make sure you have Git installed. You can check if it's installed by typing : `git --version` in the terminal. If it's not installed, you can download it from the official website: https://git-scm.com/.
-
-- Clone the repository to your local machine, open a terminal at the place where you want to install the project and typing :  
-`git clone https://github.com/EpitechMscProPromo2024/T-DEV-700-NAN_5.git`
-
-- Then go to the shop directory with the following command :   
-`cd ./T-DEV-700/shop`
+- Go to the shop directory with the following command :   
+```
+cd ./T-DEV-700/shop
+```
 
 - To run the app, type :   
-`flutter run --dart-define=SHOP_USERNAME='' --dart-define=SHOP_PASSWORD='' --dart-define=API_URL=''`  
-Don't forget to fill in the variables (inside the quotes) according to your environment variables `(see shop.example.env)`.  
+```
+flutter run --dart-define=ENV='' --dart-define=SHOP_USERNAME='' --dart-define=SHOP_PASSWORD='' --dart-define=API_URL=''
+```  
+Don't forget to fill in the variables (inside the quotes) according to your environment variables (see `shop.example.env`).  
 This will run the app on the emulator or on a physical device connected to your computer.
 
 Note: If you want to run the app on a physical device, you must first enable USB debugging on your device and connect it to your computer with a USB cable.
+
+For more details `--dart-define` about variables:
+
+- **ENV** = 'local' or 'prod'
+
+Note: For 'local' use, you must add the `API_URL` variable in run command.
+This able the app to interact with server run on your computer on local use, on a same network. Your computer local IPv4 is usually like 192.168.x.x.
+
+- **API_URL** = '***[YOUR_LOCAL_IPV4]***:8080'
+
+Run it like this :
+
+```
+flutter run --dart-define=ENV='local' --dart-define=SHOP_USERNAME='' --dart-define=SHOP_PASSWORD='' --dart-define=API_URL='YOUR_LOCAL_IPV4:8080'
+```  
+
+- **SHOP_USERNAME** and **SHOP_PASSWORD** are both secret value, given by project's owners in production mode, and filled in `shop.env` in local environment.
 
 ##### Payment Terminal
 
@@ -172,17 +198,26 @@ Note: If you want to run the app on a physical device, you must first enable USB
 - To run the app, type :   
 `flutter run --dart-define=ENV='' --dart-define=TPE_REGISTER_SECRET_KEY='' --dart-define=TPE_REGISTER_SECRET_HEADER=''`  
 
-Don't forget to fill in the variables (inside the quotes) according to your environment variables `(see tpe.example.env)`.  
+Don't forget to fill in the variables (inside the quotes) according to your environment variables (see `tpe.example.env`).  
 This will run the app on the emulator or on a physical device connected to your computer.
 
-###### Variables
+For more details `--dart-define` about variables:
 
-ENV = 'local' or 'prod'
+- **ENV** = 'local' or 'prod'
+
+**Note: For 'local' use, you must add the API_URL variable in run command.
+This able the app to interact with server run on your computer on local use, on a same network. Your computer local IPv4 is usually almost like 192.168.x.x.**
+
+- **API_URL** = '***[YOUR_LOCAL_IPV4]***:8080'
+
+Run the app like this :
+
+`flutter run --dart-define=API_URL='YOUR_LOCAL_IPV4:8080' --dart-define=ENV='local' --dart-define=TPE_REGISTER_SECRET_KEY='' --dart-define=TPE_REGISTER_SECRET_HEADER=''`
+
+- **TPE_REGISTER_SECRET_HEADER** and **TPE_REGISTER_SECRET_KEY** are both secret value, given by project's owners in production mode, and filled in `tpe.env` in local environment.
 
 
-Note: If you want to run the app on a physical device, you must first enable USB debugging on your device and connect it to your computer with a USB cable.
-
-##### Flutter Documentation
+#### Flutter Documentation
 
 The mobile shop application and payment terminal are built with Flutter, an open-source mobile application development framework created by Google. 
 
