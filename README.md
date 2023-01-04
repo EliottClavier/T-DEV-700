@@ -6,6 +6,7 @@
 This project is a course project for Epitech school and is a complete system for managing a shop. It includes a server application coded with Java and SpringBoot and linked to a MariaDB server, a Redis server and a Mailhog server. It also includes a mobile shop application built with Flutter and a payment terminal also built with Flutter.
 
 ## Table of Contents
+- [Contributors](#contributors)
 - [Architecture](#architecture)
 - [Server Application](#server-application)
 - [Shop Mobile Application](#shop-mobile-application)
@@ -25,6 +26,17 @@ This project is a course project for Epitech school and is a complete system for
     - [Flutter documentation](#flutter-documentation)
 - [Tests](#tests)
   - [Launch server application and services tests](#launch-server-application-and-services-tests)
+
+---------------------------------------------------------------
+
+## Contributors
+
+Our team is composed of:
+- CLAVIER Eliott
+- MARTIN Maxime
+- PIGNON Nathan
+- MATHÉ Clément
+- RIPAULT Paul
 
 ---------------------------------------------------------------
 
