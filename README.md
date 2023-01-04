@@ -205,10 +205,14 @@ flutter run --dart-define=ENV='local' --dart-define=SHOP_USERNAME='' --dart-defi
 ##### Payment Terminal
 
 - Go to the Payment Terminal directory with the following command :   
-`cd ./T-DEV-700/tpe`
+```
+cd ./T-DEV-700/tpe`
+```
 
 - To run the app, type :   
-`flutter run --dart-define=ENV='' --dart-define=TPE_REGISTER_SECRET_KEY='' --dart-define=TPE_REGISTER_SECRET_HEADER=''`  
+```
+flutter run --dart-define=ENV='' --dart-define=TPE_REGISTER_SECRET_KEY='' --dart-define=TPE_REGISTER_SECRET_HEADER=''`  
+```
 
 Don't forget to fill in the variables (inside the quotes) according to your environment variables (see `tpe.example.env`).  
 This will run the app on the emulator or on a physical device connected to your computer.
@@ -224,10 +228,18 @@ This able the app to interact with server run on your computer on local use, on 
 
 Run the app like this :
 
-`flutter run --dart-define=API_URL='YOUR_LOCAL_IPV4:8080' --dart-define=ENV='local' --dart-define=TPE_REGISTER_SECRET_KEY='' --dart-define=TPE_REGISTER_SECRET_HEADER=''`
+```
+flutter run --dart-define=API_URL='YOUR_LOCAL_IPV4:8080' --dart-define=ENV='local' --dart-define=TPE_REGISTER_SECRET_KEY='' --dart-define=TPE_REGISTER_SECRET_HEADER=''`
+``` 
 
 - **TPE_REGISTER_SECRET_HEADER** and **TPE_REGISTER_SECRET_KEY** are both secret value, given by project's owners in production mode, and filled in `tpe.env` in local environment.
 
+#### Tests
+
+To run tests in Flutter, follow these steps:
+
+  - Open a terminal window and navigate to the root directory of your Flutter project.
+  - Run the flutter test command. This will automatically run all the tests in your project.
 
 #### Flutter Documentation
 
