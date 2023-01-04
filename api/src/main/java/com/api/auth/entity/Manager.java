@@ -12,6 +12,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.UUID;
 
+/**
+ * Manager entity
+ */
 @Entity
 @Getter
 @Setter

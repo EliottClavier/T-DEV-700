@@ -33,6 +33,10 @@ public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     private JWTUtil jwtUtil;
 
+    /**
+     * A supplementary filter added to SecurityFilterChain to check if JWT Token passed in the request is valid
+     * on either TPE, Shop or Manager perspective.
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -40,6 +44,7 @@ public class JWTFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
+        // Check if Authorization header is present and well formed
         if(authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")){
             String jwt = authHeader.substring(7);
             if(jwt.isBlank()){
@@ -48,6 +53,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 try{
                     String subject = jwtUtil.getSubjectFromToken(jwt);
                     UsernamePasswordAuthenticationToken authToken;
+                    // Manager perspective
                     if (Objects.equals(subject, "Manager Connection")) {
                         String username = jwtUtil.validateTokenAndRetrieveSubject(jwt, subject);
                         UserDetails managerDetails = managerDetailsService.loadUserByUsername(username);
@@ -56,6 +62,7 @@ public class JWTFilter extends OncePerRequestFilter {
                             SecurityContextHolder.getContext().setAuthentication(authToken);
                         }
 
+                    // TPE perspective
                     } else if (Objects.equals(subject, "TPE Connection")) {
                         String androidId = jwtUtil.validateTokenAndRetrieveSubject(jwt, subject);
                         UserDetails tpeDetails = tpeDetailsService.loadUserByUsername(androidId);
@@ -63,6 +70,8 @@ public class JWTFilter extends OncePerRequestFilter {
                         if (SecurityContextHolder.getContext().getAuthentication() == null) {
                             SecurityContextHolder.getContext().setAuthentication(authToken);
                         }
+
+                    // Shop perspective
                     } else if (Objects.equals(subject, "Shop Connection")) {
                         String name = jwtUtil.validateTokenAndRetrieveSubject(jwt, subject);
                         UserDetails shopDetails = shopDetailsService.loadUserByUsername(name);
@@ -78,6 +87,7 @@ public class JWTFilter extends OncePerRequestFilter {
             }
         }
 
+        // Continue the filter chain
         filterChain.doFilter(request, response);
     }
 }

@@ -17,10 +17,10 @@ public class ManagerDetailsService implements UserDetailsService {
     @Autowired
     private ManagerRepository managerRepository;
 
+    // Process to check if manager exists in database and give it the role of manager
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Manager> managerRes = managerRepository.findByUsername(username);
-        System.out.println(managerRes);
         if(managerRes.isEmpty())
             throw new UsernameNotFoundException("Could not findUser with username = " + username + ".");
         Manager manager = managerRes.get();

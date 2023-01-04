@@ -2,6 +2,9 @@ package com.api.auth.model;
 
 import lombok.*;
 
+/**
+ * Manager login credentials model
+ */
 @Getter
 @Setter
 @AllArgsConstructor

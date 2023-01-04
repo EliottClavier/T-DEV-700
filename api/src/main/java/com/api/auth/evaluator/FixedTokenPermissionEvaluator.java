@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
+/**
+ * Evaluates the permission of a user to access a TPE register route.
+ * It depends if the http request contains a valid fixed token in the correct http header.
+ */
 @Component
 public class FixedTokenPermissionEvaluator implements PermissionEvaluator {
 
