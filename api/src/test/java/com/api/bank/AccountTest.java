@@ -9,6 +9,7 @@ import com.api.bank.model.enums.SocialReasonStatus;
 import com.api.bank.service.AccountService;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -34,6 +35,7 @@ public class AccountTest implements BeforeAllCallback, ExtensionContext.Store.Cl
     public final static UUID ACCOUNT_ID = UUID.fromString("19ce4597-642a-432c-aac1-e26dcfaaa8d9");
 
     @Test
+    @Order(1)
     void testCreateOneAccount() {
 
         //Arrange
@@ -58,8 +60,9 @@ public class AccountTest implements BeforeAllCallback, ExtensionContext.Store.Cl
     }
 
     @Test
-    @After("testCreateOneAccount")
-    @Before("DeleteOneAccount")
+    @After("testCreateOneAccount()")
+    @Before("testDelete()")
+    @Order(2)
     void testUpdate() {
         //Arrange
         var account = ((Account) accountService.get(ACCOUNT_ID.toString()).getData());
@@ -80,8 +83,9 @@ public class AccountTest implements BeforeAllCallback, ExtensionContext.Store.Cl
 
     }
 
-    @Test
-    @After("testUpdate")
+//    @Test
+//    @After("testUpdate()")
+//    @Order(3)
     void testDelete() {
         //Arrange
         ObjectResponse res;
@@ -122,7 +126,7 @@ public class AccountTest implements BeforeAllCallback, ExtensionContext.Store.Cl
         if (started) {
             started = false;
             var account = ((Account) accountService.get(ACCOUNT_ID.toString()).getData());
-//            accountService.delete(account);
+           accountService.delete(account);
         }
     }
 }

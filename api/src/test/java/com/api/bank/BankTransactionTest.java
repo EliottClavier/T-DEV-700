@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -92,15 +93,15 @@ public class BankTransactionTest implements BeforeAllCallback, ExtensionContext.
 
         assertNotNull(res1);
         assertEquals("Success", res1.getMessage());
-        assertTrue(res1.isValid());
+        assertEquals(HttpStatus.OK, res1.getStatus() );
 
         assertNotNull(res2);
         assertEquals("Success", res2.getMessage());
-        assertTrue(res2.isValid());
+        assertEquals(HttpStatus.OK, res2.getStatus() );
 
         assertNotNull(res3);
         assertEquals("Success", res3.getMessage());
-        assertTrue(res3.isValid());
+        assertEquals(HttpStatus.OK, res3.getStatus() );
     }
 
 
@@ -153,8 +154,8 @@ public class BankTransactionTest implements BeforeAllCallback, ExtensionContext.
         //Act
 
         var res = bankManager.shoppingTransaction(transaction);
-        afterDepositAccount = accountService.getAccountByOwnerName("test");
-        afterWithdrawAccount = accountService.getAccountByOwnerName("Gotham Bank");
+        afterDepositAccount = (Account) accountService.get(TestConstant.SHOP_ID.toString()).getData();
+        afterWithdrawAccount = (Account) accountService.get(TestConstant.CLIENT_ID.toString()).getData();
 
         //Assert
 
@@ -277,8 +278,8 @@ public class BankTransactionTest implements BeforeAllCallback, ExtensionContext.
     private void deleteAll() {
 
         qrCheckService.delete((QrCheck) qrCheckService.get(TestConstant.CHECK_ID).getData());
-        accountService.delete(individualAccount);
-        accountService.delete(shopAccount);
-        accountService.delete(bankAccount);
+        accountService.delete(accountService.getAccountByClientId(TestConstant.CLIENT_ID));
+        accountService.delete(accountService.getAccountByClientId(TestConstant.SHOP_ID));
+        accountService.delete(accountService.getAccountByClientId(TestConstant.BANK_ID));
     }
 }

@@ -30,6 +30,9 @@ public class IndividualRunner implements ApplicationRunner {
     @Value("${default.individual.lastname}")
     private String lastname;
 
+    @Value("001-043-191-039")
+    private String cardId;
+
     @Autowired
     public IndividualRunner(AccountService accountService) {
         this.accountService = accountService;
@@ -41,7 +44,7 @@ public class IndividualRunner implements ApplicationRunner {
         Account accountSearch = accountService.getAccountByClientId(UUID.fromString(id));
         if (accountSearch == null) {
             Client client = new Client(UUID.fromString(id), firstname, lastname, SocialReasonStatus.INDIVIDUAL);
-            Card card = new Card("001-043-191-039");
+            Card card = new Card(cardId);
             Account account = new Account(10000, client, card);
 
             accountService.add(account);
