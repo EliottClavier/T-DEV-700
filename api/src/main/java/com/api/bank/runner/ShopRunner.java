@@ -39,8 +39,9 @@ public class ShopRunner implements ApplicationRunner {
     // This is basically the shop account that will be used by the Shop application
     public void run(ApplicationArguments args) {
         Shop shop = new Shop(shopId, username, password);
-        shop.setWhitelisted(true);
+
         Shop shopRegisterResponse = shopService.registerShop(shop);
+        shopService.updateShopStatus(shopRegisterResponse.getId().toString(), true);
 
         Account accountSearch = accountService.getAccountByClientId(UUID.fromString(shopId));
         if (accountSearch == null) {

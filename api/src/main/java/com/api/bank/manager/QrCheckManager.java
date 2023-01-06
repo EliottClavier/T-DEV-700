@@ -50,14 +50,18 @@ public class QrCheckManager implements IQrCheckManager {
      * @throws BankTransactionException if the token is not valid or does not exist
      */
     @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
-    public void checkToken(QrCheckTransactionModel transaction) throws BankTransactionException {
+    public void controlAmountAndToken(QrCheckTransactionModel transaction) throws BankTransactionException {
         if (transaction.getToken().isEmpty()) {
             throw new BankTransactionException(TransactionStatus.TOKEN_EMPTY_ERROR, transaction.getOperationId(), "Token is empty");
         }
         if (checkService.existsCheckByCheckToken(transaction.getToken())) {
             throw new BankTransactionException(TransactionStatus.TOKEN_ERROR, transaction.getOperationId(), "Token is already used");
         }
+        if (transaction.getAmount() <= 0) {
+            throw new BankTransactionException(TransactionStatus.AMOUNT_ERROR, transaction.getOperationId(), "Amount is not valid");
+        }
     }
+
 
     /**
      * Method that return the information of a QrCheck

@@ -1,10 +1,13 @@
 package com.api.bank.runner;
 
+
 import com.api.bank.model.entity.Account;
 import com.api.bank.model.entity.Card;
 import com.api.bank.model.entity.Client;
+import com.api.bank.model.entity.QrCheck;
 import com.api.bank.model.enums.SocialReasonStatus;
 import com.api.bank.service.AccountService;
+import com.api.bank.service.CheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -21,7 +24,7 @@ public class IndividualRunner implements ApplicationRunner {
 
     private final AccountService accountService;
 
-    @Value("${default.individual.id}")
+    @Value("${default.individual.account.id}")
     private String id;
 
     @Value("${default.individual.firstname}")
@@ -30,7 +33,7 @@ public class IndividualRunner implements ApplicationRunner {
     @Value("${default.individual.lastname}")
     private String lastname;
 
-    @Value("#{'${default.individual.card.id}' ?:'001-043-191-039'}")
+    @Value("${default.individual.card.id}")
     private String cardId;
 
     @Autowired
