@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.concurrent.*;
 
 /**
@@ -88,7 +89,8 @@ public class BankManager implements IBankManager {
             return result.get();
 
         } catch (ExecutionException | InterruptedException e) {
-            return new TransactionResult(getEnum(e.getCause().getMessage()), shoppingTransaction.getOperationId(), getMessage(e.getCause().getMessage()));
+
+            return new TransactionResult(getEnum(e.getCause().getMessage()), shoppingTransaction.getOperationId()  , getMessage(e.getCause().getMessage()));
         }
     }
 

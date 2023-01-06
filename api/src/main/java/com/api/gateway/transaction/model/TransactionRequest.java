@@ -8,6 +8,9 @@ import org.springframework.data.redis.core.RedisHash;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * TransactionRequest gathering all infos needed for TPE and Shop to build a full and accepted transaction request
+ */
 @Data
 @AllArgsConstructor
 @RedisHash(value = "TRANSACTION")

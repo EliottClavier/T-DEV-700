@@ -33,6 +33,9 @@ class RequestsClass {
   // Session ID of the websocket connection
   String _sessionId = "";
 
+  String get token => _token;
+  StompClient get client => _client;
+
   /* Connects to the server using a HTTP request and initiates the websocket connection
   If the connection is successful, the websocket connection is initiated and the total amount of the payment is set to the amount parameter 
   and the parent context is set to the context parameter of the function call */
@@ -48,7 +51,7 @@ class RequestsClass {
         totalAmount = amount;
         parentContext = context;
       } else {
-        if (response.statusCode == 403) {
+        if (response.statusCode == 401) {
           print("Error : ${response.statusCode} - ${response.body}");
           Navigator.pushNamed(context, Shop.pageName);
           showSnackBar(
@@ -119,7 +122,11 @@ class RequestsClass {
     return StompConfig.SockJS(
       url: "$HTTP_PROTOCOL://$_url/websocket-manager/secured/shop/socket",
       onConnect: onConnectCallback,
-      onWebSocketError: (dynamic error) => print(error.toString()),
+      onWebSocketError: (dynamic error) {
+        resetAttributes();
+        Navigator.pushNamed(parentContext, Shop.pageName);
+        showSnackBar(parentContext, "Le serveur a été redémarré", "error", 3);
+      },
       stompConnectHeaders: {'Authorization': "Bearer $_token"},
       webSocketConnectHeaders: {
         'Authorization': "Bearer $_token",
@@ -155,13 +162,13 @@ class RequestsClass {
         callback: (frame) {
           var response = Response.fromJson(jsonDecode(frame.body!));
           switch (response.type) {
-            case "TRANSACTION_DONE":
+            case "SUCCESS":
               paymentSended = true;
               resetAttributes();
               shop_articles = [];
               Navigator.pushNamed(parentContext, Validation.pageName);
               break;
-            case "TRANSACTION_ERROR":
+            case "FAILED":
               paymentSended = true;
               resetAttributes();
               Navigator.pushNamed(parentContext, Shop.pageName);
@@ -211,6 +218,7 @@ class RequestsClass {
                   parentContext, "La transaction a été annulée", "error", 3);
               break;
             default:
+              resetAttributes();
               Navigator.pushNamed(parentContext, Shop.pageName);
               showSnackBar(
                   parentContext, "Erreur lors de la transaction", "error", 3);

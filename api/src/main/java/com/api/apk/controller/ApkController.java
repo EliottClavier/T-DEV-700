@@ -1,4 +1,5 @@
 package com.api.apk.controller;
+import com.api.apk.service.ApkService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -18,44 +19,42 @@ import java.io.IOException;
 @RequestMapping(path = "/download")
 public class ApkController {
 
-    private HttpHeaders setHeadersApkRoute(File file, String filename) throws IOException {
-        FileSystemResource fileSystemResource = new FileSystemResource(file);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-        headers.setContentLength(fileSystemResource.contentLength());
-        headers.setContentDispositionFormData("attachment", filename + ".apk");
-        return headers;
+    private final ApkService apkService;
+
+    public ApkController(
+            ApkService apkService
+    ) {
+        this.apkService = apkService;
     }
 
-    public File getApkFile(String path) throws FileNotFoundException {
-        File file = new File(path);
-        if (!file.exists()) {
-            throw new FileNotFoundException("File not found.");
-        }
-        return file;
-    }
-
+    /**
+     * Route to download Shop app
+     *
+     * @return ResponseEntity with headers and .apk file
+     */
     @RequestMapping(path = "/shop.apk", method = RequestMethod.GET, produces = "application/apk")
     public ResponseEntity<InputStreamResource> getShopApk() throws IOException {
         try {
-            File file = getApkFile("/apks/shop.apk");
+            File file = apkService.getApkFile("/apks/shop.apk");
             InputStreamResource isResource = new InputStreamResource(new FileInputStream(file));
-            HttpHeaders headers = setHeadersApkRoute(file, "shop");
+            HttpHeaders headers = apkService.setHeadersApkRoute(file, "shop");
             return new ResponseEntity<>(isResource, headers, HttpStatus.OK);
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException("File not found.");
         }
     }
 
+    /**
+     * Route to download TPE app
+     *
+     * @return ResponseEntity with headers and .apk file
+     */
     @RequestMapping(path = "/tpe.apk", method = RequestMethod.GET, produces = "application/apk")
     public ResponseEntity<InputStreamResource> getTpeApk() throws IOException {
         try {
-            File file = getApkFile("/apks/tpe.apk");
+            File file = apkService.getApkFile("/apks/tpe.apk");
             InputStreamResource isResource = new InputStreamResource(new FileInputStream(file));
-            HttpHeaders headers = setHeadersApkRoute(file, "tpe");
+            HttpHeaders headers = apkService.setHeadersApkRoute(file, "tpe");
             return new ResponseEntity<>(isResource, headers, HttpStatus.OK);
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException("File not found.");

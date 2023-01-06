@@ -20,6 +20,12 @@ public class TpeManagerService {
     @Autowired
     private RedisTemplate<String, String> customRedisTemplate;
 
+    /**
+     * Used to add TPE to the Redis
+     *
+     * @param tpeManager the TPE to add
+     * @return a Message indicating the status of the operation
+     */
     public Message addTpeRedis(TpeManager tpeManager) {
         Message message = new Message("Processing", WebSocketStatus.SYNCHRONIZATION_ERROR);
         try {
@@ -44,6 +50,13 @@ public class TpeManagerService {
         return message;
     }
 
+    /**
+     * Method which wraps and calls the addTpeRedis method
+     *
+     * @param username  the username of the TPE
+     * @param sessionId the session id of the TPE
+     * @return a Message indicating the status of the operation
+     */
     public Message synchronizeTpeRedis(String username, String sessionId) {
         try {
             TpeManager tpeManager = new TpeManager(username, sessionId);
@@ -53,6 +66,12 @@ public class TpeManagerService {
         }
     }
 
+    /**
+     * Used to check if PaymentMethod exist in enum
+     *
+     * @param paymentMethod the payment method to check
+     * @return true if the PaymentMethod exist in enum, false otherwise
+     */
     public Boolean isValidPaymentMethod(String paymentMethod) {
         try {
             PaymentMethod.valueOf(paymentMethod);
@@ -62,6 +81,12 @@ public class TpeManagerService {
         }
     }
 
+    /**
+     * Used to retrieve a transaction request by TPE session ID
+     *
+     * @param sessionId the session ID of the TPE
+     * @return the transaction request, null if no transaction request found
+     */
     public TransactionRequest retrieveTransactionRequestByTpeSessionId(String sessionId) {
         // For each transaction return value
         for (String key : customRedisTemplate.keys(HASH_KEY_NAME_TRANSACTION + ":*")) {
@@ -73,26 +98,58 @@ public class TpeManagerService {
         return null;
     }
 
+    /**
+     * Method to check if a TPE is available for transaction in Redis
+     *
+     * @param tpeUsername the username of the TPE
+     * @return true if the TPE is available for transaction, false otherwise
+     */
     public Boolean isTpeRedisAvailable(String tpeUsername) {
         return this.customRedisTemplate.opsForHash().hasKey(HASH_KEY_NAME_TPE, tpeUsername);
     }
 
+    /**
+     * Used to delete TPE from the Redis by its username
+     *
+     * @param tpeUsername the username of the TPE to delete
+     */
     public void deleteTpeRedisByTpeUsername(String tpeUsername) {
         this.customRedisTemplate.opsForHash().delete(HASH_KEY_NAME_TPE, tpeUsername);
     }
 
+    /**
+     * Used to delete TPE from the Redis by the transaction ID linked to it
+     *
+     * @param transactionId the transaction ID linked to the TPE to delete
+     */
     public void deleteTransactionByTransactionId(String transactionId) {
         customRedisTemplate.delete(HASH_KEY_NAME_TRANSACTION + ":" + transactionId);
     }
 
+    /**
+     * Used to retrieve all TPEs available from the Redis
+     *
+     * @return List of TPEs available, can be empty
+     */
     public List<Object> getAllTpeRedis() {
         return customRedisTemplate.opsForHash().values(HASH_KEY_NAME_TPE);
     }
 
+    /**
+     * Used to retrieve a random TPE which is available for transaction
+     *
+     * @return a random TPE available, null if no TPE available
+     */
     public Object getRandomTpeRedisUsername() {
         return customRedisTemplate.opsForHash().randomKey(HASH_KEY_NAME_TPE);
     }
 
+    /**
+     * Used to retrieve TPE session ID by its username from Redis
+     *
+     * @param tpeUsername the username of the TPE
+     * @return the session ID of the TPE, null if no TPE found
+     */
     public Object getTpeRedisSessionIdByUsername(String tpeUsername) {
         return customRedisTemplate.opsForHash().get(HASH_KEY_NAME_TPE, tpeUsername);
     }

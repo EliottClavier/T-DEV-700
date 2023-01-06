@@ -41,7 +41,7 @@ public class GenericService<T extends Base> {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = BankTransactionException.class)
+
     public ObjectResponse delete(T entity) {
         try {
             repository.delete(entity);
@@ -105,6 +105,15 @@ public class GenericService<T extends Base> {
     public boolean exist(String id){
         try {
             return repository.existsById(UUID.fromString(id));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean persist(){
+        try {
+            repository.flush();
+            return true;
         } catch (Exception e) {
             return false;
         }

@@ -1,0 +1,69 @@
+version: '3'
+
+services:
+
+  api:
+    container_name: api
+    build: 
+      context: ./api
+      dockerfile: Dockerfile.test
+    restart: "no"
+    env_file:
+      - ./env/database.env
+      - ./env/redis.env
+      - ./env/api.env
+      - ./env/tpe.env
+      - ./env/shop.env
+      - ./env/mail.env
+    ports:
+      - ${API_PORT}:${API_PORT}
+    volumes:
+      - ./api:/api
+    networks:
+      - back-net
+    depends_on:
+      - database
+      - redis
+      - mailhog
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    restart: "no"
+    command: redis-server --save 20 1 --requirepass ${REDIS_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    networks:
+      - back-net
+
+  database:
+    container_name: database
+    image: mariadb:latest
+    restart: "no"
+    env_file:
+      - ./env/database.env
+    ports:
+      - ${MARIADB_PORT}:${MARIADB_PORT}
+    networks:
+      - back-net
+  
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    restart: "no"
+    environment:
+      MH_AUTH_FILE: /mailhog.auth
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - ./env/mailhog.auth:/mailhog.auth:ro
+    networks:
+      - back-net
+
+volumes:
+  api:
+  mailhog.auth:
+
+networks:
+  back-net:

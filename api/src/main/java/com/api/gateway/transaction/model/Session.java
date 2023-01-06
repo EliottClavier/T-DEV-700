@@ -5,6 +5,9 @@ import lombok.*;
 import javax.persistence.Id;
 import java.io.Serializable;
 
+/**
+ * Session class used to manipulate ones session data (either Shop or TPE)
+ */
 @Data
 @AllArgsConstructor
 public class Session implements Serializable {

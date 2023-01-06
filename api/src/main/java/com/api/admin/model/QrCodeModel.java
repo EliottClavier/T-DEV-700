@@ -5,6 +5,9 @@ import lombok.Setter;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * QrCodeModel class to create a new QrCode
+ */
 @Getter
 @Setter
 public class QrCodeModel {

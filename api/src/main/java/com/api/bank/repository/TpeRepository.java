@@ -10,6 +10,7 @@ import java.util.Optional;
 @Transactional
 public interface TpeRepository extends GenericRepository<Tpe> {
     Optional<Tpe> findByAndroidId(String id);
-
     Boolean existsByAndroidId(String id);
+    @Transactional
+    void deleteByAndroidId(String id);
 }

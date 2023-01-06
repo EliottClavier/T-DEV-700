@@ -1,9 +1,10 @@
-$("#submit").click(function() {
-
+$(document).ready(function() {
     if (localStorage.getItem("token")) {
         location.replace(window.location.origin + "/" + window.location.pathname.split( '/' )[1] + "/dashboard");
     }
+});
 
+$("#submit").click(function() {
     const username = $("#username").val();
     const password = $("#password").val();
 

@@ -3,7 +3,11 @@ package com.api.admin.controller;
 import com.api.admin.model.QrCodeModel;
 import com.api.bank.manager.IBankManager;
 import com.api.bank.model.enums.PaymentMethod;
+import com.api.bank.model.enums.TransactionStatus;
+import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.QrCheckTransactionModel;
+import com.api.bank.model.transaction.TransactionResult;
+import com.api.gateway.transaction.model.TransactionRequest;
 import com.api.tools.crypting.CryptingService;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -46,34 +50,54 @@ public class QrCodeController {
         this.bankManager = bankManager;
     }
 
+    /**
+     * Route to generate a Qr-code (image and database entry)
+     *
+     * @param qrCode data to generate the Qr-code
+     * @return ResponseEntity with headers and .png file, or error message in case of exception
+     */
     @RequestMapping(value = {"/", ""}, method = RequestMethod.POST)
     public ResponseEntity createQrcode(@RequestBody QrCodeModel qrCode) {
         try {
             // Create the QR code (the image)
             String token = qrCode.getAmount() + ":" + qrCode.getClientId() + ":" + new Date().getTime();
             String encryptedString = cryptingService.encrypt(token, key);
-            String qrCodeUuid = generateQrcode(encryptedString);
 
-            if (qrCodeUuid == null) {
-                throw new Exception("Error while generating the QR code");
-            } else {
-                // Execute the transaction between Bank and the client asking for the QR code
-                QrCheckTransactionModel qrCheckTransactionModel = new QrCheckTransactionModel(
-                        null, encryptedString, qrCode.getAmount(), qrCode.getClientId(), PaymentMethod.TRANSFER
-                );
-                bankManager.buyCheckTransaction(qrCheckTransactionModel);
+            // Execute the transaction between Bank and the client asking for the QR code
+            QrCheckTransactionModel qrCheckTransactionModel = new QrCheckTransactionModel(
+                    null, encryptedString, qrCode.getAmount(), qrCode.getClientId(), PaymentMethod.TRANSFER
+            );
 
-                // Build JSON Response with message and qrCodeUuid
-                Map<String, String> map = new HashMap<>();
-                map.put("message", "QrCode created");
-                map.put("uuid", qrCodeUuid);
-                return ResponseEntity.ok().body(map);
+            try {
+                TransactionResult transactionResult = bankManager.buyCheckTransaction(qrCheckTransactionModel);
+                if (transactionResult.getTransactionStatus() == TransactionStatus.SUCCESS) {
+                    String qrCodeUuid = generateQrcode(encryptedString);
+                    if (qrCodeUuid != null) {
+                        // Build JSON Response with message and qrCodeUuid
+                        Map<String, String> map = new HashMap<>();
+                        map.put("message", "QrCode created");
+                        map.put("uuid", qrCodeUuid);
+                        return ResponseEntity.ok().body(map);
+                    } else {
+                        throw new Exception("Error while generating the QR code");
+                    }
+                } else {
+                    throw new Exception(transactionResult.getMessage());
+                }
+            } catch (BankTransactionException e) {
+                throw new Exception("Error while creating the QR code");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(e);
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
+    /**
+     * Method which calls QR Code generator and prepare it to be placed in the file system
+     *
+     * @param check
+     * @return
+     */
     public String generateQrcode(String check) {
         try {
             UUID uuid = UUID.randomUUID();
@@ -90,13 +114,30 @@ public class QrCodeController {
         }
     }
 
+    /**
+     * Method which generates the QR Code
+     *
+     * @param data the text to be encoded
+     * @param path the path where the QR Code will be saved
+     * @param charset the charset to be used
+     * @param h the height of the QR Code
+     * @param w the width of the QR Code
+     * @throws WriterException
+     * @throws IOException
+     */
     public static void qrcode(String data, String path, String charset, int h, int w) throws WriterException, IOException
     {
         BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset), BarcodeFormat.QR_CODE, w, h);
         MatrixToImageWriter.writeToFile(matrix, path.substring(path.lastIndexOf('.') + 1), new File(path));
     }
 
-    //Return the qrCode in the navigator
+    /**
+     * Return the Qr-code image
+     *
+     * @param qrCodeUuid the uuid of the Qr-code
+     * @return ResponseEntity with headers and .png file, or error message in case of exception
+     * @throws IOException
+     */
     @RequestMapping(path = "/{qrCodeUuid}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getImageWithMediaType(
             @PathVariable String qrCodeUuid

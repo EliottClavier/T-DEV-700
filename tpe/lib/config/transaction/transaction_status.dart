@@ -6,6 +6,7 @@ import 'package:tpe/config/transaction/transaction_reset.dart';
 
 TransactionService transactionService = TransactionService();
 
+// Handle websocket transaction status messages
 String handleTransactionStatus(
     BuildContext context, Map<String, dynamic> body) {
   transactionService = TransactionService();

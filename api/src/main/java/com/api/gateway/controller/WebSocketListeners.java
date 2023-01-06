@@ -28,6 +28,16 @@ public class WebSocketListeners {
     @Autowired
     private TransactionRequestService transactionRequestService;
 
+    /**
+     * Websocket event listener for when a user disconnects
+     * If the TPE disconnects, it sends message to the Shop on /user/queue/shop/transaction-status/{sessionId}
+     * If the Shop disconnects, it sends message to the TPE  on /user/queue/tpe/synchronization-status/{sessionId}
+     *
+     * The sessionId retrieved by @param event is the session id of the user that disconnected
+     * That's why this method also retrieves the sessionId of the other user impacted by the transaction
+     *
+     * @param event the event sent by the websocket
+     */
     @EventListener
     public void onSocketDisconnected(SessionDisconnectEvent event) {
         StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());

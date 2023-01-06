@@ -30,7 +30,7 @@ public class IndividualRunner implements ApplicationRunner {
     @Value("${default.individual.lastname}")
     private String lastname;
 
-    @Value("001-043-191-039")
+    @Value("#{'${default.individual.card.id}' ?:'001-043-191-039'}")
     private String cardId;
 
     @Autowired

@@ -18,6 +18,7 @@ public class ShopDetailsService implements UserDetailsService {
     @Autowired
     private ShopRepository shopRepository;
 
+    // Process to check if shop exists in database, is whitelisted and give it the role of shop
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException, AccessDeniedException {
         Optional<Shop> shopRes = shopRepository.findByName(name);
