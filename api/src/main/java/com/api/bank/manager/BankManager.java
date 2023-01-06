@@ -116,7 +116,7 @@ public class BankManager implements IBankManager {
                 try {
 
                     var bankTransaction = createBankTransactionFrom(qrCheckTransaction);
-                    qrCheckManager.checkToken(qrCheckTransaction);
+                    qrCheckManager.controlAmountAndToken(qrCheckTransaction);
                     bankTransactionManager.executeTransaction(bankTransaction);
 
                     return qrCheckManager.createQrCheck(qrCheckTransaction);
@@ -281,6 +281,7 @@ public class BankManager implements IBankManager {
                 case INSUFFICIENT_FUNDS_ERROR -> "Account's insufficient funds";
                 case ACCOUNT_ERROR -> "Account not found";
                 case EMPTY_TRANSACTION_ERROR -> "Empty transaction error";
+                case AMOUNT_ERROR -> "Amount is not valid";
                 default -> "";
             };
         } catch (IllegalArgumentException e) {

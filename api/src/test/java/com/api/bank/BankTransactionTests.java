@@ -37,21 +37,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BankTransactionTests {
-    public static boolean started = false;
+
     private final static String SUCCESS = "Success";
     @Autowired
     IBankManager bankManager;
-
     @Autowired
     AccountService accountService;
-
     @Autowired
     CheckService qrCheckService;
 
-
-//    Account individualAccount;
-//    Account shopAccount;
-//    Account bankAccount;
 
     @Test
     @BeforeAll
@@ -61,7 +55,6 @@ public class BankTransactionTests {
         ObjectResponse res1 = null;
         ObjectResponse res2 = null;
         ObjectResponse res3 = null;
-
 
         var individualClient = new Client(TestConst.CLIENT_ID, TestConst.CLIENT_USERNAME, TestConst.CLIENT_USERNAME, SocialReasonStatus.INDIVIDUAL);
         var shopClient = new Client(TestConst.SHOP_ID, TestConst.SHOP_USERNAME, SocialReasonStatus.COMPANY);
@@ -255,26 +248,13 @@ public class BankTransactionTests {
 
     }
 
-//    @Override
-//    public void beforeAll(ExtensionContext context) throws Exception {
-//        if (!started) {
-//            started = true;
-//            testInitAccounts();
-//        }
-//    }
-
-    //    @Override
-    public void close() throws Throwable {
-        started = false;
-//        deleteAll();
-
-    }
-
-    private void deleteAll() {
+    @AfterAll
+    public void deleteAll() {
 
         qrCheckService.delete((QrCheck) qrCheckService.get(TestConst.CHECK_ID).getData());
         accountService.delete(accountService.getAccountByClientId(TestConst.CLIENT_ID));
         accountService.delete(accountService.getAccountByClientId(TestConst.SHOP_ID));
         accountService.delete(accountService.getAccountByClientId(TestConst.BANK_ID));
+
     }
 }
