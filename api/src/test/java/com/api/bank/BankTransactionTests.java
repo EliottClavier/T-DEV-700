@@ -203,6 +203,8 @@ public class BankTransactionTests {
         Account afterDepositAccountNullWithdrawAccount = null;
         Account afterDepositAccountNullDepositAccount = null;
 
+        ShoppingTransactionModel transactionAmountInvalid = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", TestConst.CARD_ID, -10, PaymentMethod.CARD);
+
         ShoppingTransactionModel transactionCardNull = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", "", 10, PaymentMethod.CARD);
         ShoppingTransactionModel transactionCardExpired = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", TestConst.CARD_ID, 10, PaymentMethod.CARD);
 
@@ -212,6 +214,8 @@ public class BankTransactionTests {
         ShoppingTransactionModel transactionDepositAccountNull = new ShoppingTransactionModel(UUID.randomUUID().toString(), "dede", "test", TestConst.CARD_ID, 10, PaymentMethod.CARD);
 
         //Act
+        var resAmountInvalid = bankManager.shoppingTransaction(transactionAmountInvalid);
+
         var resTransactionCardNull = bankManager.shoppingTransaction(transactionCardNull);
 
         individualAccount.getCard().setExpirationDate(Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2020-02-13T18:51:09.840Z"))));
@@ -231,6 +235,7 @@ public class BankTransactionTests {
         afterDepositAccountNullDepositAccount = accountService.getAccountByClientId(TestConst.SHOP_ID);
 
         //Assert
+        assertEquals(resAmountInvalid.getTransactionStatus(), TransactionStatus.AMOUNT_ERROR);
 
         assertEquals(resTransactionCardNull.getTransactionStatus(), TransactionStatus.CARD_ERROR);
 
