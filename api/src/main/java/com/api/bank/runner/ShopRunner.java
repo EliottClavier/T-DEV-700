@@ -11,16 +11,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+
 import java.util.UUID;
 
 @Component
 public class ShopRunner implements ApplicationRunner {
 
-    @Autowired
-    private ShopService shopService;
+    private final ShopService shopService;
+    private final AccountService accountService;
 
     @Autowired
-    private AccountService accountService;
+    public ShopRunner(AccountService accountService, ShopService shopService) {
+        this.accountService = accountService;
+        this.shopService = shopService;
+    }
 
     @Value("${default.shop.username}")
     private String username;
@@ -28,14 +32,14 @@ public class ShopRunner implements ApplicationRunner {
     @Value("${default.shop.password}")
     private String password;
 
-    // Create a default shop account following environment variables
-    // This is basically the shop account that will be used by the Shop application
     @Value("${default.shop.client.id}")
     private String shopId;
 
-
+    // Create a default shop account following environment variables
+    // This is basically the shop account that will be used by the Shop application
     public void run(ApplicationArguments args) {
         Shop shop = new Shop(shopId, username, password);
+        shop.setWhitelisted(true);
         Shop shopRegisterResponse = shopService.registerShop(shop);
 
         Account accountSearch = accountService.getAccountByClientId(UUID.fromString(shopId));
