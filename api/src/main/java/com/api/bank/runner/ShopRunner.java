@@ -53,7 +53,7 @@ public class ShopRunner implements ApplicationRunner {
 
             if (accountSearch == null) {
                 Client client = new Client(shop.getId(), shop.getName(), SocialReasonStatus.COMPANY);
-                Account account = new Account(1500, client);
+                Account account = new Account(3000, client);
                 accountService.add(account);
             }
         } catch (Exception e) {
