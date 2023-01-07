@@ -33,7 +33,7 @@ public class QrCheckRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
 
-
+            // Use for demonstration only
             boolean isQrCheckExist =( (List<QrCheck>)  qrCheckService.getAll().getData()).isEmpty();
             if (isQrCheckExist) {
                 QrCheck qrCheck = new QrCheck(1500, token);
