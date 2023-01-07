@@ -32,6 +32,11 @@ public class Card extends Base {
         this.cardId = cardId;
         this.expirationDate = expirationDate;
     }
+    public Card(String cardId) {
+        super();
+        this.cardId = cardId;
+        init();
+    }
 
     private void init() {
         if (this.cardId == null) {

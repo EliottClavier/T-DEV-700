@@ -28,10 +28,17 @@ public class QrCheck extends Base {
         init();
     }
 
-    public QrCheck(double soldAmount, String checkToken) {
+    public QrCheck(double amount, String token) {
         super();
-        this.soldAmount = soldAmount;
-        this.checkToken = checkToken;
+        this.soldAmount = amount;
+        this.checkToken = token;
+        init();
+    }
+
+    public QrCheck(double i, String token, String applicantAccountId) {
+        super();
+        this.soldAmount = i;
+        this.checkToken = token;
         init();
     }
 
