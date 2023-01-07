@@ -33,22 +33,32 @@ public class ShopRunner implements ApplicationRunner {
     @Value("${default.shop.password}")
     private String password;
 
-    @Value("${default.shop.client.id}")
-    private String shopId;
-
     // Create a default shop account following environment variables
     // This is basically the shop account that will be used by the Shop application
     public void run(ApplicationArguments args) {
 
-        Account accountSearch = accountService.getAccountByClientId(UUID.fromString(shopId));
-        if (accountSearch == null) {
+        try {
+            var shop = shopService.getShopByName(username);
 
-            Shop shop = new Shop(shopId, username, password);
-            Shop shopRegisterResponse = shopService.registerShop(shop);
-            shopService.updateShopStatus(shopRegisterResponse.getId().toString(), true);
-            Client client = new Client(shop.getId(), shop.getName(), SocialReasonStatus.COMPANY);
-            Account account = new Account(1500, client);
-            accountService.add(account);
+            if (shop == null) {
+                shop = new Shop(UUID.randomUUID().toString(), username, password);
+                shopService.registerShop(shop);
+            }
+
+            if (!shop.getWhitelisted()) {
+                shopService.updateShopStatus(shop.getId().toString(), true);
+            }
+
+            Account accountSearch = accountService.getAccountByOwnerName(username);
+
+            if (accountSearch == null) {
+                Client client = new Client(shop.getId(), shop.getName(), SocialReasonStatus.COMPANY);
+                Account account = new Account(1500, client);
+                accountService.add(account);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
+

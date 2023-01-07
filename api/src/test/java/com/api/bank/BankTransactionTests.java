@@ -31,7 +31,8 @@ import java.util.Date;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest()
 @ExtendWith(SpringExtension.class)
@@ -101,7 +102,7 @@ public class BankTransactionTests {
     @Test
     void testBuyQrCode() {
         //Arrange
-        var originalBankSold = ((Account)accountService.get(BankConstants.BANK_ID).getData()).getSold();
+        var originalBankSold = ((Account) accountService.get(BankConstants.BANK_ID).getData()).getSold();
         var originalClientSold = accountService.getAccountByClientId(TestConst.CLIENT_ID).getSold();
 
         Account bankAccountAfter;
@@ -117,7 +118,7 @@ public class BankTransactionTests {
 
         //Act
         var res = bankManager.buyCheckTransaction(transaction);
-        bankAccountAfter = ((Account)accountService.get(BankConstants.BANK_ID).getData());
+        bankAccountAfter = ((Account) accountService.get(BankConstants.BANK_ID).getData());
         clientAccountAfter = accountService.getAccountByClientId(TestConst.CLIENT_ID);
         var check = qrCheckService.getCheckByCheckToken(TestConst.CHECK_ID);
 
@@ -134,7 +135,7 @@ public class BankTransactionTests {
     }
 
     @Test
-    void shoppingTransactionByCard() {
+    void testShoppingTransactionByCard() {
 
         //Arrange
         double originalDepositSold = accountService.getAccountByClientId(TestConst.SHOP_ID).getSold();
@@ -157,7 +158,7 @@ public class BankTransactionTests {
     }
 
     @Test
-    void shoppingTransactionByQrCheck() {
+    void testShoppingTransactionByQrCheck() {
 
         //Arrange
         double originalDepositSold = accountService.getAccountByClientId(TestConst.SHOP_ID).getSold();
@@ -183,69 +184,96 @@ public class BankTransactionTests {
 
         //Assert
         assertEquals(res.getTransactionStatus(), TransactionStatus.SUCCESS);
-        assertEquals(0, actualQrCheckSold );
+        assertEquals(0, actualQrCheckSold);
         assertEquals((originalDepositSold + 10d), actualDepositSold);
         assertEquals((originalWithdrawSold - 10d), actualWithdrawSold);
     }
 
     @Test
-    @AfterAll
-    void shoppingCardTransactionFailed() {
+    void testShoppingAmountInvalid() {
         //Arrange
+        ShoppingTransactionModel transactionAmountInvalid = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", TestConst.CARD_ID, -10, PaymentMethod.CARD);
+        //Act
+        var resAmountInvalid = bankManager.shoppingTransaction(transactionAmountInvalid);
+        //Assert
+        assertEquals(resAmountInvalid.getTransactionStatus(), TransactionStatus.AMOUNT_ERROR);
+    }
 
+    @Test
+    void testShoppingCardNull() {
+        //Arrange
+        ShoppingTransactionModel transactionCardNull = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", "", 10, PaymentMethod.CARD);
+        //Act
+        var resTransactionCardNull = bankManager.shoppingTransaction(transactionCardNull);
+
+        //Assert
+        assertEquals(resTransactionCardNull.getTransactionStatus(), TransactionStatus.CARD_ERROR);
+    }
+
+    @Test
+    void testShoppingCardExpired() {
+        //Arrange
+        Account individualAccount = accountService.getAccountByClientId(TestConst.CLIENT_ID);
+        ShoppingTransactionModel transactionCardExpired = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", TestConst.CARD_ID, 10, PaymentMethod.CARD);
+
+        individualAccount.getCard().setExpirationDate(Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2020-02-13T18:51:09.840Z"))));
+        accountService.update(individualAccount);
+        //Act
+        var resTransactionCardExpired = bankManager.shoppingTransaction(transactionCardExpired);
+        //Assert
+        assertEquals(resTransactionCardExpired.getTransactionStatus(), TransactionStatus.VALIDITY_DATE_ERROR);
+        //Finally
+        individualAccount.getCard().setExpirationDate(Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2050-02-13T18:51:09.840Z"))));
+        accountService.update(individualAccount);
+    }
+
+    @Test
+    void testShoppingWithdrawalAccountNull() {
+        //Arrange
+        ShoppingTransactionModel transactionWithdrawalAccountNull = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", "notAValidCardId", 10, PaymentMethod.CARD);
+        //Act
+        var resTransactionWithdrawalAccountNull = bankManager.shoppingTransaction(transactionWithdrawalAccountNull);
+        //Assert
+        assertThat(resTransactionWithdrawalAccountNull.getTransactionStatus(), Matchers.either(Matchers.is(TransactionStatus.ACCOUNT_ERROR)).or(Matchers.is(TransactionStatus.BANK_ERROR)));
+    }
+
+    @Test
+    void testShoppingNotEnoughMoney() {
         double originalDepositSold = accountService.getAccountByClientId(TestConst.SHOP_ID).getSold();
         double originalWithdrawSold = accountService.getAccountByClientId(TestConst.CLIENT_ID).getSold();
 
-        Account individualAccount = accountService.getAccountByClientId(TestConst.CLIENT_ID);
-
         Account afterWithdrawNotEnoughMoney = null;
         Account afterDepositNotEnoughMoney = null;
+
+        //Arrange
+        ShoppingTransactionModel transactionNotEnoughMoney = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", TestConst.CARD_ID, 1000000000, PaymentMethod.CARD);
+        //Act
+        var resTransactionNotEnoughMoney = bankManager.shoppingTransaction(transactionNotEnoughMoney);
+        afterWithdrawNotEnoughMoney = accountService.getAccountByClientId(TestConst.CLIENT_ID);
+        afterDepositNotEnoughMoney = accountService.getAccountByClientId(TestConst.SHOP_ID);
+        //Assert
+        assertEquals(resTransactionNotEnoughMoney.getTransactionStatus(), TransactionStatus.INSUFFICIENT_FUNDS_ERROR);
+        assertEquals(afterWithdrawNotEnoughMoney.getSold(), originalWithdrawSold);
+        assertEquals(afterDepositNotEnoughMoney.getSold(), originalDepositSold);
+    }
+
+    @Test
+    void testShoppingDepositAccountNull() {
+        //Arrange
+        double originalDepositSold = accountService.getAccountByClientId(TestConst.SHOP_ID).getSold();
+        double originalWithdrawSold = accountService.getAccountByClientId(TestConst.CLIENT_ID).getSold();
+
         Account afterDepositAccountNullWithdrawAccount = null;
         Account afterDepositAccountNullDepositAccount = null;
-
-        ShoppingTransactionModel transactionAmountInvalid = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", TestConst.CARD_ID, -10, PaymentMethod.CARD);
-
-        ShoppingTransactionModel transactionCardNull = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", "", 10, PaymentMethod.CARD);
-        ShoppingTransactionModel transactionCardExpired = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", TestConst.CARD_ID, 10, PaymentMethod.CARD);
-
-        ShoppingTransactionModel transactionWithdrawalAccountNull = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", "notAValidCardId", 10, PaymentMethod.CARD);
-        ShoppingTransactionModel transactionNotEnoughMoney = new ShoppingTransactionModel(UUID.randomUUID().toString(), TestConst.SHOP_USERNAME, "test", TestConst.CARD_ID, 1000000000, PaymentMethod.CARD);
 
         ShoppingTransactionModel transactionDepositAccountNull = new ShoppingTransactionModel(UUID.randomUUID().toString(), "dede", "test", TestConst.CARD_ID, 10, PaymentMethod.CARD);
 
         //Act
-        var resAmountInvalid = bankManager.shoppingTransaction(transactionAmountInvalid);
-
-        var resTransactionCardNull = bankManager.shoppingTransaction(transactionCardNull);
-
-        individualAccount.getCard().setExpirationDate(Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2020-02-13T18:51:09.840Z"))));
-        accountService.update(individualAccount);
-        var resTransactionCardExpired = bankManager.shoppingTransaction(transactionCardExpired);
-        individualAccount.getCard().setExpirationDate(Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2050-02-13T18:51:09.840Z"))));
-        accountService.update(individualAccount);
-
-        var resTransactionWithdrawalAccountNull = bankManager.shoppingTransaction(transactionWithdrawalAccountNull);
-
-        var resTransactionNotEnoughMoney = bankManager.shoppingTransaction(transactionNotEnoughMoney);
-        afterWithdrawNotEnoughMoney = accountService.getAccountByClientId(TestConst.CLIENT_ID);
-        afterDepositNotEnoughMoney = accountService.getAccountByClientId(TestConst.SHOP_ID);
-
         var resTransactionDepositAccountNull = bankManager.shoppingTransaction(transactionDepositAccountNull);
         afterDepositAccountNullWithdrawAccount = accountService.getAccountByClientId(TestConst.CLIENT_ID);
         afterDepositAccountNullDepositAccount = accountService.getAccountByClientId(TestConst.SHOP_ID);
 
         //Assert
-        assertEquals(resAmountInvalid.getTransactionStatus(), TransactionStatus.AMOUNT_ERROR);
-
-        assertEquals(resTransactionCardNull.getTransactionStatus(), TransactionStatus.CARD_ERROR);
-
-        assertEquals(resTransactionCardExpired.getTransactionStatus(), TransactionStatus.VALIDITY_DATE_ERROR);
-
-        assertThat(resTransactionWithdrawalAccountNull.getTransactionStatus(), Matchers.either(Matchers.is(TransactionStatus.ACCOUNT_ERROR)).or(Matchers.is(TransactionStatus.BANK_ERROR)));
-
-        assertEquals(resTransactionNotEnoughMoney.getTransactionStatus(), TransactionStatus.INSUFFICIENT_FUNDS_ERROR);
-        assertEquals(afterWithdrawNotEnoughMoney.getSold(), originalWithdrawSold);
-        assertEquals(afterDepositNotEnoughMoney.getSold(), originalDepositSold);
 
         assertThat(resTransactionDepositAccountNull.getTransactionStatus(), Matchers.either(Matchers.is(TransactionStatus.ACCOUNT_ERROR)).or(Matchers.is(TransactionStatus.BANK_ERROR)));
         assertEquals(afterDepositAccountNullWithdrawAccount.getSold(), originalWithdrawSold);
