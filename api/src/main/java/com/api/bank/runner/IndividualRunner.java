@@ -24,9 +24,6 @@ public class IndividualRunner implements ApplicationRunner {
 
     private final AccountService accountService;
 
-    @Value("${default.individual.account.id}")
-    private String id;
-
     @Value("${default.individual.firstname}")
     private String firstname;
 
@@ -44,9 +41,9 @@ public class IndividualRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
 
-        Account accountSearch = accountService.getAccountByClientId(UUID.fromString(id));
+        Account accountSearch = accountService.getAccountByCardId(cardId);
         if (accountSearch == null) {
-            Client client = new Client(UUID.fromString(id), firstname, lastname, SocialReasonStatus.INDIVIDUAL);
+            Client client = new Client(UUID.randomUUID(), firstname, lastname, SocialReasonStatus.INDIVIDUAL);
             Card card = new Card(cardId);
             Account account = new Account(10000, client, card);
 
