@@ -1,5 +1,6 @@
 package com.api.bank.runner;
 
+        import com.api.admin.controller.QrCodeController;
         import com.api.bank.model.entity.QrCheck;
         import com.api.bank.service.CheckService;
         import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ package com.api.bank.runner;
         import org.springframework.boot.ApplicationArguments;
         import org.springframework.boot.ApplicationRunner;
         import org.springframework.stereotype.Component;
+        import java.util.List;
 
 /**
  * This class is used to create a default QrCheck account
@@ -21,20 +23,22 @@ public class QrCheckRunner implements ApplicationRunner {
 
     @Value("${default.qrcheck.token}")
     private String token;
-
+    private final QrCodeController qrCodeController  ;
     @Autowired
-    public QrCheckRunner(CheckService qrCheckService) {
+    public QrCheckRunner(QrCodeController qrCodeController, CheckService qrCheckService) {
+        this.qrCodeController = qrCodeController;
         this.qrCheckService = qrCheckService;
     }
 
     @Override
     public void run(ApplicationArguments args) {
 
-        QrCheck qrCheckSerach = qrCheckService.getCheckByCheckToken(token);
-        if (qrCheckSerach == null) {
-            QrCheck qrCheck = new QrCheck(500, token, applicantAccountId);
-            qrCheckService.add(qrCheck);
+
+            boolean isQrCheckExist =( (List<QrCheck>)  qrCheckService.getAll().getData()).isEmpty();
+            if (isQrCheckExist) {
+                QrCheck qrCheck = new QrCheck(1500, token);
+                qrCheckService.add(qrCheck);
+            }
         }
-    }
 }
 

@@ -20,6 +20,7 @@ public class ShopRunner implements ApplicationRunner {
     private final ShopService shopService;
     private final AccountService accountService;
 
+
     @Autowired
     public ShopRunner(AccountService accountService, ShopService shopService) {
         this.accountService = accountService;
@@ -38,15 +39,15 @@ public class ShopRunner implements ApplicationRunner {
     // Create a default shop account following environment variables
     // This is basically the shop account that will be used by the Shop application
     public void run(ApplicationArguments args) {
-        Shop shop = new Shop(shopId, username, password);
-
-        Shop shopRegisterResponse = shopService.registerShop(shop);
-        shopService.updateShopStatus(shopRegisterResponse.getId().toString(), true);
 
         Account accountSearch = accountService.getAccountByClientId(UUID.fromString(shopId));
         if (accountSearch == null) {
+
+            Shop shop = new Shop(shopId, username, password);
+            Shop shopRegisterResponse = shopService.registerShop(shop);
+            shopService.updateShopStatus(shopRegisterResponse.getId().toString(), true);
             Client client = new Client(shop.getId(), shop.getName(), SocialReasonStatus.COMPANY);
-            Account account = new Account(0, client);
+            Account account = new Account(1500, client);
             accountService.add(account);
         }
     }
