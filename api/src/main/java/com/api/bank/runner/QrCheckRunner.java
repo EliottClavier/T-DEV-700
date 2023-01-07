@@ -18,12 +18,9 @@ public class QrCheckRunner implements ApplicationRunner {
 
     private final CheckService qrCheckService;
 
-    @Value("${default.individual.account.id}")
-    private String applicantAccountId;
-
     @Value("${default.qrcheck.token}")
     private String token;
-    private final QrCodeController qrCodeController  ;
+    private final QrCodeController qrCodeController;
     @Autowired
     public QrCheckRunner(QrCodeController qrCodeController, CheckService qrCheckService) {
         this.qrCodeController = qrCodeController;
