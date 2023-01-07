@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest()
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//public class AccountTest implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
 public class AccountTests {
 
     @Autowired
@@ -45,7 +44,6 @@ public class AccountTests {
         var individualAccount = new Account(ACCOUNT_ID, 100000, individualClient, card);
 
         accountService.add(individualAccount);
-
     }
 
     //Get the account created and check if the account, client and card is the same
@@ -118,25 +116,4 @@ public class AccountTests {
         assertEquals(BankConstants.BANK_NAME, testBankAccount.getClient().getOrganisationName());
         assertEquals(SocialReasonStatus.BANK, testBankAccount.getClient().getSocialReason());
     }
-
-//    @Override
-//    public void beforeAll(ExtensionContext context) throws Exception {
-//        if (!started) {
-//            started = true;
-//            setupAccount();
-//        }
-//    }
-//
-//    @Override
-//    public void close() throws Throwable {
-//        if (started) {
-//            started = false;
-//            try {
-//                var account = ((Account) accountService.get(ACCOUNT_ID.toString()).getData());
-//                accountService.delete(account);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 }
