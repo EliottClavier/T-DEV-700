@@ -1,5 +1,6 @@
 package com.api.gateway.controller;
 
+import com.api.ApiApplication;
 import com.api.auth.security.JWTUtil;
 import com.api.auth.security.providers.ShopAuthenticationProvider;
 import com.api.auth.security.providers.TpeAuthenticationProvider;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -38,6 +40,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static com.api.bank.model.BankConstants.BANK_ID;
+import static com.api.bank.model.BankConstants.BANK_NAME;
 import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TPE;
 import static com.api.gateway.constants.RedisConstants.HASH_KEY_NAME_TRANSACTION;
 import static org.junit.jupiter.api.Assertions.*;
@@ -78,7 +82,7 @@ public class WebSocketTests {
     @Value("${server.port}")
     private String serverPort;
 
-    private final String paymentId = "000-000-000-000";
+    private final String paymentId = "PaymentId";
     private final String clientName = "ClientName";
     private StompSession tpeStompSession;
     private StompSession shopStompSession;
@@ -163,6 +167,18 @@ public class WebSocketTests {
             Card card = new Card(paymentId, expirationDate);
             Account account = new Account(10000, client, card);
 
+            accountRepository.save(account);
+        }
+    }
+
+    /**
+     * Set bank
+     */
+    public void initBank() {
+        Account accountSearch = accountRepository.findAccountByClient_OrganisationName(BANK_NAME);
+        if (accountSearch == null) {
+            Client client = new Client(UUID.randomUUID(), BANK_NAME, SocialReasonStatus.BANK);
+            Account account = new Account(UUID.fromString(BANK_ID), 100000000, client);
             accountRepository.save(account);
         }
     }
@@ -313,6 +329,9 @@ public class WebSocketTests {
 
         // Init client
         initClient();
+
+        // Init bank
+        initBank();
     }
 
     @BeforeEach

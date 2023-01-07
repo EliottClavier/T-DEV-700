@@ -1,6 +1,7 @@
 package com.api.auth.controller;
 
 import com.api.auth.model.ManagerLoginCredentials;
+import com.api.auth.model.ShopLoginCredentials;
 import com.api.auth.security.JWTUtil;
 import com.api.bank.model.entity.Shop;
 import com.api.bank.repository.ShopRepository;
@@ -93,7 +94,7 @@ public class AuthShopControllerTests {
         // Request
         ResponseEntity response = restTemplate.postForEntity(
                 "http://localhost:" + serverPort + "/auth/shop/login",
-                new Shop(username, password),
+                new ShopLoginCredentials(username, password),
                 String.class
         );
 
@@ -156,7 +157,7 @@ public class AuthShopControllerTests {
         // Request
         ResponseEntity response = restTemplate.postForEntity(
                 "http://localhost:" + serverPort + "/auth/shop/register",
-                new Shop(usernameNewShop, passwordNewShop),
+                new ShopLoginCredentials(usernameNewShop, passwordNewShop),
                 String.class
         );
 

@@ -5,10 +5,7 @@ import com.api.bank.model.entity.Tpe;
 import com.api.bank.repository.TpeRepository;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,6 +73,11 @@ public class AuthTpeControllerTests {
             tpe.setWhitelisted(whitelisted);
             tpeRepository.save(tpe);
         });
+    }
+
+    @BeforeAll
+    public void setup() {
+        tpeRepository.findByAndroidId(androidId).ifPresent(tpeRepository::delete);
     }
 
     @BeforeEach
