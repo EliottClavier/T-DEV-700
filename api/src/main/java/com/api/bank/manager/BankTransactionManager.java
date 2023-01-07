@@ -7,7 +7,6 @@ import com.api.bank.model.entity.QrCheck;
 import com.api.bank.model.enums.*;
 import com.api.bank.model.exception.BankTransactionException;
 import com.api.bank.model.transaction.BankTransactionModel;
-import com.api.bank.model.transaction.TransactionResult;
 import com.api.bank.repository.AccountRepository;
 import com.api.bank.repository.OperationRepository;
 import com.api.bank.service.AccountService;
@@ -25,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Class that manage all the bank transactions
+ */
 @Component()
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class BankTransactionManager {
@@ -41,15 +43,18 @@ public class BankTransactionManager {
     }
 
     /**
-     * Handle a transaction between two accounts
+     * Handle a transaction between two accounts and throws exception if something goes wrong
      *
      * @param transaction Represents the transaction to be processed
-     * @return The transaction status by the TransactionResult Object
+     * @throws BankTransactionException If the transaction is not valid
+     * @throws RuntimeException         If a runtime problem occurs
      */
+
     @Transactional(rollbackFor = {BankTransactionException.class, RuntimeException.class}, propagation = Propagation.REQUIRED)
     public void executeTransaction(BankTransactionModel transaction) throws BankTransactionException, RuntimeException {
 
         checkTransaction(transaction);
+        checkAmount(transaction);
         checkAccount(transaction.getWithdrawalAccount(), transaction, OperationType.WITHDRAW);
         checkMeansOfPayment(transaction.getWithdrawalAccount(), transaction);
 
@@ -64,19 +69,31 @@ public class BankTransactionManager {
 
         updateAccountBalanceAndOperation(transaction.getDepositAccount(), transaction, depositOperation);
 
-        if(transaction.getBankTransactionType() == BankTransactionType.SHOPPING && transaction.getPaymentMethod() == PaymentMethod.CHECK) {
+        if (transaction.getBankTransactionType() == BankTransactionType.SHOPPING && transaction.getPaymentMethod() == PaymentMethod.CHECK) {
             updateQrCheck(transaction);
         }
-   }
+    }
 
+    /**
+     * Update the QrCheck status when the transaction used a check method payment
+     *
+     * @param transaction Represents the transaction to be processed
+     * @throws BankTransactionException If the transaction is not valid
+     */
     private void updateQrCheck(BankTransactionModel transaction) throws BankTransactionException {
-       qrCheckManager.updateQrCheck(transaction);
+        qrCheckManager.updateQrCheck(transaction);
     }
 
 
+    /**
+     * Check if the transaction is not empty
+     *
+     * @param transaction Represents the transaction to be processed
+     * @throws BankTransactionException If the transaction is not valid
+     */
     private void checkTransaction(BankTransactionModel transaction) throws BankTransactionException {
-        if(transaction == null){
-            throw new BankTransactionException(TransactionStatus.EMPTY_TRANSACTION_ERROR,"","Transaction is Empty" );
+        if (transaction == null) {
+            throw new BankTransactionException(TransactionStatus.EMPTY_TRANSACTION_ERROR, "", "Transaction is Empty");
         }
     }
 
@@ -107,6 +124,18 @@ public class BankTransactionManager {
     }
 
     /**
+     * Check if the amount is valid
+     *
+     * @param transaction The transaction to be processed
+     * @throws BankTransactionException If the amount is not valid
+     */
+    private void checkAmount(BankTransactionModel transaction) throws BankTransactionException {
+        if (transaction.getAmount() <= 0) {
+            throw new BankTransactionException(TransactionStatus.AMOUNT_ERROR, transaction.getOperationId(), "Amount is not valid");
+        }
+    }
+
+    /**
      * Check if the account or/and the qrCheck has enough balance to proceed the transaction
      *
      * @param withdrawAccount The account to be checked
@@ -114,11 +143,15 @@ public class BankTransactionManager {
      * @throws BankTransactionException If the account or qrCheck has not enough balance
      */
     private void checkBalance(Account withdrawAccount, BankTransactionModel transaction) throws BankTransactionException {
+        if (transaction.getAmount() <= 0) {
+            throw new BankTransactionException(TransactionStatus.AMOUNT_ERROR, transaction.getOperationId(), "Amount is not valid");
+        }
         if (!withdrawAccount.isEnoughMoney(transaction.getAmount()))
             throw new BankTransactionException(TransactionStatus.INSUFFICIENT_FUNDS_ERROR, transaction.getOperationId(), "Account's insufficient funds");
 
         if (transaction.getQrCheck() != null && !transaction.getQrCheck().isEnoughMoney(transaction.getAmount()))
             throw new BankTransactionException(TransactionStatus.INSUFFICIENT_FUNDS_ERROR, transaction.getOperationId(), "Check amount invalid");
+
     }
 
     /**
@@ -201,7 +234,7 @@ public class BankTransactionManager {
      * @param transaction Represents the transaction to be processed
      * @return true if the transaction is a card payment
      */
-    private boolean isCardPayment(BankTransactionModel transaction) throws BankTransactionException {
+    private boolean isCardPayment(BankTransactionModel transaction) {
         return transaction.getPaymentMethod() == PaymentMethod.CARD;
     }
 
@@ -211,7 +244,7 @@ public class BankTransactionManager {
      * @param transaction Represents the transaction to be processed
      * @return true if the transaction is a check payment
      */
-    private boolean isCheckPayment(BankTransactionModel transaction) throws BankTransactionException {
+    private boolean isCheckPayment(BankTransactionModel transaction) {
         return transaction.getPaymentMethod() == PaymentMethod.CHECK;
     }
 
@@ -241,6 +274,7 @@ public class BankTransactionManager {
         operation.setOperationStatus(status);
         return operationService.update(operation).isValid();
     }
+
     /**
      * Cancel a pending operation when transaction failed
      *

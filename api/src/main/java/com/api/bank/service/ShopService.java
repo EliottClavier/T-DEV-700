@@ -109,5 +109,13 @@ public class ShopService extends GenericService<Shop> {
             return new ObjectResponse(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
+
+    public Shop getShopByName(String name) {
+        try {
+            return shopRepository.findByName(name).get();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
 

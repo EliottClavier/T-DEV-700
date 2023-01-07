@@ -10,17 +10,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class ShopRunner implements ApplicationRunner {
 
-    @Autowired
-    private ShopService shopService;
+    private final ShopService shopService;
+    private final AccountService accountService;
+
 
     @Autowired
-    private AccountService accountService;
+    public ShopRunner(AccountService accountService, ShopService shopService) {
+        this.accountService = accountService;
+        this.shopService = shopService;
+    }
 
     @Value("${default.shop.username}")
     private String username;
@@ -31,13 +36,29 @@ public class ShopRunner implements ApplicationRunner {
     // Create a default shop account following environment variables
     // This is basically the shop account that will be used by the Shop application
     public void run(ApplicationArguments args) {
-        Shop shop = new Shop(username, password);
-        Shop shopRegisterResponse = shopService.registerShop(shop);
 
-        if (shopRegisterResponse != null) {
-            Client client = new Client(shop.getId(), shop.getName(), SocialReasonStatus.COMPANY);
-            Account account = new Account(0, client);
-            accountService.add(account);
+        try {
+            var shop = shopService.getShopByName(username);
+
+            if (shop == null) {
+                shop = new Shop(UUID.randomUUID().toString(), username, password);
+                shopService.registerShop(shop);
+            }
+
+            if (!shop.getWhitelisted()) {
+                shopService.updateShopStatus(shop.getId().toString(), true);
+            }
+
+            Account accountSearch = accountService.getAccountByOwnerName(username);
+
+            if (accountSearch == null) {
+                Client client = new Client(shop.getId(), shop.getName(), SocialReasonStatus.COMPANY);
+                Account account = new Account(3000, client);
+                accountService.add(account);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
+
