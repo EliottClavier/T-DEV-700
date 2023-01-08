@@ -73,6 +73,26 @@ Our Trello board lists all tasks completed by the team in order to accomplish th
 
 ---------------------------------------------------------------
 
+## Project Delivery
+
+### Mockups
+
+Here are the links to the different mobile application mockups, made on Figma.
+
+#### Shop
+
+- [Shop designs](https://www.figma.com/file/f0JXyglvKGQCILHpkgVcRb/Zoning-%2F-Maquettage-CashManager?t=Uqh87dhvWtoDJ6qy-1)
+
+#### Payment Terminal
+
+- [Payment Terminal designs](https://www.figma.com/file/593IOdR4OfIqVT1viiBbC1/Zoning-%2F-Maquettage-TPE?t=Uqh87dhvWtoDJ6qy-1)
+
+### Diagrams and functional tests
+
+The documents are in the Diagrams_and_tests package, at project's root. 
+
+---------------------------------------------------------------
+
 ## Get Started
 
 There are two ways you can test the whole stack of the application:
