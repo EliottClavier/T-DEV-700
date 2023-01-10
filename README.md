@@ -5,6 +5,8 @@
 
 This project is a course project for Epitech school and is a complete system for managing a shop. It includes a server application coded with Java and SpringBoot and linked to a MariaDB server, a Redis server and a Mailhog server. It also includes a mobile shop application built with Flutter and a payment terminal also built with Flutter.
 
+__You can find the slideshow from our keynote inside the Diagrams_and_tests package__
+
 ## Table of Contents
 - [Contributors](#contributors)
 - [Architecture](#architecture)
@@ -89,7 +91,11 @@ Here are the links to the different mobile application mockups, made on Figma.
 
 ### Diagrams and functional tests
 
+<<<<<<< HEAD
+The documents are in the Diagrams_and_tests package, at project's root. You can also find the slideshow presented during the keynote inside this package.
+=======
 The documents are in the Diagrams_and_tests package, at project's root. 
+>>>>>>> origin/main
 
 ---------------------------------------------------------------
 
