@@ -5,6 +5,8 @@
 
 This project is a course project for Epitech school and is a complete system for managing a shop. It includes a server application coded with Java and SpringBoot and linked to a MariaDB server, a Redis server and a Mailhog server. It also includes a mobile shop application built with Flutter and a payment terminal also built with Flutter.
 
+__You can find the slideshow from our keynote inside the Diagrams_and_tests package__
+
 ## Table of Contents
 - [Contributors](#contributors)
 - [Architecture](#architecture)
@@ -70,6 +72,26 @@ You can access our Trello by clicking on this link:
 - [Our Trello board](https://trello.com/invite/b/b30uHQCj/ATTIa3135fb8477da058b9be864797bbffb5558079B9/cashmanager)
 
 Our Trello board lists all tasks completed by the team in order to accomplish the project.
+
+---------------------------------------------------------------
+
+## Project Delivery
+
+### Mockups
+
+Here are the links to the different mobile application mockups, made on Figma.
+
+#### Shop
+
+- [Shop designs](https://www.figma.com/file/f0JXyglvKGQCILHpkgVcRb/Zoning-%2F-Maquettage-CashManager?t=Uqh87dhvWtoDJ6qy-1)
+
+#### Payment Terminal
+
+- [Payment Terminal designs](https://www.figma.com/file/593IOdR4OfIqVT1viiBbC1/Zoning-%2F-Maquettage-TPE?t=Uqh87dhvWtoDJ6qy-1)
+
+### Diagrams and functional tests
+
+The documents are in the Diagrams_and_tests package, at project's root. You can also find the slideshow presented during the keynote inside this package.
 
 ---------------------------------------------------------------
 
