@@ -91,7 +91,11 @@ Here are the links to the different mobile application mockups, made on Figma.
 
 ### Diagrams and functional tests
 
+<<<<<<< HEAD
 The documents are in the Diagrams_and_tests package, at project's root. You can also find the slideshow presented during the keynote inside this package.
+=======
+The documents are in the Diagrams_and_tests package, at project's root. 
+>>>>>>> origin/main
 
 ---------------------------------------------------------------
 
